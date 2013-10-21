@@ -1,0 +1,9 @@
+*~
+*.pyc
+
+bin/
+lib/
+man/
+local/
+include/
+pyvenv.cfg
