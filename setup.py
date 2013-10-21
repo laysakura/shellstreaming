@@ -5,8 +5,11 @@ import shellstreaming
 
 setup(
     name         = 'ShellStreaming',
-    version      = shellstreaming.__version__,
     description  = '[under development] A stream processor working with shell commands',
+    url          = 'https://github.com/laysakura/ShellStreaming'
+    version      = shellstreaming.__version__,
+    author       = shellstreaming.__author__,
+    author_email = shellstreaming.__email__,
     requires     = [
         'nose',
     ],
@@ -14,9 +17,6 @@ setup(
         'shellstreaming',
         'shellstreaming.inputstream',
     ],
-    author       = shellstreaming.__author__,
-    author_email = shellstreaming.__email__,
-    url          = '',
     classifiers  = '''
 Programming Language :: Python
 Development Status :: 1 - Planning
