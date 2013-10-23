@@ -1,0 +1,5 @@
+0.0.2
+        - introduced typed|untyped record
+
+0.0.1
+        - just start development
