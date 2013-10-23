@@ -2,6 +2,7 @@
 '''
 # -*- coding: utf-8 -*-
 from shellstreaming.error import BaseError
+from shellstreaming.columndef import ColumnDef, ColumnDefError
 
 
 class RecordDef(object):
@@ -9,48 +10,48 @@ class RecordDef(object):
     # APIs
     def __init__(self, record_def):
         """Constructor.
-        For each column specification, following keys are supported.
-            [required]
-            name : name of column
 
-            [optional]
-            type : ShellStream types.
-                   'INT', 'STRING' are supported.
-                   type specification is used for strict type checking.
+        @example
+            rdef = RecordDef(
+                [
+                    {'name'        : 'col1',
+                     'type'        : 'STRING',
+                     'primary_key' : True,
+                    },
+                    {'name'        : 'col2',
+                     'type'        : 'INT',
+                    },
+                ]
+            )
+            rdef[1].name  # => 'col2'
+            rdef[1].type  # => Type('INT')
+
+        For each column specification, following keys are supported.
+        (See: ColumnDef.required_keys, ColumnDef.optional_keys)
 
         @param record_def  an array defining record type.
             e.g.
-            [
-                {'name'        : 'col1',
-                 'type'        : 'STRING',
-                 'primary_key' : True,
-                },
-                {'name'        : 'col2',
-                 'type'        : 'INT',
-                },
-            ]
 
         @raises RecordDefError
         """
         self._recdef = record_def
-        _chk_recdef(self._recdef)
+        self._set_coldefs()
 
     def __len__(self):
-        return len(self._recdef)
+        return len(self._coldefs)
 
     def __getitem__(self, key):
-        return self._recdef[key]
+        return self._coldefs[key]
 
     # Private functions
-    @staticmethod
-    def _chk_recdef(recdef):
-        _chk_unsupported_keys(recdef)
-        _chk_required_keys(recdef)
-        _chk_name_col(recdef)
-        _chk_type_col(recdef)
+    def _set_coldefs(self):
+        self._coldefs = []
+        for i, raw_coldef in enumerate(self._recdef):
+            try:
+                self._coldefs.append(ColumnDef(raw_coldef))
+            except ColumnDefError as e:
+                raise RecordDefError("In column %d: %s" % (i, e))
 
-    @staticmethod
-    def _chk_type(rec_
 
 class RecordTypeError(BaseError):
     """An exception raised when a record does not match with RecordDef."""
