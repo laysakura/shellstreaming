@@ -11,12 +11,17 @@ def test_record_usage():
          'type': 'STRING',
         },
         {'name': 'col1',
-         'type': 'STRING',
+         # any basic type is allowed
         },
     ])
     rec = Record(
         rdef,
         'Hello', 'World'
+    )
+    eq_(len(rec), 2)
+    rec = Record(
+        rdef,
+        'Hello', 777
     )
     eq_(len(rec), 2)
 

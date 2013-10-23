@@ -41,9 +41,14 @@ class Record(object):
         """
         if len(recdef) != len(rec):
             raise RecordTypeError("Number of columns is different from RecordDef")
+
         for i in xrange(len(recdef)):
-            def_type = recdef[i].type
-            col_type = Type.equivalent_ss_type(rec[i])
-            if col_type != def_type:
-                raise RecordTypeError("Column %d has mismatched type:  Got '%s' [%s] ; Expected [%s]" %
-                                      (i, rec[i], col_type, def_type))
+            try:
+                def_type = recdef[i].type
+                col_type = Type.equivalent_ss_type(rec[i])
+                if col_type != def_type:
+                    raise RecordTypeError("Column %d has mismatched type:  Got '%s' [%s] ; Expected [%s]" %
+                                          (i, rec[i], col_type, def_type))
+            except AttributeError as e:
+                # recdef[i].type is not defined, then any type is allowed
+                pass
