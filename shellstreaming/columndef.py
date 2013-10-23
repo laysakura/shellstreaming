@@ -2,8 +2,8 @@
 '''
 # -*- coding: utf-8 -*-
 import re
-from shellstreaming.error import BaseError
-from shellstreaming.type import Type, UnsupportedTypeError
+from error import UnsupportedTypeError, ColumnDefError
+from type import Type
 
 
 class ColumnDef(object):
@@ -60,11 +60,3 @@ class ColumnDef(object):
             return Type(_type)
         except UnsupportedTypeError as e:
             raise ColumnDefError("%s")
-
-
-class ColumnDefError(BaseError):
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return self.msg

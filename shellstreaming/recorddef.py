@@ -1,8 +1,8 @@
 '''recorddef.py
 '''
 # -*- coding: utf-8 -*-
-from shellstreaming.error import BaseError
-from shellstreaming.columndef import ColumnDef, ColumnDefError
+from error import ColumnDefError, RecordDefError
+from columndef import ColumnDef
 
 
 class RecordDef(object):
@@ -51,21 +51,3 @@ class RecordDef(object):
                 self._coldefs.append(ColumnDef(raw_coldef))
             except ColumnDefError as e:
                 raise RecordDefError("In column %d: %s" % (i, e))
-
-
-class RecordTypeError(BaseError):
-    """An exception raised when a record does not match with RecordDef."""
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):  # pragma: no cover
-        return self.msg
-
-
-class RecordDefError(BaseError):
-    """An exception raised when input to RecordDef is invalid data structure."""
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):  # pragma: no cover
-        return self.msg

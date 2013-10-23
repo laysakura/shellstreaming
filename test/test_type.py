@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
-from shellstreaming.type import Type, UnsupportedTypeError
+from shellstreaming.error import UnsupportedTypeError
+from shellstreaming.type import Type
 
 
 def test_type_usage():

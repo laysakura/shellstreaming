@@ -2,7 +2,7 @@
 '''
 # -*- coding: utf-8 -*-
 import types
-from shellstreaming.error import BaseError
+from error import UnsupportedTypeError
 
 
 class Type:
@@ -45,12 +45,3 @@ class Type:
                                        (builtin_type))
         ss_type_str  = Type._typemap[builtin_type]
         return Type(ss_type_str)
-
-
-class UnsupportedTypeError(BaseError):
-    """An exception raised when unsupported type is used"""
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return self.msg

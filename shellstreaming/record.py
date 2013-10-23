@@ -1,8 +1,8 @@
 '''record.py
 '''
 # -*- coding: utf-8 -*-
-from recorddef import RecordTypeError
-from type import Type, UnsupportedTypeError
+from error import RecordTypeError, UnsupportedTypeError
+from type import Type
 
 
 class Record(object):

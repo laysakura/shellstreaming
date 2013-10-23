@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
+from shellstreaming.error import RecordTypeError
 from shellstreaming.record import Record
-from shellstreaming.recorddef import RecordDef, RecordTypeError
+from shellstreaming.recorddef import RecordDef
 
 
 def test_record_usage():

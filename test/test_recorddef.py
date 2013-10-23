@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
-from shellstreaming.recorddef import RecordDef, RecordDefError
+from shellstreaming.error import RecordDefError
+from shellstreaming.recorddef import RecordDef
 from shellstreaming.type import Type
 
 
