@@ -1,23 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from distutils.core import setup
+import os
+from setuptools import setup
 import shellstreaming
 
+
 setup(
-    name         = 'ShellStreaming',
-    description  = '[under development] A stream processor working with shell commands',
-    url          = 'https://github.com/laysakura/ShellStreaming',
-    version      = shellstreaming.__version__,
-    author       = shellstreaming.__author__,
-    author_email = shellstreaming.__email__,
-    requires     = [
-        'nose',
+    name          = 'ShellStreaming',
+    description   = '[under development] A stream processor working with shell commands',
+    url           = 'https://github.com/laysakura/ShellStreaming',
+    version       = shellstreaming.__version__,
+    author        = shellstreaming.__author__,
+    author_email  = shellstreaming.__email__,
+    test_suite    = 'nose.collector',
+    requires      = [
     ],
-    packages     = [
+    tests_require = [
+        'nose',
+        'coverage',
+    ],
+    packages      = [
         'shellstreaming',
         'shellstreaming.inputstream',
     ],
-    classifiers  = '''
+    classifiers   = '''
 Programming Language :: Python
 Development Status :: 1 - Planning
 License :: OSI Approved :: Apache Software License
