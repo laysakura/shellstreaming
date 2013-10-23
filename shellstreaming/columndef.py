@@ -14,7 +14,7 @@ class ColumnDef(object):
         'type',  # ShellStream types. 'INT', 'STRING' are supported. Used for strict type checking.
     ]
 
-    pat_name = re.compile('[_a-zA-Z][_a-zA-Z0-9]*')
+    pat_name = re.compile('^[_a-zA-Z][_a-zA-Z0-9]*$')
 
     # APIs
     def __init__(self, column_def):
@@ -59,7 +59,7 @@ class ColumnDef(object):
         try:
             return Type(_type)
         except UnsupportedTypeError as e:
-            raise ColumnDefError(e)
+            raise ColumnDefError("%s")
 
 
 class ColumnDefError(BaseError):

@@ -50,3 +50,19 @@ def test_record_mismatch_type():
         rdef,
         'not convertible to INT',
     )
+
+
+@raises(RecordTypeError)
+def test_record_non_basic_type():
+    class C:
+        pass
+    c = C  # c has too complex type as stream record
+
+    rdef = RecordDef([
+        {'name': 'col0',
+        },
+    ])
+    rec = Record(
+        rdef,
+        c,
+    )

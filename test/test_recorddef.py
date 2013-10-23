@@ -24,3 +24,32 @@ def test_recorddef_required_key_lacks():
         {
         },  # at least 'name' is required
     ])
+
+
+@raises(RecordDefError)
+def test_recorddef_unsupported_key():
+    rdef = RecordDef([
+        {
+            'name': 'col0',
+            'xyz' : 'yeah',
+        },
+    ])
+
+
+@raises(RecordDefError)
+def test_recorddef_name_invalid():
+    rdef = RecordDef([
+        {
+            'name': 'invalid-col',
+        },
+    ])
+
+
+@raises(RecordDefError)
+def test_recorddef_type_invalid():
+    rdef = RecordDef([
+        {
+            'name': 'col0',
+            'type': 'SUPER_TYPE'
+        },
+    ])
