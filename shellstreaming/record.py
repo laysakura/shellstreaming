@@ -9,14 +9,19 @@ class Record(object):
     """Record"""
     # APIs
     def __init__(self, record_def, *args):
+        """Checks if type of `rec` matches `recdef`
+        @param record_def  instance of RecordDef
+        @param *args       columns
+        @raises  RecordTypeError
+        """
         self._rec    = Record._internal_repl(args)
         self._recdef = record_def
         Record._chk_type(self._recdef, self._rec)
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         retstr = "("
         for i in xrange(len(self._rec)):
-            retstr += "%s: %s" % (self._recdef[i]['name'], self._rec[i])
+            retstr += "%s: %s, " % (self._recdef[i]['name'], self._rec[i])
         return retstr + ")"
 
     def __len__(self):

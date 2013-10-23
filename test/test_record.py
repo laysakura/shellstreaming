@@ -18,11 +18,11 @@ def test_record_usage():
         rdef,
         'Hello', 'World'
     )
-    print rec
+    eq_(len(rec), 2)
 
 
 @raises(RecordTypeError)
-def test_recorddef_mismatch_length():
+def test_record_mismatch_length():
     rdef = RecordDef([
         {'name': 'col0',
          'type': 'STRING',
@@ -35,7 +35,7 @@ def test_recorddef_mismatch_length():
 
 
 @raises(RecordTypeError)
-def test_recorddef_mismatch_type():
+def test_record_mismatch_type():
     rdef = RecordDef([
         {'name': 'col0',
          'type': 'INT',
