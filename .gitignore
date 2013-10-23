@@ -1,9 +1,17 @@
 *~
 *.pyc
+core
 
 bin/
+dist/
 lib/
 man/
 local/
 include/
+*.egg-info/
+*.egg/
+
+.coverage
 pyvenv.cfg
+.python-version
+MANIFEST
