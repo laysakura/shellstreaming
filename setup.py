@@ -22,7 +22,7 @@ setup(
     packages      = [
         'shellstreaming',
         'shellstreaming.inputstream',
-        'test'
+        'shellstreaming.test'
     ],
     classifiers   = '''
 Programming Language :: Python
