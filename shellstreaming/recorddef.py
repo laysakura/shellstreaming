@@ -1,8 +1,8 @@
 '''recorddef.py
 '''
 # -*- coding: utf-8 -*-
-from error import ColumnDefError, RecordDefError
-from columndef import ColumnDef
+from shellstreaming.error import ColumnDefError, RecordDefError
+from shellstreaming.columndef import ColumnDef
 
 
 class RecordDef(object):
