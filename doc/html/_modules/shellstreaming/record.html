@@ -51,7 +51,9 @@
             
   <h1>Source code for shellstreaming.record</h1><div class="highlight"><pre>
 <span class="c"># -*- coding: utf-8 -*-</span>
-<span class="sd">&quot;&quot;&quot;record.py</span>
+<span class="sd">&quot;&quot;&quot;:synopsis: Provides (typed|untyped) record structure.</span>
+
+<span class="sd">.. moduleauthor:: Sho Nakatani &lt;lay.sakura@gmail.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.error</span> <span class="kn">import</span> <span class="n">RecordTypeError</span><span class="p">,</span> <span class="n">UnsupportedTypeError</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.type</span> <span class="kn">import</span> <span class="n">Type</span>
@@ -65,7 +67,7 @@
         <span class="sd">&quot;&quot;&quot;Creates a record with `record_def` constraints.</span>
 
 <span class="sd">        :param record_def: instance of `RecordDef &lt;#shellstreaming.recorddef.RecordDef&gt;`_</span>
-<span class="sd">        :param *args:      contents of columns</span>
+<span class="sd">        :param \*args:      contents of columns</span>
 <span class="sd">        :raises:           `RecordTypeError &lt;#shellstreaming.error.RecordTypeError&gt;`_</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span>    <span class="o">=</span> <span class="n">Record</span><span class="o">.</span><span class="n">_internal_repl</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>

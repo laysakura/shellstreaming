@@ -51,7 +51,9 @@
             
   <h1>Source code for shellstreaming.type</h1><div class="highlight"><pre>
 <span class="c"># -*- coding: utf-8 -*-</span>
-<span class="sd">&quot;&quot;&quot;type.py</span>
+<span class="sd">&quot;&quot;&quot;:synopsis: Provides shellstreaming types.</span>
+
+<span class="sd">.. moduleauthor:: Sho Nakatani &lt;lay.sakura@gmail.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">types</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.error</span> <span class="kn">import</span> <span class="n">UnsupportedTypeError</span>
@@ -66,7 +68,7 @@
         <span class="n">types</span><span class="o">.</span><span class="n">StringType</span> <span class="p">:</span> <span class="s">&#39;STRING&#39;</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">type_list</span> <span class="o">=</span> <span class="n">_typemap</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-    <span class="sd">&quot;&quot;&quot;List of shellstream types.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;List of shellstreaming types.&quot;&quot;&quot;</span>
 
     <span class="c"># APIs</span>
 <div class="viewcode-block" id="Type.__init__"><a class="viewcode-back" href="../../index.html#shellstreaming.type.Type.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss_type_str</span><span class="p">):</span>

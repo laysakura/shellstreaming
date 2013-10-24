@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""error.py
+""":synopsis: Exception classes.
+
+.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
 """
 
 

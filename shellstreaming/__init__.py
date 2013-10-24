@@ -1,7 +1,7 @@
-'''shellstreaming - explain
+""":synopsis: Core package of shellstreaming
 
-foobarbuz
-'''
+.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+"""
 
 __versioninfo__ = (0, 0, 4)
 __version__     = '.'.join(map(str, __versioninfo__))

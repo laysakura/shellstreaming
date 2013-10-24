@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""type.py
+""":synopsis: Provides shellstreaming types.
+
+.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
 """
 import types
 from shellstreaming.error import UnsupportedTypeError
@@ -14,7 +16,7 @@ class Type:
         types.StringType : 'STRING',
     }
     type_list = _typemap.values()
-    """List of shellstream types."""
+    """List of shellstreaming types."""
 
     # APIs
     def __init__(self, ss_type_str):

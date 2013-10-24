@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""record.py
+""":synopsis: Provides (typed|untyped) record structure.
+
+.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
 """
 from shellstreaming.error import RecordTypeError, UnsupportedTypeError
 from shellstreaming.type import Type
@@ -13,7 +15,7 @@ class Record(object):
         """Creates a record with `record_def` constraints.
 
         :param record_def: instance of `RecordDef <#shellstreaming.recorddef.RecordDef>`_
-        :param *args:      contents of columns
+        :param \*args:      contents of columns
         :raises:           `RecordTypeError <#shellstreaming.error.RecordTypeError>`_
         """
         self._rec    = Record._internal_repl(args)
