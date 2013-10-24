@@ -12,6 +12,9 @@ class RecordDef(object):
         """Constructor.
 
         @example
+
+        ::
+
             rdef = RecordDef(
                 [
                     {'name'        : 'col1',

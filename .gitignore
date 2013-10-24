@@ -15,3 +15,10 @@ include/
 pyvenv.cfg
 .python-version
 MANIFEST
+
+doc/.buildinfo
+doc/.doctrees/
+doc/doctrees/
+doc/html/.buildinfo
+doc/html/_sources/
+doc/html/objects.inv
