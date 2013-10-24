@@ -9,6 +9,7 @@ setup(
     name          = 'shellstreaming',
     description   = '[under development] A stream processor working with shell commands',
     url           = 'https://github.com/laysakura/shellstreaming',
+    license       = 'LICENSE.txt',
     version       = shellstreaming.__version__,
     author        = shellstreaming.__author__,
     author_email  = shellstreaming.__email__,
@@ -23,6 +24,9 @@ setup(
         'shellstreaming',
         'shellstreaming.inputstream',
         'shellstreaming.test'
+    ],
+    scripts       = [
+        # 'bin/foo.py'
     ],
     classifiers   = '''
 Programming Language :: Python

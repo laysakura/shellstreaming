@@ -2,8 +2,8 @@
 '''
 # -*- coding: utf-8 -*-
 import re
-from error import UnsupportedTypeError, ColumnDefError
-from type import Type
+from shellstreaming.error import UnsupportedTypeError, ColumnDefError
+from shellstreaming.type import Type
 
 
 class ColumnDef(object):

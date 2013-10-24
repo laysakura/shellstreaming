@@ -2,7 +2,7 @@
 '''
 # -*- coding: utf-8 -*-
 import types
-from error import UnsupportedTypeError
+from shellstreaming.error import UnsupportedTypeError
 
 
 class Type:

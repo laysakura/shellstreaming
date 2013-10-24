@@ -1,8 +1,8 @@
 '''record.py
 '''
 # -*- coding: utf-8 -*-
-from error import RecordTypeError, UnsupportedTypeError
-from type import Type
+from shellstreaming.error import RecordTypeError, UnsupportedTypeError
+from shellstreaming.type import Type
 
 
 class Record(object):
