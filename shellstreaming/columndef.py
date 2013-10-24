@@ -1,44 +1,58 @@
-'''columndef.py
-'''
 # -*- coding: utf-8 -*-
+"""columndef.py
+"""
 import re
 from shellstreaming.error import UnsupportedTypeError, ColumnDefError
 from shellstreaming.type import Type
 
 
 class ColumnDef(object):
-    required_keys = [
-        'name',  # name of column
-    ]
-    optional_keys = [
-        'type',  # ShellStream types. 'INT', 'STRING' are supported. Used for strict type checking.
-    ]
+    """Specifies column's features (name, type, ...)."""
 
-    pat_name = re.compile('^[_a-zA-Z][_a-zA-Z0-9]*$')
+    required_fields = [
+        'name',
+    ]
+    """Required fields for column definition.
+
+    :param name: name of column with `name_format <#shellstreaming.columndef.ColumnDef.name_format>`_
+    """
+
+    optional_fields = [
+        'type',
+    ]
+    """Optional fields for column definition.
+
+    :param type: shellstream types used for strict type checking (one of `Type.type_list <#shellstreaming.type.Type.type_list>`_)
+    """
+
+    name_format = '^[_a-zA-Z][_a-zA-Z0-9]*$'
+    """`name` field's format. """
+    _pat_name = re.compile(name_format)
 
     # APIs
     def __init__(self, column_def):
-        """
+        """abc
+
         @param column_def
             E.g. {'name': 'col1', 'type': 'STRING'}
 
         @raises ColumnDefError
         """
-        ColumnDef._chk_unsupported_keys(column_def)
-        ColumnDef._chk_required_keys(column_def)
+        ColumnDef._chk_unsupported_fields(column_def)
+        ColumnDef._chk_required_fields(column_def)
         self._set_attrs(column_def)
 
     # Private functions
     @staticmethod
-    def _chk_unsupported_keys(coldef):
-        all_keys = set(ColumnDef.required_keys) | set(ColumnDef.optional_keys)
+    def _chk_unsupported_fields(coldef):
+        all_fields = set(ColumnDef.required_fields) | set(ColumnDef.optional_fields)
         for k in coldef.iterkeys():
-            if k not in all_keys:
+            if k not in all_fields:
                 raise ColumnDefError("Key '%s' is invalid" % (k))
 
     @staticmethod
-    def _chk_required_keys(coldef):
-        for k in ColumnDef.required_keys:
+    def _chk_required_fields(coldef):
+        for k in ColumnDef.required_fields:
             if k not in coldef.keys():
                 raise ColumnDefError("Key '%s' is required" % (k))
 
@@ -50,7 +64,7 @@ class ColumnDef(object):
 
     @staticmethod
     def _gen_name(name):
-        if not ColumnDef.pat_name.match(name):
+        if not ColumnDef._pat_name.match(name):
             raise ColumnDefError("'%s' is invalid for 'name'" % (name))
         return name
 

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to shellstreaming’s documentation! &mdash; shellstreaming 0.0.4 documentation</title>
+    <title>shellstreaming’s documentation! &mdash; shellstreaming 0.0.4 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -47,8 +47,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="welcome-to-shellstreaming-s-documentation">
-<h1>Welcome to shellstreaming&#8217;s documentation!<a class="headerlink" href="#welcome-to-shellstreaming-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="shellstreaming-s-documentation">
+<h1>shellstreaming&#8217;s documentation!<a class="headerlink" href="#shellstreaming-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Contents:</p>
 <div class="toctree-wrapper compound">
 <ul class="simple">
@@ -62,19 +62,179 @@
 <li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
 <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
 </ul>
-<span class="target" id="module-shellstreaming"></span><p>shellstreaming - explain</p>
+</div>
+<div class="section" id="api-documents">
+<h1>API documents<a class="headerlink" href="#api-documents" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-shellstreaming">
+<span id="shellstreaming"></span><h2>shellstreaming<a class="headerlink" href="#module-shellstreaming" title="Permalink to this headline">¶</a></h2>
+<p>shellstreaming - explain</p>
 <p>foobarbuz</p>
-<span class="target" id="module-shellstreaming.recorddef"></span><p>recorddef.py</p>
+</div>
+<div class="section" id="module-shellstreaming.columndef">
+<span id="shellstreaming-columndef"></span><h2>shellstreaming.columndef<a class="headerlink" href="#module-shellstreaming.columndef" title="Permalink to this headline">¶</a></h2>
+<p>columndef.py</p>
+<dl class="class">
+<dt id="shellstreaming.columndef.ColumnDef">
+<em class="property">class </em><tt class="descclassname">shellstreaming.columndef.</tt><tt class="descname">ColumnDef</tt><big>(</big><em>column_def</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/columndef.html#ColumnDef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.columndef.ColumnDef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Specifies column&#8217;s features (name, type, ...).</p>
+<dl class="method">
+<dt id="shellstreaming.columndef.ColumnDef.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>column_def</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/columndef.html#ColumnDef.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.columndef.ColumnDef.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>abc</p>
+<dl class="docutils">
+<dt>&#64;param column_def</dt>
+<dd>E.g. {&#8216;name&#8217;: &#8216;col1&#8217;, &#8216;type&#8217;: &#8216;STRING&#8217;}</dd>
+</dl>
+<p>&#64;raises ColumnDefError</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shellstreaming.columndef.ColumnDef.name_format">
+<tt class="descname">name_format</tt><em class="property"> = '^[_a-zA-Z][_a-zA-Z0-9]*$'</em><a class="headerlink" href="#shellstreaming.columndef.ColumnDef.name_format" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>name</cite> field&#8217;s format.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shellstreaming.columndef.ColumnDef.optional_fields">
+<tt class="descname">optional_fields</tt><em class="property"> = ['type']</em><a class="headerlink" href="#shellstreaming.columndef.ColumnDef.optional_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional fields for column definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type</strong> &#8211; shellstream types used for strict type checking (one of <a class="reference external" href="#shellstreaming.type.Type.type_list">Type.type_list</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shellstreaming.columndef.ColumnDef.required_fields">
+<tt class="descname">required_fields</tt><em class="property"> = ['name']</em><a class="headerlink" href="#shellstreaming.columndef.ColumnDef.required_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required fields for column definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; name of column with <a class="reference external" href="#shellstreaming.columndef.ColumnDef.name_format">name_format</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-shellstreaming.error">
+<span id="shellstreaming-error"></span><h2>shellstreaming.error<a class="headerlink" href="#module-shellstreaming.error" title="Permalink to this headline">¶</a></h2>
+<p>error.py</p>
+<dl class="exception">
+<dt id="shellstreaming.error.BaseError">
+<em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">BaseError</tt><a class="reference internal" href="_modules/shellstreaming/error.html#BaseError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.BaseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Base class for exceptions in this module.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="shellstreaming.error.ColumnDefError">
+<em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">ColumnDefError</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/error.html#ColumnDefError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.ColumnDefError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.error.BaseError" title="shellstreaming.error.BaseError"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.error.BaseError</span></tt></a></p>
+<p>An exception raised when invalid column definition is used.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="shellstreaming.error.RecordDefError">
+<em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">RecordDefError</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/error.html#RecordDefError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.RecordDefError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.error.BaseError" title="shellstreaming.error.BaseError"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.error.BaseError</span></tt></a></p>
+<p>An exception raised when input to RecordDef is invalid data structure.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="shellstreaming.error.RecordTypeError">
+<em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">RecordTypeError</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/error.html#RecordTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.RecordTypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.error.BaseError" title="shellstreaming.error.BaseError"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.error.BaseError</span></tt></a></p>
+<p>An exception raised when a record does not match with RecordDef.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="shellstreaming.error.UnsupportedTypeError">
+<em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">UnsupportedTypeError</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/error.html#UnsupportedTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.UnsupportedTypeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.error.BaseError" title="shellstreaming.error.BaseError"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.error.BaseError</span></tt></a></p>
+<p>An exception raised when unsupported type is used.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-shellstreaming.record">
+<span id="shellstreaming-record"></span><h2>shellstreaming.record<a class="headerlink" href="#module-shellstreaming.record" title="Permalink to this headline">¶</a></h2>
+<p>record.py</p>
+<dl class="class">
+<dt id="shellstreaming.record.Record">
+<em class="property">class </em><tt class="descclassname">shellstreaming.record.</tt><tt class="descname">Record</tt><big>(</big><em>record_def</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/record.html#Record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.record.Record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Record.</p>
+<dl class="method">
+<dt id="shellstreaming.record.Record.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>record_def</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/record.html#Record.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.record.Record.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a record with <cite>record_def</cite> constraints.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>record_def</strong> &#8211; instance of <a class="reference external" href="#shellstreaming.recorddef.RecordDef">RecordDef</a></li>
+<li><strong>*args</strong> &#8211; <p>contents of columns</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference external" href="#shellstreaming.error.RecordTypeError">RecordTypeError</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-shellstreaming.recorddef">
+<span id="shellstreaming-recorddef"></span><h2>shellstreaming.recorddef<a class="headerlink" href="#module-shellstreaming.recorddef" title="Permalink to this headline">¶</a></h2>
+<p>recorddef.py</p>
 <dl class="class">
 <dt id="shellstreaming.recorddef.RecordDef">
 <em class="property">class </em><tt class="descclassname">shellstreaming.recorddef.</tt><tt class="descname">RecordDef</tt><big>(</big><em>record_def</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/recorddef.html#RecordDef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.recorddef.RecordDef" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Record definition.</p>
+<p>Used as DDL (like CREATE TABLE) information.</p>
+<dl class="method">
+<dt id="shellstreaming.recorddef.RecordDef.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>key</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/recorddef.html#RecordDef.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.recorddef.RecordDef.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns specified column definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>int (0-origin)</em>) &#8211; column index to get definition.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="#shellstreaming.columndef.ColumnDef">ColumnDef</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="shellstreaming.recorddef.RecordDef.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>record_def</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/recorddef.html#RecordDef.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.recorddef.RecordDef.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructor.</p>
-<p>&#64;example</p>
+<dd><p>Creates an object with each column property from <cite>record_def</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>record_def</strong> &#8211; list of column definition hash (see example below)</td>
+</tr>
+</tbody>
+</table>
+<p><em>Example:</em></p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">rdef</span> <span class="o">=</span> <span class="n">RecordDef</span><span class="p">(</span>
     <span class="p">[</span>
         <span class="p">{</span><span class="s">&#39;name&#39;</span>        <span class="p">:</span> <span class="s">&#39;col1&#39;</span><span class="p">,</span>
@@ -90,23 +250,72 @@
 <span class="n">rdef</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>  <span class="c"># =&gt; Type(&#39;INT&#39;)</span>
 </pre></div>
 </div>
-<p>For each column specification, following keys are supported.
-(See: ColumnDef.required_keys, ColumnDef.optional_keys)</p>
-<dl class="docutils">
-<dt>&#64;param record_def  an array defining record type.</dt>
-<dd>e.g.</dd>
-</dl>
-<p>&#64;raises RecordDefError</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference external" href="#shellstreaming.columndef.ColumnDef.required_fields">ColumnDef.required_fields</a> and
+<a class="reference external" href="#shellstreaming.columndef.ColumnDef.optional_fields">ColumnDef.optional_fields</a>
+for each column&#8217;s specification.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.recorddef.RecordDef.__len__">
+<tt class="descname">__len__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/recorddef.html#RecordDef.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.recorddef.RecordDef.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of columns</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-shellstreaming.type">
+<span id="shellstreaming-type"></span><h2>shellstreaming.type<a class="headerlink" href="#module-shellstreaming.type" title="Permalink to this headline">¶</a></h2>
+<p>type.py</p>
+<dl class="class">
+<dt id="shellstreaming.type.Type">
+<em class="property">class </em><tt class="descclassname">shellstreaming.type.</tt><tt class="descname">Type</tt><big>(</big><em>ss_type_str</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/type.html#Type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.type.Type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Types of columns.</p>
+<dl class="method">
+<dt id="shellstreaming.type.Type.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>ss_type_str</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/type.html#Type.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.type.Type.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Type object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ss_type_str</strong> &#8211; <p>string representing shellstreaming type (one of <a class="reference external" href="#shellstreaming.type.Type.type_list">Type.type_list</a>)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference external" href="#shellstreaming.error.UnsupportedTypeError">UnsupportedTypeError</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="shellstreaming.type.Type.equivalent_ss_type">
+<em class="property">static </em><tt class="descname">equivalent_ss_type</tt><big>(</big><em>val</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/type.html#Type.equivalent_ss_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.type.Type.equivalent_ss_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns <cite>val</cite>&#8216;s shellstreaming compatible type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>val</strong> &#8211; value to check shellstreaming equivalent type</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference external" href="#shellstreaming.error.UnsupportedTypeError">UnsupportedTypeError</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="shellstreaming.recorddef.RecordDef.__weakref__">
-<tt class="descname">__weakref__</tt><a class="headerlink" href="#shellstreaming.recorddef.RecordDef.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
+<dt id="shellstreaming.type.Type.type_list">
+<tt class="descname">type_list</tt><em class="property"> = ['STRING', 'INT']</em><a class="headerlink" href="#shellstreaming.type.Type.type_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of shellstream types.</p>
 </dd></dl>
 
 </dd></dl>
 
+</div>
 </div>
 
 
@@ -117,10 +326,19 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to shellstreaming&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#">shellstreaming&#8217;s documentation!</a><ul>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#api-documents">API documents</a><ul>
+<li><a class="reference internal" href="#module-shellstreaming">shellstreaming</a></li>
+<li><a class="reference internal" href="#module-shellstreaming.columndef">shellstreaming.columndef</a></li>
+<li><a class="reference internal" href="#module-shellstreaming.error">shellstreaming.error</a></li>
+<li><a class="reference internal" href="#module-shellstreaming.record">shellstreaming.record</a></li>
+<li><a class="reference internal" href="#module-shellstreaming.recorddef">shellstreaming.recorddef</a></li>
+<li><a class="reference internal" href="#module-shellstreaming.type">shellstreaming.type</a></li>
+</ul>
+</li>
 </ul>
 
   <h3>This Page</h3>
@@ -158,7 +376,7 @@
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Sho Nakatani.
+        &copy; Copyright 2013 Sho Nakatani.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

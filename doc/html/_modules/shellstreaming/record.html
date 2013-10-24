@@ -1,0 +1,154 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>shellstreaming.record &mdash; shellstreaming 0.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="shellstreaming 0.0.4 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">shellstreaming 0.0.4 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for shellstreaming.record</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;record.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">shellstreaming.error</span> <span class="kn">import</span> <span class="n">RecordTypeError</span><span class="p">,</span> <span class="n">UnsupportedTypeError</span>
+<span class="kn">from</span> <span class="nn">shellstreaming.type</span> <span class="kn">import</span> <span class="n">Type</span>
+
+
+<div class="viewcode-block" id="Record"><a class="viewcode-back" href="../../index.html#shellstreaming.record.Record">[docs]</a><span class="k">class</span> <span class="nc">Record</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Record.&quot;&quot;&quot;</span>
+
+    <span class="c"># APIs</span>
+<div class="viewcode-block" id="Record.__init__"><a class="viewcode-back" href="../../index.html#shellstreaming.record.Record.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_def</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a record with `record_def` constraints.</span>
+
+<span class="sd">        :param record_def: instance of `RecordDef &lt;#shellstreaming.recorddef.RecordDef&gt;`_</span>
+<span class="sd">        :param *args:      contents of columns</span>
+<span class="sd">        :raises:           `RecordTypeError &lt;#shellstreaming.error.RecordTypeError&gt;`_</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span>    <span class="o">=</span> <span class="n">Record</span><span class="o">.</span><span class="n">_internal_repl</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recdef</span> <span class="o">=</span> <span class="n">record_def</span>
+        <span class="n">Record</span><span class="o">.</span><span class="n">_chk_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recdef</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c"># pragma: no cover</span>
+        <span class="n">retstr</span> <span class="o">=</span> <span class="s">&quot;(&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">)):</span>
+            <span class="n">retstr</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">, &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recdef</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">retstr</span> <span class="o">+</span> <span class="s">&quot;)&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">)</span>
+
+    <span class="c"># Private functions</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_internal_repl</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_chk_type</span><span class="p">(</span><span class="n">recdef</span><span class="p">,</span> <span class="n">rec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks if type of `rec` matches `recdef`</span>
+<span class="sd">        :param recdef: instance of RecordDef</span>
+<span class="sd">        :param rec:    instance of Record</span>
+<span class="sd">        :raises:       `RecordTypeError &lt;#shellstreaming.error.RecordTypeError&gt;`_</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">recdef</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">RecordTypeError</span><span class="p">(</span><span class="s">&quot;Number of columns is different from RecordDef&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">recdef</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">def_type</span> <span class="o">=</span> <span class="n">recdef</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+                <span class="n">col_type</span> <span class="o">=</span> <span class="n">Type</span><span class="o">.</span><span class="n">equivalent_ss_type</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">col_type</span> <span class="o">!=</span> <span class="n">def_type</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">RecordTypeError</span><span class="p">(</span><span class="s">&quot;Column </span><span class="si">%d</span><span class="s"> has mismatched type:  Got &#39;</span><span class="si">%s</span><span class="s">&#39; [</span><span class="si">%s</span><span class="s">] ; Expected [</span><span class="si">%s</span><span class="s">]&quot;</span> <span class="o">%</span>
+                                          <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">rec</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">col_type</span><span class="p">,</span> <span class="n">def_type</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c"># recdef[i].type is not defined, then any ShellStream type is allowed</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">Type</span><span class="o">.</span><span class="n">equivalent_ss_type</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">except</span> <span class="n">UnsupportedTypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">RecordTypeError</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">shellstreaming 0.0.4 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 Sho Nakatani.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
