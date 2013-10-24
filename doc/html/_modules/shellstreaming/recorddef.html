@@ -1,0 +1,160 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>shellstreaming.recorddef &mdash; shellstreaming 0.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="shellstreaming 0.0.4 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">shellstreaming 0.0.4 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for shellstreaming.recorddef</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;:synopsis: Provides DDL (like CREATE TABLE) information.</span>
+
+<span class="sd">.. moduleauthor:: Sho Nakatani &lt;lay.sakura@gmail.com&gt;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">shellstreaming.error</span> <span class="kn">import</span> <span class="n">ColumnDefError</span><span class="p">,</span> <span class="n">RecordDefError</span>
+<span class="kn">from</span> <span class="nn">shellstreaming.columndef</span> <span class="kn">import</span> <span class="n">ColumnDef</span>
+
+
+<div class="viewcode-block" id="RecordDef"><a class="viewcode-back" href="../../index.html#shellstreaming.recorddef.RecordDef">[docs]</a><span class="k">class</span> <span class="nc">RecordDef</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Used as DDL (like CREATE TABLE) information.&quot;&quot;&quot;</span>
+    <span class="c"># APIs</span>
+<div class="viewcode-block" id="RecordDef.__init__"><a class="viewcode-back" href="../../index.html#shellstreaming.recorddef.RecordDef.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_def</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates an object with each column property from `record_def`.</span>
+
+<span class="sd">        :param record_def: list of column definition hash (see example below)</span>
+
+<span class="sd">        *Example:*</span>
+
+<span class="sd">        ::</span>
+
+<span class="sd">            rdef = RecordDef(</span>
+<span class="sd">                [</span>
+<span class="sd">                    {&#39;name&#39;        : &#39;col1&#39;,</span>
+<span class="sd">                     &#39;type&#39;        : &#39;STRING&#39;,</span>
+<span class="sd">                     &#39;primary_key&#39; : True,</span>
+<span class="sd">                    },</span>
+<span class="sd">                    {&#39;name&#39;        : &#39;col2&#39;,</span>
+<span class="sd">                     &#39;type&#39;        : &#39;INT&#39;,</span>
+<span class="sd">                    },</span>
+<span class="sd">                ]</span>
+<span class="sd">            )</span>
+<span class="sd">            rdef[1].name  # =&gt; &#39;col2&#39;</span>
+<span class="sd">            rdef[1].type  # =&gt; Type(&#39;INT&#39;)</span>
+
+<span class="sd">        .. seealso::</span>
+
+<span class="sd">            `ColumnDef.required_fields &lt;#shellstreaming.columndef.ColumnDef.required_fields&gt;`_ and</span>
+<span class="sd">            `ColumnDef.optional_fields &lt;#shellstreaming.columndef.ColumnDef.optional_fields&gt;`_</span>
+<span class="sd">            for each column&#39;s specification.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recdef</span> <span class="o">=</span> <span class="n">record_def</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_coldefs</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="RecordDef.__len__"><a class="viewcode-back" href="../../index.html#shellstreaming.recorddef.RecordDef.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns number of columns&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coldefs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RecordDef.__getitem__"><a class="viewcode-back" href="../../index.html#shellstreaming.recorddef.RecordDef.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns specified column definition.</span>
+
+<span class="sd">        :param key: column index to get definition.</span>
+<span class="sd">        :type key:  int (0-origin)</span>
+<span class="sd">        :rtype:     `ColumnDef &lt;#shellstreaming.columndef.ColumnDef&gt;`_</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coldefs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="c"># Private functions</span></div>
+    <span class="k">def</span> <span class="nf">_set_coldefs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coldefs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">raw_coldef</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recdef</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_coldefs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ColumnDef</span><span class="p">(</span><span class="n">raw_coldef</span><span class="p">))</span>
+            <span class="k">except</span> <span class="n">ColumnDefError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">RecordDefError</span><span class="p">(</span><span class="s">&quot;In column </span><span class="si">%d</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">shellstreaming 0.0.4 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 Sho Nakatani.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

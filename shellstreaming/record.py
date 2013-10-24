@@ -1,18 +1,22 @@
-'''record.py
-'''
 # -*- coding: utf-8 -*-
+""":synopsis: Provides (typed|untyped) record structure.
+
+.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+"""
 from shellstreaming.error import RecordTypeError, UnsupportedTypeError
 from shellstreaming.type import Type
 
 
 class Record(object):
-    """Record"""
+    """Record."""
+
     # APIs
     def __init__(self, record_def, *args):
-        """Checks if type of `rec` matches `recdef`
-        @param record_def  instance of RecordDef
-        @param *args       columns
-        @raises  RecordTypeError
+        """Creates a record with `record_def` constraints.
+
+        :param record_def: instance of `RecordDef <#shellstreaming.recorddef.RecordDef>`_
+        :param \*args:      contents of columns
+        :raises:           `RecordTypeError <#shellstreaming.error.RecordTypeError>`_
         """
         self._rec    = Record._internal_repl(args)
         self._recdef = record_def
@@ -35,9 +39,9 @@ class Record(object):
     @staticmethod
     def _chk_type(recdef, rec):
         """Checks if type of `rec` matches `recdef`
-        @param recdef  instance of RecordDef
-        @param rec     instance of Record
-        @raises  RecordTypeError
+        :param recdef: instance of RecordDef
+        :param rec:    instance of Record
+        :raises:       `RecordTypeError <#shellstreaming.error.RecordTypeError>`_
         """
         if len(recdef) != len(rec):
             raise RecordTypeError("Number of columns is different from RecordDef")

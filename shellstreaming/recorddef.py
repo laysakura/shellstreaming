@@ -1,17 +1,24 @@
-'''recorddef.py
-'''
 # -*- coding: utf-8 -*-
+""":synopsis: Provides DDL (like CREATE TABLE) information.
+
+.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+"""
 from shellstreaming.error import ColumnDefError, RecordDefError
 from shellstreaming.columndef import ColumnDef
 
 
 class RecordDef(object):
-    """Record definition."""
+    """Used as DDL (like CREATE TABLE) information."""
     # APIs
     def __init__(self, record_def):
-        """Constructor.
+        """Creates an object with each column property from `record_def`.
 
-        @example
+        :param record_def: list of column definition hash (see example below)
+
+        *Example:*
+
+        ::
+
             rdef = RecordDef(
                 [
                     {'name'        : 'col1',
@@ -26,21 +33,26 @@ class RecordDef(object):
             rdef[1].name  # => 'col2'
             rdef[1].type  # => Type('INT')
 
-        For each column specification, following keys are supported.
-        (See: ColumnDef.required_keys, ColumnDef.optional_keys)
+        .. seealso::
 
-        @param record_def  an array defining record type.
-            e.g.
-
-        @raises RecordDefError
+            `ColumnDef.required_fields <#shellstreaming.columndef.ColumnDef.required_fields>`_ and
+            `ColumnDef.optional_fields <#shellstreaming.columndef.ColumnDef.optional_fields>`_
+            for each column's specification.
         """
         self._recdef = record_def
         self._set_coldefs()
 
     def __len__(self):
+        """Returns number of columns"""
         return len(self._coldefs)
 
     def __getitem__(self, key):
+        """Returns specified column definition.
+
+        :param key: column index to get definition.
+        :type key:  int (0-origin)
+        :rtype:     `ColumnDef <#shellstreaming.columndef.ColumnDef>`_
+        """
         return self._coldefs[key]
 
     # Private functions
