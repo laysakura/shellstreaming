@@ -85,12 +85,10 @@
 
     <span class="c"># APIs</span>
 <div class="viewcode-block" id="ColumnDef.__init__"><a class="viewcode-back" href="../../index.html#shellstreaming.columndef.ColumnDef.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column_def</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;abc</span>
+        <span class="sd">&quot;&quot;&quot;Creates column definition object.</span>
 
-<span class="sd">        @param column_def</span>
-<span class="sd">            E.g. {&#39;name&#39;: &#39;col1&#39;, &#39;type&#39;: &#39;STRING&#39;}</span>
-
-<span class="sd">        @raises ColumnDefError</span>
+<span class="sd">        :param column_def: e.g. ``{&#39;name&#39;: &#39;col1&#39;, &#39;type&#39;: &#39;STRING&#39;}``</span>
+<span class="sd">        :raises:           `ColumnDefError &lt;#shellstreaming.error.ColumnDefError&gt;`_</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ColumnDef</span><span class="o">.</span><span class="n">_chk_unsupported_fields</span><span class="p">(</span><span class="n">column_def</span><span class="p">)</span>
         <span class="n">ColumnDef</span><span class="o">.</span><span class="n">_chk_required_fields</span><span class="p">(</span><span class="n">column_def</span><span class="p">)</span>

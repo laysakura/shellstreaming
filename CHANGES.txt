@@ -1,3 +1,6 @@
+0.0.5
+        - introduces Sphinx documents
+
 0.0.4
         - changes test/ place
 

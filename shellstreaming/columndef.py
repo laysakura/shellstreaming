@@ -33,12 +33,10 @@ class ColumnDef(object):
 
     # APIs
     def __init__(self, column_def):
-        """abc
+        """Creates column definition object.
 
-        @param column_def
-            E.g. {'name': 'col1', 'type': 'STRING'}
-
-        @raises ColumnDefError
+        :param column_def: e.g. ``{'name': 'col1', 'type': 'STRING'}``
+        :raises:           `ColumnDefError <#shellstreaming.error.ColumnDefError>`_
         """
         ColumnDef._chk_unsupported_fields(column_def)
         ColumnDef._chk_required_fields(column_def)
