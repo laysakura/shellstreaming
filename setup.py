@@ -6,9 +6,9 @@ import shellstreaming
 
 
 setup(
-    name          = 'ShellStreaming',
+    name          = 'shellstreaming',
     description   = '[under development] A stream processor working with shell commands',
-    url           = 'https://github.com/laysakura/ShellStreaming',
+    url           = 'https://github.com/laysakura/shellstreaming',
     version       = shellstreaming.__version__,
     author        = shellstreaming.__author__,
     author_email  = shellstreaming.__email__,

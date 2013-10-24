@@ -1,4 +1,5 @@
 0.0.3
+        - changes name: ShellStreaming => shellstreaming
         - includes tests
 
 0.0.2

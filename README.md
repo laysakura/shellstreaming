@@ -1,4 +1,4 @@
-# ShellStreaming
+# shellstreaming
 A stream processor working with shell commands
 
 # TODO

@@ -1,4 +1,4 @@
-'''ShellStreaming - explain
+'''shellstreaming - explain
 
 foobarbuz
 '''
