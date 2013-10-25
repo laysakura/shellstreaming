@@ -28,3 +28,7 @@ $ ./setup.py sdist upload
 
 # TODO
 - _internal_replをlistにしても動くことを確認するテスト
+- 俺のシステムでリレーションを作るよりは，既存のDBからリレーションを取ってこれるadapterとリレーションにappendできるoutput opを作るほうが賢明．
+  - システム的には飽くまでもRecordBatch同士の演算
+- 基本operatorを実装する
+- recordがtimestampとlineage情報を持つようにする(?)
