@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 from setuptools import setup
-from pypi_release import Release
+# from pypi_release import Release
 
 
 setup(
-    cmdclass      = {'release': Release},
+    # cmdclass      = {'release': Release},
 
     name             = 'shellstreaming',
     description      = '[under development] A stream processor working with shell commands',

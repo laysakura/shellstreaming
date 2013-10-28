@@ -22,14 +22,28 @@ class Record(object):
         self._recdef = record_def
         Record._chk_type(self._recdef, self._rec)
 
+        self._cur_col = 0  # Used for `next()`
+
     def __str__(self):  # pragma: no cover
+        """Returns string representation of record"""
         retstr = "("
         for i in xrange(len(self._rec)):
             retstr += "%s: %s, " % (self._recdef[i]['name'], self._rec[i])
         return retstr + ")"
 
     def __len__(self):
+        """Returns number of columns in record"""
         return len(self._rec)
+
+    def __getitem__(self, index):
+        """Returns column data specified by `index`"""
+        return self._rec[index]
+
+    def __iter__(self):
+        while self._cur_col < len(self._rec):
+            yield self._rec[self._cur_col]
+            self._cur_col += 1
+        self._cur_col = 0
 
     # Private functions
     @staticmethod

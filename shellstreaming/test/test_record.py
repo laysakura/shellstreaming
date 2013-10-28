@@ -15,6 +15,8 @@ def test_record_usage():
          # any basic type is allowed
         },
     ])
+
+    # col1 accepts any type
     rec = Record(
         rdef,
         'Hello', 'World'
@@ -25,6 +27,14 @@ def test_record_usage():
         'Hello', 777
     )
     eq_(len(rec), 2)
+
+    # get column by index
+    eq_(rec[0], 'Hello')
+
+    # iterate all columns
+    cols = []
+    for col in rec:
+        cols.append(col)
 
 
 @raises(RecordTypeError)
