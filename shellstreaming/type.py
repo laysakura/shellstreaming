@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-""":synopsis: Provides shellstreaming types.
+"""
+    shellstreaming.type
+    ~~~~~~~~~~~~~~~~~~~
 
-.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+    :synopsis: Provides shellstreaming types.
 """
 import types
 from shellstreaming.error import UnsupportedTypeError

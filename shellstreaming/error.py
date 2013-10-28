@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-""":synopsis: Exception classes.
+"""
+    shellstreaming.error
+    ~~~~~~~~~~~~~~~~~~~~
 
-.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+    :synopsis: Exception classes.
 """
 
 

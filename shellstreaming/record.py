@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-""":synopsis: Provides (typed|untyped) record structure.
+"""
+    shellstreaming.record
+    ~~~~~~~~~~~~~~~~~~~~~
 
-.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+    :synopsis: Provides (typed|untyped) record structure.
 """
 from shellstreaming.error import RecordTypeError, UnsupportedTypeError
 from shellstreaming.type import Type

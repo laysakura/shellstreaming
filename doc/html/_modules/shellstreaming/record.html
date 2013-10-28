@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>shellstreaming.record &mdash; shellstreaming 0.0.4 documentation</title>
+    <title>shellstreaming.record &mdash; shellstreaming  documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.4',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="shellstreaming 0.0.4 documentation" href="../../index.html" />
+    <link rel="top" title="shellstreaming  documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">shellstreaming 0.0.4 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">shellstreaming  documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -51,9 +51,11 @@
             
   <h1>Source code for shellstreaming.record</h1><div class="highlight"><pre>
 <span class="c"># -*- coding: utf-8 -*-</span>
-<span class="sd">&quot;&quot;&quot;:synopsis: Provides (typed|untyped) record structure.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    shellstreaming.record</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~~</span>
 
-<span class="sd">.. moduleauthor:: Sho Nakatani &lt;lay.sakura@gmail.com&gt;</span>
+<span class="sd">    :synopsis: Provides (typed|untyped) record structure.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.error</span> <span class="kn">import</span> <span class="n">RecordTypeError</span><span class="p">,</span> <span class="n">UnsupportedTypeError</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.type</span> <span class="kn">import</span> <span class="n">Type</span>
@@ -73,15 +75,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span>    <span class="o">=</span> <span class="n">Record</span><span class="o">.</span><span class="n">_internal_repl</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recdef</span> <span class="o">=</span> <span class="n">record_def</span>
         <span class="n">Record</span><span class="o">.</span><span class="n">_chk_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recdef</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c"># Used for `next()`</span>
 </div>
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c"># pragma: no cover</span>
+<div class="viewcode-block" id="Record.__str__"><a class="viewcode-back" href="../../index.html#shellstreaming.record.Record.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c"># pragma: no cover</span>
+        <span class="sd">&quot;&quot;&quot;Returns string representation of record&quot;&quot;&quot;</span>
         <span class="n">retstr</span> <span class="o">=</span> <span class="s">&quot;(&quot;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">)):</span>
             <span class="n">retstr</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">, &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recdef</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">retstr</span> <span class="o">+</span> <span class="s">&quot;)&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="Record.__len__"><a class="viewcode-back" href="../../index.html#shellstreaming.record.Record.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns number of columns in record&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Record.__getitem__"><a class="viewcode-back" href="../../index.html#shellstreaming.record.Record.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns column data specified by `index`&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+</div>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c"># Private functions</span>
     <span class="nd">@staticmethod</span>
@@ -144,7 +160,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">shellstreaming 0.0.4 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">shellstreaming  documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

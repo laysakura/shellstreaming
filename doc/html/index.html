@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>shellstreaming’s documentation &mdash; shellstreaming 0.0.4 documentation</title>
+    <title>shellstreaming’s documentation &mdash; shellstreaming  documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.0.4',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="shellstreaming 0.0.4 documentation" href="#" /> 
+    <link rel="top" title="shellstreaming  documentation" href="#" /> 
   </head>
   <body>
     <div class="related">
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="#">shellstreaming 0.0.4 documentation</a> &raquo;</li> 
+        <li><a href="#">shellstreaming  documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -57,10 +57,10 @@
 <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
 </ul>
 </div>
-<div class="section" id="api-documents">
-<h2>API documents<a class="headerlink" href="#api-documents" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="module-shellstreaming">
-<span id="shellstreaming"></span><h3>shellstreaming<a class="headerlink" href="#module-shellstreaming" title="Permalink to this headline">¶</a></h3>
+<span id="api-documents"></span><h2>API documents<a class="headerlink" href="#module-shellstreaming" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="shellstreaming">
+<h3>shellstreaming<a class="headerlink" href="#shellstreaming" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -70,8 +70,8 @@
 </tbody>
 </table>
 </div>
-<div class="section" id="module-shellstreaming.columndef">
-<span id="shellstreaming-columndef"></span><h3>shellstreaming.columndef<a class="headerlink" href="#module-shellstreaming.columndef" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-shellstreaming.columndef"></span><div class="section" id="shellstreaming-columndef">
+<h3>shellstreaming.columndef<a class="headerlink" href="#shellstreaming-columndef" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -138,8 +138,8 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-shellstreaming.error">
-<span id="shellstreaming-error"></span><h3>shellstreaming.error<a class="headerlink" href="#module-shellstreaming.error" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-shellstreaming.error"></span><div class="section" id="shellstreaming-error">
+<h3>shellstreaming.error<a class="headerlink" href="#shellstreaming-error" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -184,8 +184,8 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-shellstreaming.record">
-<span id="shellstreaming-record"></span><h3>shellstreaming.record<a class="headerlink" href="#module-shellstreaming.record" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-shellstreaming.record"></span><div class="section" id="shellstreaming-record">
+<h3>shellstreaming.record<a class="headerlink" href="#shellstreaming-record" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -199,6 +199,12 @@
 <em class="property">class </em><tt class="descclassname">shellstreaming.record.</tt><tt class="descname">Record</tt><big>(</big><em>record_def</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/record.html#Record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.record.Record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Record.</p>
+<dl class="method">
+<dt id="shellstreaming.record.Record.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>index</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/record.html#Record.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.record.Record.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns column data specified by <cite>index</cite></p>
+</dd></dl>
+
 <dl class="method">
 <dt id="shellstreaming.record.Record.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>record_def</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/record.html#Record.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.record.Record.__init__" title="Permalink to this definition">¶</a></dt>
@@ -220,11 +226,23 @@
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="shellstreaming.record.Record.__len__">
+<tt class="descname">__len__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/record.html#Record.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.record.Record.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of columns in record</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.record.Record.__str__">
+<tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/record.html#Record.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.record.Record.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns string representation of record</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
-<div class="section" id="module-shellstreaming.recorddef">
-<span id="shellstreaming-recorddef"></span><h3>shellstreaming.recorddef<a class="headerlink" href="#module-shellstreaming.recorddef" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-shellstreaming.recorddef"></span><div class="section" id="shellstreaming-recorddef">
+<h3>shellstreaming.recorddef<a class="headerlink" href="#shellstreaming-recorddef" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -299,8 +317,8 @@ for each column&#8217;s specification.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-shellstreaming.type">
-<span id="shellstreaming-type"></span><h3>shellstreaming.type<a class="headerlink" href="#module-shellstreaming.type" title="Permalink to this headline">¶</a></h3>
+<span class="target" id="module-shellstreaming.type"></span><div class="section" id="shellstreaming-type">
+<h3>shellstreaming.type<a class="headerlink" href="#shellstreaming-type" title="Permalink to this headline">¶</a></h3>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -368,13 +386,13 @@ for each column&#8217;s specification.</p>
   <ul>
 <li><a class="reference internal" href="#">shellstreaming&#8217;s documentation</a><ul>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-<li><a class="reference internal" href="#api-documents">API documents</a><ul>
-<li><a class="reference internal" href="#module-shellstreaming">shellstreaming</a></li>
-<li><a class="reference internal" href="#module-shellstreaming.columndef">shellstreaming.columndef</a></li>
-<li><a class="reference internal" href="#module-shellstreaming.error">shellstreaming.error</a></li>
-<li><a class="reference internal" href="#module-shellstreaming.record">shellstreaming.record</a></li>
-<li><a class="reference internal" href="#module-shellstreaming.recorddef">shellstreaming.recorddef</a></li>
-<li><a class="reference internal" href="#module-shellstreaming.type">shellstreaming.type</a></li>
+<li><a class="reference internal" href="#module-shellstreaming">API documents</a><ul>
+<li><a class="reference internal" href="#shellstreaming">shellstreaming</a></li>
+<li><a class="reference internal" href="#shellstreaming-columndef">shellstreaming.columndef</a></li>
+<li><a class="reference internal" href="#shellstreaming-error">shellstreaming.error</a></li>
+<li><a class="reference internal" href="#shellstreaming-record">shellstreaming.record</a></li>
+<li><a class="reference internal" href="#shellstreaming-recorddef">shellstreaming.recorddef</a></li>
+<li><a class="reference internal" href="#shellstreaming-type">shellstreaming.type</a></li>
 </ul>
 </li>
 </ul>
@@ -412,7 +430,7 @@ for each column&#8217;s specification.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="#">shellstreaming 0.0.4 documentation</a> &raquo;</li> 
+        <li><a href="#">shellstreaming  documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

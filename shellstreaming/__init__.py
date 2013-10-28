@@ -1,4 +1,6 @@
-""":synopsis: Core package of shellstreaming
+"""
+    shellstreaming
+    ~~~~~~~~~~~~~~
 
-.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+    :synopsis: Core package of shellstreaming
 """
