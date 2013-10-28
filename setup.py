@@ -2,33 +2,37 @@
 # -*- coding: utf-8 -*-
 import os
 from setuptools import setup
-import shellstreaming
+from pypi_release import Release
 
 
 setup(
-    name          = 'shellstreaming',
-    description   = '[under development] A stream processor working with shell commands',
-    url           = 'https://github.com/laysakura/shellstreaming',
-    license       = 'LICENSE.txt',
-    version       = shellstreaming.__version__,
-    author        = shellstreaming.__author__,
-    author_email  = shellstreaming.__email__,
-    test_suite    = 'nose.collector',
-    requires      = [
+    cmdclass      = {'release': Release},
+
+    name             = 'shellstreaming',
+    description      = '[under development] A stream processor working with shell commands',
+    long_description = open('README.rst').read(),
+    url              = 'https://github.com/laysakura/shellstreaming',
+    license          = 'LICENSE.txt',
+    version          = '0.0.5',
+    author           = 'Sho Nakatani',
+    author_email     = 'lay.sakura@gmail.com',
+    test_suite       = 'nose.collector',
+    install_requires = [
+        'nextversion',
     ],
-    tests_require = [
+    tests_require    = [
         'nose',
         'coverage',
     ],
-    packages      = [
+    packages         = [
         'shellstreaming',
         'shellstreaming.inputstream',
         'shellstreaming.test'
     ],
-    scripts       = [
+    scripts          = [
         # 'bin/foo.py'
     ],
-    classifiers   = '''
+    classifiers      = '''
 Programming Language :: Python
 Development Status :: 1 - Planning
 License :: OSI Approved :: Apache Software License
