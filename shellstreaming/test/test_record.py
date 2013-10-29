@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
+import datetime
 from shellstreaming.error import RecordTypeError
 from shellstreaming.record import Record
 from shellstreaming.recorddef import RecordDef
+from shellstreaming.timestamp import Timestamp
 
 
 def test_record_usage():
@@ -47,4 +49,10 @@ def test_record_non_basic_type():
     c = C  # c has too complex type as stream record
 
     rdef = RecordDef([{'name': 'col0'}])
-    rec = Record(rdef, c)
+    rec  = Record(rdef, c)
+
+
+def test_record_user_defined_timestamp():
+    rdef = RecordDef([{'name': 'col0'}])
+    rec  = Record(rdef, 'hello', timestamp=Timestamp(datetime.datetime(1999, 7, 1)))
+    eq_(rec.timestamp, Timestamp(datetime.datetime(1999, 7, 1)))
