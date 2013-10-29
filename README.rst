@@ -46,3 +46,10 @@ TODO
   - システム的には飽くまでもRecordBatch同士の演算
 - 基本operatorを実装する
 - recordがtimestampとlineage情報を持つようにする(?)
+
+- 使いやすいAPI再考．今は__iter__()のやりかたの分からなさに引きずられてる気がする
+- test_testfileで，明らかに終わってない感じがする．StopIterationしようよ
+- test_stdinでenter連打したら，本当は　len(batch) = %d　の出力がまとめて複数どさっと出てくるはず
+- docstring
+- 各種テスト
+- 抽象クラス

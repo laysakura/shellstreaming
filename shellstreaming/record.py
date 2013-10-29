@@ -7,22 +7,30 @@
 """
 from shellstreaming.error import RecordTypeError, UnsupportedTypeError
 from shellstreaming.type import Type
+from shellstreaming.timestamp import Timestamp
 
 
 class Record(object):
     """Record."""
 
     # APIs
-    def __init__(self, record_def, *args):
+    def __init__(self, record_def, *columns, **kwargs):
         """Creates a record with `record_def` constraints.
 
         :param record_def: instance of `RecordDef <#shellstreaming.recorddef.RecordDef>`_
-        :param \*args:      contents of columns
+        :param \*columns:     contents of columns
+        :param timestamp=: instance of `Timestamp <#shellstreaming.timestamp.Timestamp>`_
         :raises:           `RecordTypeError <#shellstreaming.error.RecordTypeError>`_
         """
-        self._rec    = Record._internal_repl(args)
+        self._rec    = Record._internal_repl(columns)
         self._recdef = record_def
         Record._chk_type(self._recdef, self._rec)
+
+        if 'timestamp' in kwargs:
+            assert(isinstance(kwargs['timestamp'], Timestamp))
+            self.timestamp = kwargs['timestamp']
+        else:
+            self.timestamp = Timestamp()
 
         self._cur_col = 0  # Used for `next()`
 
@@ -49,8 +57,8 @@ class Record(object):
 
     # Private functions
     @staticmethod
-    def _internal_repl(args):
-        return tuple(args)
+    def _internal_repl(columns):
+        return tuple(columns)
 
     @staticmethod
     def _chk_type(recdef, rec):

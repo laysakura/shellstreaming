@@ -36,7 +36,7 @@ class Type:
         return str(self) == str(other)
 
     def __ne__(self, other):
-        return str(self) != str(other)
+        return not self.__eq__(other)
 
     def __str__(self):
         return self._typestr
