@@ -9,6 +9,7 @@
 """
 from shellstreaming.inputstream.base import FiniteStream
 from shellstreaming.record import Record
+from shellstreaming.recorddef import RecordDef
 
 
 class TextFile(FiniteStream):
@@ -25,7 +26,7 @@ class TextFile(FiniteStream):
     def run(self):
         """Reads a text file line-by-line until EOF"""
         with open(self._path) as f:
-            rdef = [{'name': 'line', 'type': 'STRING'}]
+            rdef = RecordDef([{'name': 'line', 'type': 'STRING'}])
             line = f.readline()
             while line:
                 self.add(Record(rdef, line))
