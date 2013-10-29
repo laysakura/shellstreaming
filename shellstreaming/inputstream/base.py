@@ -175,8 +175,5 @@ class FiniteStream(Base):
         return self._batches.pop()
 
     # private functions
-    def _fetch_finished(self):
-        return self._fetch_finished
-
     def _no_more_input(self):
-        return self._fetch_finished() and len(self._batches)
+        return self._fetch_finished and len(self._batches) == 0

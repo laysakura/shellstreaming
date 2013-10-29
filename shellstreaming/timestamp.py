@@ -11,13 +11,14 @@ import datetime
 class Timestamp(object):
     """Provides efficient data structure to represent timestamp
     """
-    def __init__(self, timestamp=datetime.datetime.now()):
+    def __init__(self, timestamp):
         """Constructor"""
         # year=2013, month=10, day=29, hour=01, minute=04, second=12, microsecond=123456
         # => 20131029010412123456
         t = timestamp
-        self._ts = int((t.microsecond) + (t.second * 1e6) + (t.minute * 1e8) + (t.hour * 1e10) +
-                       (t.day * 1e12)  + (t.month * 1e14) + (t.year * 1e16))
+        self._ts = (t.microsecond +
+                    int(t.second * 1e6) + int(t.minute * 1e8) + int(t.hour * 1e10) +
+                    int(t.day * 1e12)   + int(t.month * 1e14) + int(t.year * 1e16))
 
     def year(self):
         """Return year"""

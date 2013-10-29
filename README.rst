@@ -46,6 +46,3 @@ TODO
   - システム的には飽くまでもRecordBatch同士の演算
 - 基本operatorを実装する
 - recordがtimestampとlineage情報を持つようにする(?)
-
-- docstring
-- 各種テスト

@@ -9,13 +9,19 @@ TEST_FILE = os.path.abspath(os.path.dirname(__file__)) + '/test_textfile_input01
 
 
 def test_textfile_usage():
-    stream = TextFile(TEST_FILE, batch_span_ms=100)
+    n_batches = n_records = 0
+    stream = TextFile(TEST_FILE, batch_span_ms=20)
     for batch in stream:
         if batch is None:
             time.sleep(0.1)
             continue
+
+        n_batches += 1
         for record in batch:
             eq_(len(record), 1)
             line = record[0]
             eq_('line ', line[0:5])
             ok_(0 <= int(line[5:]) < 100)  # record order in a batch is not always 'oldest-first'
+            n_records += 1
+    assert_greater_equal(n_batches, 1)
+    eq_(n_records, 100)

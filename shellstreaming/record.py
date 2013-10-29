@@ -5,6 +5,7 @@
 
     :synopsis: Provides (typed|untyped) record structure.
 """
+import datetime
 from shellstreaming.error import RecordTypeError, UnsupportedTypeError
 from shellstreaming.type import Type
 from shellstreaming.timestamp import Timestamp
@@ -30,7 +31,7 @@ class Record(object):
             assert(isinstance(kwargs['timestamp'], Timestamp))
             self.timestamp = kwargs['timestamp']
         else:
-            self.timestamp = Timestamp()
+            self.timestamp = Timestamp(datetime.datetime.now())
 
         self._cur_col = 0  # Used for `next()`
 

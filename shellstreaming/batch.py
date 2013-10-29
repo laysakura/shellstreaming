@@ -44,7 +44,7 @@ class Batch(object):
         return len(self._records)
 
     def __iter__(self):
-        self
+        return self
 
     def next(self):
         """Return one of record in this batch in out-of-order.
