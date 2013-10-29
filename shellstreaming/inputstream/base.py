@@ -4,11 +4,14 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 import threading
+from abc import ABCMeta, abstractmethod
 from shellstreaming.batch import Batch
 from shellstreaming.batch_set import BatchSet
 
 
 class Base(threading.Thread):
+    __metaclass__ = ABCMeta
+
     def __init__(self, batch_span_ms):
         self._batch_span_ms = batch_span_ms
         self._batches       = BatchSet()
@@ -36,8 +39,18 @@ class Base(threading.Thread):
     def __iter__(self):
         return self
 
+    @abstractmethod
+    def next(self):
+        pass
+
+    @abstractmethod
+    def run(self):
+        pass
+
 
 class InfiniteStream(Base):
+    __metaclass__ = ABCMeta
+
     def __init__(self, batch_span_ms):
         Base.__init__(self, batch_span_ms)
 
