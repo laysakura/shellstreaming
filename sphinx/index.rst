@@ -24,5 +24,17 @@ API documents
 .. automodule:: shellstreaming.recorddef
    :exclude-members: __weakref__
 
+.. automodule:: shellstreaming.batch
+   :exclude-members: __weakref__
+
+.. automodule:: shellstreaming.batch_set
+   :exclude-members: __weakref__
+
 .. automodule:: shellstreaming.type
+   :exclude-members: __weakref__
+
+.. automodule:: shellstreaming.timestamp
+   :exclude-members: __weakref__
+
+.. automodule:: shellstreaming.inputstream.base
    :exclude-members: __weakref__

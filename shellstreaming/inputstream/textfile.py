@@ -3,7 +3,7 @@
     shellstreaming.inputstream.textfile
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :synopsis: Input stream for text files.
+    :synopsis: FiniteStream for text files.
 
     A line is used as record with single column.
 """
@@ -12,7 +12,7 @@ from shellstreaming.record import Record
 
 
 class TextFile(FiniteStream):
-    """Finite input stream for text files"""
+    """FiniteStream for text files"""
     def __init__(self, path, batch_span_ms=1000):
         """Constructor
 
@@ -23,6 +23,7 @@ class TextFile(FiniteStream):
         FiniteStream.__init__(self, batch_span_ms)
 
     def run(self):
+        """Reads a text file line-by-line until EOF"""
         with open(self._path) as f:
             rdef = [{'name': 'line', 'type': 'STRING'}]
             line = f.readline()

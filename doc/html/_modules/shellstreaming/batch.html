@@ -1,0 +1,156 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>shellstreaming.batch &mdash; shellstreaming  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="shellstreaming  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">shellstreaming  documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for shellstreaming.batch</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    shellstreaming.batch</span>
+<span class="sd">    ~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="sd">    Set of records assembled by timestamp.</span>
+
+<span class="sd">    From users&#39; perspective, `Batch` is equivalent to so-called `window` in stream processing&#39;s context.</span>
+<span class="sd">    Also, a `Batch` is passed to an operator at-a-time internally.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="Batch"><a class="viewcode-back" href="../../index.html#shellstreaming.batch.Batch">[docs]</a><span class="k">class</span> <span class="nc">Batch</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set of records assembled by timestamp&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Batch.__init__"><a class="viewcode-back" href="../../index.html#shellstreaming.batch.Batch.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp_start</span><span class="p">,</span> <span class="n">timestamp_end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a batch to assemble records whose timestamps are within `[timestamps_start, timestamps_end)`&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ts_start</span> <span class="o">=</span> <span class="n">timestamp_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ts_end</span>   <span class="o">=</span> <span class="n">timestamp_end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_records</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c"># TODO: is list fast/useful enough?</span>
+</div>
+<div class="viewcode-block" id="Batch.add"><a class="viewcode-back" href="../../index.html#shellstreaming.batch.Batch.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add `record` to this batch.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            `record.timestamp_end` must be within `[timestamps_start, timestamps_end)`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># assert: record&#39;s timestamp is in-between batch&#39;s time range</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timestamp_start</span><span class="p">())</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;</span>  <span class="bp">self</span><span class="o">.</span><span class="n">get_timestamp_end</span><span class="p">())</span>
+
+        <span class="c"># TODO: inserting record into better index (for performance)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Batch.get_timestamp_start"><a class="viewcode-back" href="../../index.html#shellstreaming.batch.Batch.get_timestamp_start">[docs]</a>    <span class="k">def</span> <span class="nf">get_timestamp_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return this batch&#39;s start-timestamp&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts_start</span>
+</div>
+<div class="viewcode-block" id="Batch.get_timestamp_end"><a class="viewcode-back" href="../../index.html#shellstreaming.batch.Batch.get_timestamp_end">[docs]</a>    <span class="k">def</span> <span class="nf">get_timestamp_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return this batch&#39;s end-timestamp&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts_end</span>
+</div>
+<div class="viewcode-block" id="Batch.__len__"><a class="viewcode-back" href="../../index.html#shellstreaming.batch.Batch.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return number of records in this batch&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_records</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span>
+
+<div class="viewcode-block" id="Batch.next"><a class="viewcode-back" href="../../index.html#shellstreaming.batch.Batch.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return one of record in this batch in out-of-order.</span>
+
+<span class="sd">        :raises: `StopIteration` when no more record is in this batch</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># TODO: return record with oldest timestamp?</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_records</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>   <span class="c"># FIXME: Thread-unsafe. Possibly another thread</span>
+                                         <span class="c"># (typically inputstream&#39;s data-fetching thread)</span>
+                                         <span class="c"># can append records to this batch at the same time.</span>
+                                         <span class="c"># In such cases, newly-appended records are discarded.</span>
+        <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">shellstreaming  documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013 Sho Nakatani.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
