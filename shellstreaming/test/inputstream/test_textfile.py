@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
-import os
 import time
+from os.path import abspath, dirname, join
 from shellstreaming.inputstream.textfile import TextFile
 
 
-TEST_FILE = os.path.abspath(os.path.dirname(__file__)) + '/test_textfile_input01.txt'
+TEST_FILE = join(abspath(dirname(__file__)), 'test_textfile_input01.txt')
 
 
 def test_textfile_usage():
