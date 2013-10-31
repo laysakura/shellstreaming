@@ -12,7 +12,7 @@ setup(
     long_description = open('README.rst').read(),
     url              = 'https://github.com/laysakura/shellstreaming',
     license          = 'LICENSE.txt',
-    version          = '0.0.5',
+    version          = '0.0.6',
     author           = 'Sho Nakatani',
     author_email     = 'lay.sakura@gmail.com',
     test_suite       = 'nose.collector',
