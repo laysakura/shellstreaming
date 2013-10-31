@@ -35,11 +35,11 @@ class Record(object):
 
         self._cur_col = 0  # Used for `next()`
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self):
         """Returns string representation of record"""
         retstr = "("
         for i in xrange(len(self._rec)):
-            retstr += "%s: %s, " % (self._recdef[i]['name'], self._rec[i])
+            retstr += "%s: %s, " % (self._recdef[i].name, self._rec[i])
         return retstr + ")"
 
     def __len__(self):

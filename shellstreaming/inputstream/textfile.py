@@ -31,4 +31,4 @@ class TextFile(FiniteStream):
             while line:
                 self.add(Record(rdef, line))
                 line = f.readline()
-        self.finish_fetching()
+        self.add(None)  # producer has end data-fetching

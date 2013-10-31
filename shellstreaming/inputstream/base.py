@@ -6,9 +6,10 @@
     :synopsis: Provides abstract FiniteStream and InfiniteStream.
 """
 import threading
+from Queue import Queue
 from abc import ABCMeta, abstractmethod
 from shellstreaming.batch import Batch
-from shellstreaming.batch_set import BatchSet
+from shellstreaming.timespan import Timespan
 
 
 class Base(threading.Thread):
@@ -29,7 +30,11 @@ class Base(threading.Thread):
         :param batch_span_ms: timespan to assemble records as batch
         """
         self._batch_span_ms = batch_span_ms
-        self._batches       = BatchSet()
+        self._batch_q       = Queue()
+
+        # for creating batches one by one
+        self._next_batch_span = None
+        self._next_batch      = None
 
         # threading
         threading.Thread.__init__(self)
@@ -86,13 +91,52 @@ class Base(threading.Thread):
         return self._interrupt.is_set()
 
     def add(self, record):
-        """Function for inputstream subclasses to add records fetched"""
-        ts = record.timestamp
-        batch = self._batches.find_batch(timestamp=ts)  # batch : Batch obj (Batch is also thread-safe queue?)
-        if batch is None:
-            batch = Batch(timestamp_start=ts, timestamp_end=ts + self._batch_span_ms)
-            self._batches.add(batch)
-        batch.add(record)
+        """Function for inputstream subclasses to add records fetched.
+
+        .. warning::
+            Current constraint: `record.timestamp` of formmer must be not greater than that of later one.
+            i.e. asserting ``rec1.timestamp <= rec2.timestamp`` where ``add(rec1) ; add(rec2)``
+
+            Therefore, current version does not support user-defined timestamp.
+
+        :param record: Give `None` to signal consumer that data-fetching process has end.
+        """
+        # FIXME: record.timestamp is asserted as arrival time. User defined timestamp is not supported.
+        # To support it, this function may wait longer to collect records and then make multiple batchs
+        # each of which has different timestamp range.
+
+        def _when_got_last_record():
+            if self._next_batch:
+                _produce_next_batch()
+            _no_more_batch()
+
+        def _produce_next_batch():
+            self._next_batch.put(None)
+            batch = Batch(self._next_batch_span, self._next_batch)
+            self._batch_q.put(batch)
+
+        def _no_more_batch():
+            self._batch_q.put(None)
+
+        def _create_next_batch():
+            self._next_batch      = Queue()
+            self._next_batch_span = Timespan(record.timestamp, self._batch_span_ms)
+
+        if record is None:
+            _when_got_last_record()
+            return
+
+        if self._next_batch is None:
+            _create_next_batch()
+
+        assert(not record.timestamp.runoff_lower(self._next_batch_span))
+
+        if record.timestamp.runoff_higher(self._next_batch_span):
+            # this record is for 2nd batch
+            _produce_next_batch()
+            _create_next_batch()
+
+        self._next_batch.put(record)
 
     def __iter__(self):
         return self
@@ -165,14 +209,18 @@ class FiniteStream(Base):
         self._fetch_finished = True
 
     def next(self):
-        """Return one of batches in out-of-order
+        """Return one of batches in out-of-order.
 
         :raises: `StopIteration` when data-fetching thread has already finished or when interrupted
         """
-        if self.interrupted() or self._no_more_input():
+        if self.interrupted():
             raise StopIteration
+
         # TODO: return batch with oldest timestamp?
-        return self._batches.pop()
+        batch = self._batch_q.get()
+        if batch is None:  # means producer thread has sent end signal
+            raise StopIteration
+        return batch
 
     # private functions
     def _no_more_input(self):

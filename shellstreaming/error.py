@@ -46,3 +46,12 @@ class RecordTypeError(BaseError):
 
     def __str__(self):  # pragma: no cover
         return self.msg
+
+
+class TimestampError(BaseError):
+    """An exception raised when timestamp constraint is not satisfied"""
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):  # pragma: no cover
+        return self.msg
