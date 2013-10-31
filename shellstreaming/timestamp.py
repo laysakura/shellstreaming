@@ -62,6 +62,18 @@ class Timestamp(object):
             self.hour(), self.minute(), self.second(),
             int(self.millisecond() * 1e3))
 
+    def runoff_lower(self, timespan):
+        """Check if this timestamp is lower than t0 of [t0, t1]"""
+        return self < timespan.get_start()
+
+    def runoff_higher(self, timespan):
+        """Check if this timestamp is higher than t1 of [t0, t1]"""
+        return self > timespan.get_end()
+
+    def between(self, timespan):
+        """Check if this timestamp is between t0 and t1 of [t0, t1]"""
+        return timespan.get_start() <= self <= timespan.get_end()
+
     def __eq__(self, other):
         return self._ts == other._ts
 
