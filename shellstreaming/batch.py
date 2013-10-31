@@ -8,28 +8,29 @@
     From users' perspective, `Batch` is equivalent to so-called `window` in stream processing's context.
     Also, a `Batch` is passed to an operator at-a-time internally.
 """
+from Queue import Queue
+from shellstreaming.error import TimestampError
 
 
 class Batch(object):
     """Set of records assembled by timestamp"""
-    def __init__(self, timestamp_start, timestamp_end):
-        """Create a batch to assemble records whose timestamps are within `[timestamps_start, timestamps_end)`"""
+    def __init__(self, timestamp_start, timestamp_end, record_q, timestamp_check=False):
+        """Create an *immutable* batch of records
+
+        :param timestamps_start, timestamps_end: timestamp of each record's in `record_q` is supposed to be between `[timestamps_start, timestamps_end)`
+        :param record_q: Records. *Last element must be `None`*.
+        :type record_q:  instance of `Queue.Queue`
+        :param timestamp_check: if `True`, checks timestamp of each record is between `[timestamps_start, timestamps_end)`
+        :raises: TimestampError when at least one of record's timestamp exceeds `[timestamps_start, timestamps_end)`
+        """
+        assert(isinstance(record_q, Queue))
+
         self._ts_start = timestamp_start
         self._ts_end   = timestamp_end
-        self._records = []  # TODO: is list fast/useful enough?
+        self._record_q = record_q
 
-    def add(self, record):
-        """Add `record` to this batch.
-
-        .. note::
-            `record.timestamp_end` must be within `[timestamps_start, timestamps_end)`
-        """
-        # assert: record's timestamp is in-between batch's time range
-        assert(record.timestamp >= self.get_timestamp_start())
-        assert(record.timestamp <  self.get_timestamp_end())
-
-        # TODO: inserting record into better index (for performance)
-        self._records.append(record)
+        if timestamp_check:
+            Batch._chk_timestamp(self._ts_start, self._ts_end, self._records)
 
     def get_timestamp_start(self):
         """Return this batch's start-timestamp"""
@@ -39,10 +40,6 @@ class Batch(object):
         """Return this batch's end-timestamp"""
         return self._ts_end
 
-    def __len__(self):
-        """Return number of records in this batch"""
-        return len(self._records)
-
     def __iter__(self):
         return self
 
@@ -51,11 +48,10 @@ class Batch(object):
 
         :raises: `StopIteration` when no more record is in this batch
         """
-        # TODO: return record with oldest timestamp?
-        try:
-            return self._records.pop()   # FIXME: Thread-unsafe. Possibly another thread
-                                         # (typically inputstream's data-fetching thread)
-                                         # can append records to this batch at the same time.
-                                         # In such cases, newly-appended records are discarded.
-        except IndexError as e:
-            raise StopIteration(e)
+        # TODO: return record with oldest timestamp? => possible if using Queue.PriorityQueue
+        # print('getting record...')
+        record = self._record_q.get()
+        # print('got record: %s' % (record))
+        if record is None:
+            raise StopIteration
+        return record

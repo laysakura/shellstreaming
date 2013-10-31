@@ -46,3 +46,6 @@ TODO
   - システム的には飽くまでもRecordBatch同士の演算
 - 基本operatorを実装する
 - recordがtimestampとlineage情報を持つようにする(?)
+
+- data-fetcher とかいうのを producer に置き換える
+- TimestampRange的なクラスを作る
