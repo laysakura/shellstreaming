@@ -27,4 +27,4 @@ class Timespan(object):
 
     def get_end(self):
         """Get end timestamp"""
-        return self._start
+        return self._last

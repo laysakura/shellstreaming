@@ -8,7 +8,6 @@ from shellstreaming.timestamp import Timestamp
 
 
 def test_record_usage():
-    """Shows how to use Record class."""
     rdef = RecordDef([
         {'name': 'col0', 'type': 'STRING'},
         {'name': 'col1'},      # any basic type is allowed

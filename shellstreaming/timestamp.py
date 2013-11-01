@@ -104,7 +104,7 @@ class Timestamp(object):
         """Return long representation of this timestamp"""
         return self._ts
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         """Return str representation of this timestamp"""
         t = str(self._ts)
         return "%04d_%02d_%02d__%02d_%02d_%02d_%03d" % (

@@ -2,6 +2,7 @@
 from nose.tools import *
 import datetime
 from shellstreaming.error import UnsupportedTypeError
+from shellstreaming.timespan import Timespan
 from shellstreaming.timestamp import Timestamp
 
 
@@ -28,3 +29,22 @@ def test_timestamp_large_number():
     ts1 = Timestamp(datetime.datetime(1999, 7, 1))
     ts2 = Timestamp(datetime.datetime(2999, 7, 1))
     assert_greater(ts2, ts1)
+
+
+def test_timestamp_timespan_ops():
+    t = Timestamp(datetime.datetime(1999, 7, 1))
+    tspan1 = Timespan(t - 1, 2)
+    tspan2 = Timespan(t - 1, 1)
+    tspan3 = Timespan(t + 1, 1)
+
+    ok_(t.between(tspan1))
+    ok_(t.between(tspan2))
+    ok_(not t.between(tspan3))
+
+    ok_(not t.runoff_lower(tspan1))
+    ok_(not t.runoff_lower(tspan2))
+    ok_(t.runoff_lower(tspan3))
+
+    ok_(not t.runoff_higher(tspan1))
+    ok_(not t.runoff_higher(tspan2))
+    ok_(not t.runoff_higher(tspan3))
