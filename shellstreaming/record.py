@@ -88,7 +88,7 @@ class Record(object):
                     raise RecordTypeError("Column %d has mismatched type:  Got '%s' [%s] ; Expected [%s]" %
                                           (i, rec[i], col_type, def_type))
             except AttributeError as e:
-                # recdef[i].type is not defined, then any ShellStream type is allowed
+                # recdef[i].type is not defined, then any shellstreaming type is allowed
                 try:
                     Type.equivalent_ss_type(rec[i])
                 except UnsupportedTypeError as e:

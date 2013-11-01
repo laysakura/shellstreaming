@@ -28,3 +28,6 @@ class Timespan(object):
     def get_end(self):
         """Get end timestamp"""
         return self._last
+
+    def __str__(self):  # pragma: no cover
+        return "[%s, %s]" % (self._start, self._last)

@@ -8,7 +8,7 @@
     From users' perspective, `Batch` is equivalent to so-called `window` in stream processing's context.
     Also, a `Batch` is passed to an operator at-a-time internally.
 """
-from Queue import Queue
+from Queue import Queue, Empty
 from shellstreaming.error import TimestampError
 
 
@@ -29,7 +29,7 @@ class Batch(object):
         self._record_q = record_q
 
         if timestamp_check:
-            Batch._chk_timestamp(self._ts_start, self._ts_end, self._records)
+            Batch._chk_timestamp(self.timespan, self._record_q)
 
     def __iter__(self):
         return self
@@ -46,3 +46,19 @@ class Batch(object):
         if record is None:
             raise StopIteration
         return record
+
+    # private functions
+    @staticmethod
+    def _chk_timestamp(timespan, record_q):
+        """Check if all records in `record_q` has timestamp between `timespan`
+
+        :raises: `TimestampError` if check failed
+        """
+        while True:
+            rec = record_q.get()
+            record_q.put(rec)
+            if rec is None:
+                return
+            if not rec.timestamp.between(timespan):
+                raise TimestampError('Following record\'s timestamp is %s, which runs off %s: \n%s' %
+                                     (rec.timestamp, timespan, rec))
