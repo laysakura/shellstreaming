@@ -35,7 +35,7 @@ class Record(object):
 
         self._cur_col = 0  # Used for `next()`
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         """Returns string representation of record"""
         retstr = "("
         for i in xrange(len(self._rec)):
@@ -51,10 +51,19 @@ class Record(object):
         return self._rec[index]
 
     def __iter__(self):
-        while self._cur_col < len(self._rec):
-            yield self._rec[self._cur_col]
-            self._cur_col += 1
-        self._cur_col = 0
+        return self
+
+    def next(self):
+        """Return a column one by one
+
+        :raises: StopIteration
+        """
+        if self._cur_col >= len(self._rec):
+            self._cur_col = 0
+            raise StopIteration
+        col = self._rec[self._cur_col]
+        self._cur_col += 1
+        return col
 
     # Private functions
     @staticmethod

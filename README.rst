@@ -48,4 +48,3 @@ TODO
 - recordがtimestampとlineage情報を持つようにする(?)
 
 - data-fetcher とかいうのを producer に置き換える
-- TimestampRange的なクラスを作る
