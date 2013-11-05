@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-""":synopsis: Provides shellstreaming types.
+"""
+    shellstreaming.type
+    ~~~~~~~~~~~~~~~~~~~
 
-.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+    :synopsis: Provides shellstreaming types.
 """
 import types
 from shellstreaming.error import UnsupportedTypeError
@@ -34,7 +36,7 @@ class Type:
         return str(self) == str(other)
 
     def __ne__(self, other):
-        return str(self) != str(other)
+        return not self.__eq__(other)
 
     def __str__(self):
         return self._typestr

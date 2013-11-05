@@ -7,42 +7,34 @@ shellstreaming's documentation
 ==============================
 
 
-Indices and tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
-
 API documents
 -------------
 
-shellstreaming
-++++++++++++++
 .. automodule:: shellstreaming
 
-shellstreaming.columndef
-++++++++++++++++++++++++
 .. automodule:: shellstreaming.columndef
    :exclude-members: __weakref__
 
-shellstreaming.error
-++++++++++++++++++++
 .. automodule:: shellstreaming.error
    :exclude-members: __weakref__
 
-shellstreaming.record
-+++++++++++++++++++++
 .. automodule:: shellstreaming.record
    :exclude-members: __weakref__
 
-shellstreaming.recorddef
-++++++++++++++++++++++++
 .. automodule:: shellstreaming.recorddef
    :exclude-members: __weakref__
 
-shellstreaming.type
-+++++++++++++++++++
+.. automodule:: shellstreaming.batch
+   :exclude-members: __weakref__
+
+.. automodule:: shellstreaming.batch_set
+   :exclude-members: __weakref__
+
 .. automodule:: shellstreaming.type
+   :exclude-members: __weakref__
+
+.. automodule:: shellstreaming.timestamp
+   :exclude-members: __weakref__
+
+.. automodule:: shellstreaming.inputstream.base
    :exclude-members: __weakref__

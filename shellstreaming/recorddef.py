@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-""":synopsis: Provides DDL (like CREATE TABLE) information.
+"""
+    shellstreaming.recorddef
+    ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+    :synopsis: Provides DDL (like CREATE TABLE) information.
 """
 from shellstreaming.error import ColumnDefError, RecordDefError
 from shellstreaming.columndef import ColumnDef

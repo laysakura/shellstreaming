@@ -15,6 +15,7 @@ include/
 pyvenv.cfg
 .python-version
 MANIFEST
+*.egg
 
 doc/.buildinfo
 doc/.doctrees/
@@ -22,3 +23,4 @@ doc/doctrees/
 doc/html/.buildinfo
 doc/html/_sources/
 doc/html/objects.inv
+doc/coverage/

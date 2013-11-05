@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-""":synopsis: Provides column definitions.
+"""
+    shellstreaming.columndef
+    ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+    :synopsis: Provides column definitions.
 """
 import re
 from shellstreaming.error import UnsupportedTypeError, ColumnDefError

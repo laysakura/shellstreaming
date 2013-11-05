@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-""":synopsis: Exception classes.
+"""
+    shellstreaming.error
+    ~~~~~~~~~~~~~~~~~~~~
 
-.. moduleauthor:: Sho Nakatani <lay.sakura@gmail.com>
+    :synopsis: Exception classes.
 """
 
 
@@ -39,6 +41,15 @@ class RecordDefError(BaseError):
 
 class RecordTypeError(BaseError):
     """An exception raised when a record does not match with RecordDef."""
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):  # pragma: no cover
+        return self.msg
+
+
+class TimestampError(BaseError):
+    """An exception raised when timestamp constraint is not satisfied"""
     def __init__(self, msg):
         self.msg = msg
 
