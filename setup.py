@@ -26,6 +26,7 @@ setup(
     packages         = [
         'shellstreaming',
         'shellstreaming.inputstream',
+        'shellstreaming.operator',
         'shellstreaming.test'
     ],
     scripts          = [
