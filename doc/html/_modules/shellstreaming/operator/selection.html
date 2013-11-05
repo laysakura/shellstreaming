@@ -59,6 +59,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">Queue</span> <span class="kn">import</span> <span class="n">Queue</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.batch</span> <span class="kn">import</span> <span class="n">Batch</span>
+<span class="kn">from</span> <span class="nn">shellstreaming.error</span> <span class="kn">import</span> <span class="n">OperatorInitError</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.operator.base</span> <span class="kn">import</span> <span class="n">Base</span>
 
 
@@ -81,7 +82,7 @@
 <span class="sd">        `range operators &lt;#shellstreaming.operator.Selection.range_op&gt;`_</span>
 <span class="sd">        can be used.</span>
 
-<span class="sd">        Works like SQL&#39;s `where` clause.</span>
+<span class="sd">        Works like SQL&#39;s ``where col_val &lt;op1&gt; val1  [and col_val &lt;op2&gt; val2]`` clause.</span>
 
 <span class="sd">        :param column_index: index of column to filter</span>
 <span class="sd">        :param op1:  one of `match operators &lt;#shellstreaming.operator.Selection.match_op&gt;`_ or</span>
@@ -90,28 +91,66 @@
 <span class="sd">        :param op2:</span>
 <span class="sd">            `&lt;` or `&lt;=`</span>
 <span class="sd">                when `op1` is either of `&gt;` or `&gt;=`</span>
-<span class="sd">            `&gt;` or `&gt;=`</span>
-<span class="sd">                when `op1` is either of `&lt;` or `&lt;=`</span>
 <span class="sd">            `None`</span>
 <span class="sd">                otherwise</span>
-
-<span class="sd">        :param val1: used like `col &lt;op1&gt; val1 and col &lt;op2&gt; val2`</span>
+<span class="sd">        :param val2: used like `col &lt;op1&gt; val1 and col &lt;op2&gt; val2`</span>
+<span class="sd">        :raises: `OperatorInitError &lt;#shellstreaming.error.OperatorInitError&gt;`_ when `op1` and `op2` are invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Selection</span><span class="o">.</span><span class="n">_chk_valid_ops</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_col</span> <span class="o">=</span> <span class="n">column_index</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_val</span> <span class="o">=</span> <span class="n">value_to_match</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_op1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_val1</span> <span class="o">=</span> <span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">val1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_op2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_val2</span> <span class="o">=</span> <span class="p">(</span><span class="n">op2</span><span class="p">,</span> <span class="n">val2</span><span class="p">)</span>
         <span class="n">Base</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Selection.execute"><a class="viewcode-back" href="../../../index.html#shellstreaming.operator.selection.Selection.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Match-filters records</span>
+        <span class="sd">&quot;&quot;&quot;Filter records</span>
 
 <span class="sd">        :param batch: batch to filter</span>
 <span class="sd">        :returns:     batch w/ filtered records</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">q</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">rec</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_col</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_val</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">Selection</span><span class="o">.</span><span class="n">_cmp</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_col</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_val1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_val2</span><span class="p">):</span>
                 <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Batch</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">timespan</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>  <span class="c"># TODO: is it OK to always use timestamp from inputstream?</span></div></div>
+        <span class="k">return</span> <span class="n">Batch</span><span class="p">(</span><span class="n">batch</span><span class="o">.</span><span class="n">timespan</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>  <span class="c"># TODO: is it OK to always use timestamp from inputstream?</span>
+
+    <span class="c"># private functions</span></div>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_chk_valid_ops</span><span class="p">(</span><span class="n">op1</span><span class="p">,</span> <span class="n">op2</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">op1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Selection</span><span class="o">.</span><span class="n">match_op</span> <span class="ow">and</span> <span class="n">op1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Selection</span><span class="o">.</span><span class="n">range_op</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OperatorInitError</span><span class="p">(</span><span class="s">&#39;`op1` is invalid: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">op1</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">op1</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">,</span> <span class="s">&#39;!=&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;=&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">op2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="k">raise</span> <span class="n">OperatorInitError</span><span class="p">(</span><span class="s">&#39;`op2` must be `None` when `op1` is `</span><span class="si">%s</span><span class="s">`&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">op1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">op1</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;&gt;=&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">op2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;=&#39;</span><span class="p">):</span> <span class="k">raise</span> <span class="n">OperatorInitError</span><span class="p">(</span><span class="s">&#39;`op2` must be `&lt;` or `&lt;=` when `op1` is `</span><span class="si">%s</span><span class="s">`&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">op1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c"># pragma: no cover</span>
+            <span class="k">assert</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_cmp</span><span class="p">(</span><span class="n">col_val</span><span class="p">,</span> <span class="n">op1</span><span class="p">,</span> <span class="n">val1</span><span class="p">,</span> <span class="n">op2</span><span class="p">,</span> <span class="n">val2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compare</span>
+
+<span class="sd">        ``col_val &lt;op1&gt; val1  [and col_val &lt;op2&gt; val2]``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">op1</span> <span class="ow">in</span> <span class="n">Selection</span><span class="o">.</span><span class="n">match_op</span> <span class="ow">or</span> <span class="n">op1</span> <span class="ow">in</span> <span class="n">Selection</span><span class="o">.</span><span class="n">range_op</span><span class="p">)</span>
+        <span class="k">if</span>   <span class="n">op1</span> <span class="o">==</span> <span class="s">&#39;=&#39;</span>  <span class="p">:</span> <span class="k">return</span> <span class="n">col_val</span> <span class="o">==</span> <span class="n">val1</span>
+        <span class="k">elif</span> <span class="n">op1</span> <span class="o">==</span> <span class="s">&#39;!=&#39;</span> <span class="p">:</span> <span class="k">return</span> <span class="n">col_val</span> <span class="o">!=</span> <span class="n">val1</span>
+        <span class="k">elif</span> <span class="n">op1</span> <span class="o">==</span> <span class="s">&#39;&lt;&#39;</span>  <span class="p">:</span> <span class="k">return</span> <span class="n">col_val</span> <span class="o">&lt;</span>  <span class="n">val1</span>
+        <span class="k">elif</span> <span class="n">op1</span> <span class="o">==</span> <span class="s">&#39;&lt;=&#39;</span> <span class="p">:</span> <span class="k">return</span> <span class="n">col_val</span> <span class="o">&lt;=</span> <span class="n">val1</span>
+        <span class="k">elif</span> <span class="n">op1</span> <span class="o">==</span> <span class="s">&#39;&gt;&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">op2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">return</span> <span class="n">col_val</span> <span class="o">&gt;</span> <span class="n">val1</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">op2</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;=&#39;</span><span class="p">))</span>
+            <span class="k">if</span>   <span class="n">op2</span> <span class="o">==</span> <span class="s">&#39;&lt;&#39;</span> <span class="p">:</span> <span class="k">return</span> <span class="n">val1</span> <span class="o">&lt;</span> <span class="n">col_val</span> <span class="o">&lt;</span>  <span class="n">val2</span>
+            <span class="k">elif</span> <span class="n">op2</span> <span class="o">==</span> <span class="s">&#39;&lt;=&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">val1</span> <span class="o">&lt;</span> <span class="n">col_val</span> <span class="o">&lt;=</span> <span class="n">val2</span>
+        <span class="k">elif</span> <span class="n">op1</span> <span class="o">==</span> <span class="s">&#39;&gt;=&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">op2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">return</span> <span class="n">col_val</span> <span class="o">&gt;=</span> <span class="n">val1</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">op2</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;=&#39;</span><span class="p">))</span>
+            <span class="k">if</span>   <span class="n">op2</span> <span class="o">==</span> <span class="s">&#39;&lt;&#39;</span> <span class="p">:</span> <span class="k">return</span> <span class="n">val1</span> <span class="o">&lt;=</span> <span class="n">col_val</span> <span class="o">&lt;</span>  <span class="n">val2</span>
+            <span class="k">elif</span> <span class="n">op2</span> <span class="o">==</span> <span class="s">&#39;&lt;=&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">val1</span> <span class="o">&lt;=</span> <span class="n">col_val</span> <span class="o">&lt;=</span> <span class="n">val2</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c"># pragma: no cover</span>
+            <span class="k">assert</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

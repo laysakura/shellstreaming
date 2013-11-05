@@ -155,6 +155,13 @@
 </dd></dl>
 
 <dl class="exception">
+<dt id="shellstreaming.error.OperatorInitError">
+<em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">OperatorInitError</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/error.html#OperatorInitError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.OperatorInitError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.error.BaseError" title="shellstreaming.error.BaseError"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.error.BaseError</span></tt></a></p>
+<p>An exception raised when operator is illegally generated</p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="shellstreaming.error.RecordDefError">
 <em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">RecordDefError</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/error.html#RecordDefError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.RecordDefError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#shellstreaming.error.BaseError" title="shellstreaming.error.BaseError"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.error.BaseError</span></tt></a></p>
@@ -962,12 +969,12 @@ method after all data are fetched.</p>
 <p><a class="reference external" href="#shellstreaming.operator.Selection.match_op">match operators</a> and
 <a class="reference external" href="#shellstreaming.operator.Selection.range_op">range operators</a>
 can be used.</p>
-<p>Works like SQL&#8217;s <cite>where</cite> clause.</p>
+<p>Works like SQL&#8217;s <tt class="docutils literal"><span class="pre">where</span> <span class="pre">col_val</span> <span class="pre">&lt;op1&gt;</span> <span class="pre">val1</span>&nbsp; <span class="pre">[and</span> <span class="pre">col_val</span> <span class="pre">&lt;op2&gt;</span> <span class="pre">val2]</span></tt> clause.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>column_index</strong> &#8211; index of column to filter</li>
 <li><strong>op1</strong> &#8211; <p>one of <a class="reference external" href="#shellstreaming.operator.Selection.match_op">match operators</a> or
 <a class="reference external" href="#shellstreaming.operator.Selection.range_op">range operators</a></p>
@@ -976,14 +983,15 @@ can be used.</p>
 <li><strong>op2</strong> &#8211; <dl class="docutils">
 <dt><cite>&lt;</cite> or <cite>&lt;=</cite></dt>
 <dd>when <cite>op1</cite> is either of <cite>&gt;</cite> or <cite>&gt;=</cite></dd>
-<dt><cite>&gt;</cite> or <cite>&gt;=</cite></dt>
-<dd>when <cite>op1</cite> is either of <cite>&lt;</cite> or <cite>&lt;=</cite></dd>
 <dt><cite>None</cite></dt>
 <dd>otherwise</dd>
 </dl>
 </li>
-<li><strong>val1</strong> &#8211; used like <cite>col &lt;op1&gt; val1 and col &lt;op2&gt; val2</cite></li>
+<li><strong>val2</strong> &#8211; used like <cite>col &lt;op1&gt; val1 and col &lt;op2&gt; val2</cite></li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference external" href="#shellstreaming.error.OperatorInitError">OperatorInitError</a> when <cite>op1</cite> and <cite>op2</cite> are invalid.</p>
 </td>
 </tr>
 </tbody>
@@ -993,7 +1001,7 @@ can be used.</p>
 <dl class="method">
 <dt id="shellstreaming.operator.selection.Selection.execute">
 <tt class="descname">execute</tt><big>(</big><em>batch</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/selection.html#Selection.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.selection.Selection.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Match-filters records</p>
+<dd><p>Filter records</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1016,6 +1024,59 @@ can be used.</p>
 <dt id="shellstreaming.operator.selection.Selection.range_op">
 <tt class="descname">range_op</tt><em class="property"> = ['&lt;', '&gt;', '&lt;=', '&gt;=']</em><a class="headerlink" href="#shellstreaming.operator.selection.Selection.range_op" title="Permalink to this definition">¶</a></dt>
 <dd><p>Range operators</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-shellstreaming.operator.sort"></span><div class="section" id="shellstreaming-operator-sort">
+<h3>shellstreaming.operator.sort<a class="headerlink" href="#shellstreaming-operator-sort" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Provides sort operators</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="shellstreaming.operator.sort.Sort">
+<em class="property">class </em><tt class="descclassname">shellstreaming.operator.sort.</tt><tt class="descname">Sort</tt><big>(</big><em>column_index</em>, <em>desc=False</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/sort.html#Sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.sort.Sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.operator.base.Base" title="shellstreaming.operator.base.Base"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.operator.base.Base</span></tt></a></p>
+<p>Sort operator</p>
+<dl class="method">
+<dt id="shellstreaming.operator.sort.Sort.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>column_index</em>, <em>desc=False</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/sort.html#Sort.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.sort.Sort.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates sort operators.</p>
+<p>Works like SQL&#8217;s <tt class="docutils literal"><span class="pre">order</span> <span class="pre">by</span> <span class="pre">[desc]</span> <span class="pre">col_val</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>column_index</strong> &#8211; index of column to filter</li>
+<li><strong>desc</strong> &#8211; sort in reverse order when <cite>True</cite></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.operator.sort.Sort.execute">
+<tt class="descname">execute</tt><big>(</big><em>batch</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/sort.html#Sort.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.sort.Sort.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort records</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch</strong> &#8211; batch to sort</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">sorted batch</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -1048,6 +1109,7 @@ can be used.</p>
 <li><a class="reference internal" href="#shellstreaming-inputstream-stdin">shellstreaming.inputstream.stdin</a></li>
 <li><a class="reference internal" href="#shellstreaming-operator-base">shellstreaming.operator.base</a></li>
 <li><a class="reference internal" href="#shellstreaming-operator-selection">shellstreaming.operator.selection</a></li>
+<li><a class="reference internal" href="#shellstreaming-operator-sort">shellstreaming.operator.sort</a></li>
 </ul>
 </li>
 </ul>

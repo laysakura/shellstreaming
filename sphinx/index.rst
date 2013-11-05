@@ -50,3 +50,6 @@ API documents
 
 .. automodule:: shellstreaming.operator.selection
    :exclude-members: __weakref__
+
+.. automodule:: shellstreaming.operator.sort
+   :exclude-members: __weakref__
