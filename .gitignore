@@ -24,3 +24,5 @@ doc/html/.buildinfo
 doc/html/_sources/
 doc/html/objects.inv
 doc/coverage/
+
+htmlcov/
