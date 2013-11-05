@@ -20,7 +20,6 @@ def _create_test_batch():
     q.put(Record(rdef, 777, 'aaa'))
     q.put(Record(rdef, 333, 'bbb'))
     q.put(Record(rdef, 777, 'ccc'))
-    q.put(None)
     return Batch(Timespan(Timestamp(datetime.now()), 10), q)
 
 
