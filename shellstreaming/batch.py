@@ -40,9 +40,7 @@ class Batch(object):
         :raises: `StopIteration` when no more record is in this batch
         """
         # TODO: return record with oldest timestamp? => possible if using Queue.PriorityQueue
-        # print('getting record...')
         record = self._record_q.get()
-        # print('got record: %s' % (record))
         if record is None:
             raise StopIteration
         return record
