@@ -22,6 +22,7 @@ setup(
     tests_require    = [
         'nose',
         'coverage',
+        'nose-cov',
     ],
     packages         = [
         'shellstreaming',

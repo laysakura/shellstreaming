@@ -35,7 +35,7 @@ class RecordDefError(BaseError):
     def __init__(self, msg):
         self.msg = msg
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self):
         return self.msg
 
 
@@ -44,7 +44,7 @@ class RecordTypeError(BaseError):
     def __init__(self, msg):
         self.msg = msg
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self):
         return self.msg
 
 
@@ -53,5 +53,5 @@ class TimestampError(BaseError):
     def __init__(self, msg):
         self.msg = msg
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self):
         return self.msg
