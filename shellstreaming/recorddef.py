@@ -19,7 +19,7 @@ class RecordDef(object):
 
         *Example:*
 
-        ::
+        .. code-block:: python
 
             rdef = RecordDef(
                 [

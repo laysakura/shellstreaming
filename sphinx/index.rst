@@ -44,3 +44,9 @@ API documents
 
 .. automodule:: shellstreaming.inputstream.stdin
    :exclude-members: __weakref__
+
+.. automodule:: shellstreaming.operator.base
+   :exclude-members: __weakref__
+
+.. automodule:: shellstreaming.operator.selection
+   :exclude-members: __weakref__

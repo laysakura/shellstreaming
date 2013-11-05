@@ -55,7 +55,7 @@
 <span class="sd">    shellstreaming.batch</span>
 <span class="sd">    ~~~~~~~~~~~~~~~~~~~~</span>
 
-<span class="sd">    Set of records assembled by timestamp.</span>
+<span class="sd">    :synopsis: Set of records assembled by timestamp.</span>
 
 <span class="sd">    From users&#39; perspective, `Batch` is equivalent to so-called `window` in stream processing&#39;s context.</span>
 <span class="sd">    Also, a `Batch` is passed to an operator at-a-time internally.</span>
@@ -70,7 +70,7 @@
         <span class="sd">&quot;&quot;&quot;Create an *immutable* batch of records</span>
 
 <span class="sd">        :param timespan: timespan of this batch</span>
-<span class="sd">        :param record_q: Records. *Last element must be `None`*.</span>
+<span class="sd">        :param record_q: records</span>
 <span class="sd">        :type record_q:  instance of `Queue.Queue`</span>
 <span class="sd">        :param timestamp_check: if `True`, checks timestamp of each record is between `[timestamps_start, timestamps_end)`</span>
 <span class="sd">        :raises: TimestampError when at least one of record&#39;s timestamp exceeds `[timestamps_start, timestamps_end)`</span>
@@ -79,6 +79,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">timespan</span>  <span class="o">=</span> <span class="n">timespan</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_record_q</span> <span class="o">=</span> <span class="n">record_q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_record_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>  <span class="c"># last element must be `None`</span>
 
         <span class="k">if</span> <span class="n">timestamp_check</span><span class="p">:</span>
             <span class="n">Batch</span><span class="o">.</span><span class="n">_chk_timestamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timespan</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_q</span><span class="p">)</span>

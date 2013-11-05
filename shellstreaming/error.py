@@ -55,3 +55,12 @@ class TimestampError(BaseError):
 
     def __str__(self):
         return self.msg
+
+
+class OperatorInitError(BaseError):
+    """An exception raised when operator is illegally generated"""
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
