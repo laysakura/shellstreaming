@@ -64,13 +64,20 @@
     <span class="sd">&quot;&quot;&quot;Provides efficient data structure to represent timestamp</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Timestamp.__init__"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        :param timestamp: timestamp</span>
+<span class="sd">        :type timestamp:  instance of `datetime.datetime`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">))</span>
+
         <span class="c"># year=2013, month=10, day=29, hour=01, minute=04, second=12, microsecond=123456</span>
-        <span class="c"># =&gt; 20131029010412123456</span>
+        <span class="c"># =&gt; 20131029010412123  (microsecond is cut to millisecond)</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">timestamp</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">microsecond</span> <span class="o">+</span>
-                    <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">second</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">minute</span> <span class="o">*</span> <span class="mf">1e8</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="mf">1e10</span><span class="p">)</span> <span class="o">+</span>
-                    <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">day</span> <span class="o">*</span> <span class="mf">1e12</span><span class="p">)</span>   <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">month</span> <span class="o">*</span> <span class="mf">1e14</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">year</span> <span class="o">*</span> <span class="mf">1e16</span><span class="p">))</span>
+        <span class="c"># TODO: compress encoded timestamp (might be better to use `datetime.datetime` as-is)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span> <span class="o">=</span> <span class="p">(</span><span class="nb">long</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">microsecond</span> <span class="o">*</span> <span class="mf">1e-3</span><span class="p">)</span> <span class="o">+</span>
+                    <span class="nb">long</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">second</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span> <span class="o">+</span> <span class="nb">long</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">minute</span> <span class="o">*</span> <span class="mf">1e5</span><span class="p">)</span> <span class="o">+</span> <span class="nb">long</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="mf">1e7</span><span class="p">)</span> <span class="o">+</span>
+                    <span class="nb">long</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">day</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)</span>    <span class="o">+</span> <span class="nb">long</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">month</span> <span class="o">*</span> <span class="mf">1e11</span><span class="p">)</span> <span class="o">+</span> <span class="nb">long</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">year</span> <span class="o">*</span> <span class="mf">1e13</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="Timestamp.year"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.year">[docs]</a>    <span class="k">def</span> <span class="nf">year</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return year&quot;&quot;&quot;</span>
@@ -96,16 +103,28 @@
         <span class="sd">&quot;&quot;&quot;Return self&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="p">)[</span><span class="mi">12</span><span class="p">:</span><span class="mi">14</span><span class="p">])</span>
 </div>
-<div class="viewcode-block" id="Timestamp.microsecond"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.microsecond">[docs]</a>    <span class="k">def</span> <span class="nf">microsecond</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return microsecond&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="p">)[</span><span class="mi">14</span><span class="p">:</span><span class="mi">20</span><span class="p">])</span>
+<div class="viewcode-block" id="Timestamp.millisecond"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.millisecond">[docs]</a>    <span class="k">def</span> <span class="nf">millisecond</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return millisecond&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="p">)[</span><span class="mi">14</span><span class="p">:</span><span class="mi">17</span><span class="p">])</span>
 </div>
 <div class="viewcode-block" id="Timestamp.datetime"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.datetime">[docs]</a>    <span class="k">def</span> <span class="nf">datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return `datetime` object&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">month</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">day</span><span class="p">(),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hour</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">minute</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">second</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">microsecond</span><span class="p">())</span>
+            <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">millisecond</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="Timestamp.runoff_lower"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.runoff_lower">[docs]</a>    <span class="k">def</span> <span class="nf">runoff_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timespan</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if this timestamp is lower than t0 of [t0, t1]&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">&lt;</span> <span class="n">timespan</span><span class="o">.</span><span class="n">get_start</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Timestamp.runoff_higher"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.runoff_higher">[docs]</a>    <span class="k">def</span> <span class="nf">runoff_higher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timespan</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if this timestamp is higher than t1 of [t0, t1]&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">&gt;</span> <span class="n">timespan</span><span class="o">.</span><span class="n">get_end</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Timestamp.between"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.between">[docs]</a>    <span class="k">def</span> <span class="nf">between</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timespan</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if this timestamp is between t0 and t1 of [t0, t1]&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">timespan</span><span class="o">.</span><span class="n">get_start</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="bp">self</span> <span class="o">&lt;=</span> <span class="n">timespan</span><span class="o">.</span><span class="n">get_end</span><span class="p">()</span>
 </div>
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_ts</span>
@@ -116,6 +135,15 @@
     <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">_ts</span>
 
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">_ts</span>
+
+    <span class="k">def</span> <span class="nf">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span> <span class="o">&lt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">_ts</span>
+
+    <span class="k">def</span> <span class="nf">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span> <span class="o">&gt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">_ts</span>
+
 <div class="viewcode-block" id="Timestamp.__add__"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.__add__">[docs]</a>    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add `ms` to this timestamp&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Timestamp</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">()</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="n">ms</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">))</span>
@@ -124,17 +152,17 @@
         <span class="sd">&quot;&quot;&quot;Subtract `ms` to this timestamp&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Timestamp</span><span class="p">(</span><span class="n">timestamp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">()</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">microseconds</span><span class="o">=</span><span class="n">ms</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">))</span>
 </div>
-<div class="viewcode-block" id="Timestamp.__int__"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.__int__">[docs]</a>    <span class="k">def</span> <span class="nf">__int__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return int representation of this timestamp&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="p">)</span>
+<div class="viewcode-block" id="Timestamp.__long__"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.__long__">[docs]</a>    <span class="k">def</span> <span class="nf">__long__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return long representation of this timestamp&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span>
 </div>
-<div class="viewcode-block" id="Timestamp.__str__"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Timestamp.__str__"><a class="viewcode-back" href="../../index.html#shellstreaming.timestamp.Timestamp.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c"># pragma: no cover</span>
         <span class="sd">&quot;&quot;&quot;Return str representation of this timestamp&quot;&quot;&quot;</span>
         <span class="n">t</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="p">)</span>
-        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%04d</span><span class="s">_</span><span class="si">%02d</span><span class="s">_</span><span class="si">%02d</span><span class="s">__</span><span class="si">%02d</span><span class="s">_</span><span class="si">%02d</span><span class="s">_</span><span class="si">%02d</span><span class="s">_</span><span class="si">%06d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%04d</span><span class="s">_</span><span class="si">%02d</span><span class="s">_</span><span class="si">%02d</span><span class="s">__</span><span class="si">%02d</span><span class="s">_</span><span class="si">%02d</span><span class="s">_</span><span class="si">%02d</span><span class="s">_</span><span class="si">%03d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">month</span><span class="p">(),</span>  <span class="bp">self</span><span class="o">.</span><span class="n">day</span><span class="p">(),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hour</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">minute</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">second</span><span class="p">(),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">microsecond</span><span class="p">())</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">millisecond</span><span class="p">())</span></div></div>
 </pre></div>
 
           </div>

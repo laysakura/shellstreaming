@@ -91,7 +91,7 @@
         <span class="sd">&quot;&quot;&quot;Returns string representation of record&quot;&quot;&quot;</span>
         <span class="n">retstr</span> <span class="o">=</span> <span class="s">&quot;(&quot;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">)):</span>
-            <span class="n">retstr</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">, &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recdef</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">retstr</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">, &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recdef</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">retstr</span> <span class="o">+</span> <span class="s">&quot;)&quot;</span>
 </div>
 <div class="viewcode-block" id="Record.__len__"><a class="viewcode-back" href="../../index.html#shellstreaming.record.Record.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -103,12 +103,21 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 </div>
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">):</span>
-            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="c"># Private functions</span>
+<div class="viewcode-block" id="Record.next"><a class="viewcode-back" href="../../index.html#shellstreaming.record.Record.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a column one by one</span>
+
+<span class="sd">        :raises: StopIteration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rec</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cur_col</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">col</span>
+
+    <span class="c"># Private functions</span></div>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_internal_repl</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
@@ -131,7 +140,7 @@
                     <span class="k">raise</span> <span class="n">RecordTypeError</span><span class="p">(</span><span class="s">&quot;Column </span><span class="si">%d</span><span class="s"> has mismatched type:  Got &#39;</span><span class="si">%s</span><span class="s">&#39; [</span><span class="si">%s</span><span class="s">] ; Expected [</span><span class="si">%s</span><span class="s">]&quot;</span> <span class="o">%</span>
                                           <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">rec</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">col_type</span><span class="p">,</span> <span class="n">def_type</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="c"># recdef[i].type is not defined, then any ShellStream type is allowed</span>
+                <span class="c"># recdef[i].type is not defined, then any shellstreaming type is allowed</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">Type</span><span class="o">.</span><span class="n">equivalent_ss_type</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                 <span class="k">except</span> <span class="n">UnsupportedTypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
