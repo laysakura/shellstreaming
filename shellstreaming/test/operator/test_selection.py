@@ -35,17 +35,6 @@ def test_selection_usage():
     eq_(n, 2)
 
 
-def test_selection_closed_range():
-    batch = _create_test_batch()
-
-    op = Selection(0, op1='>', val1=123, op2='<=', val2=777)
-    filtered_batch = op.execute(batch)
-    n = 0
-    for record in filtered_batch:
-        n += 1
-    eq_(n, 3)
-
-
 def test_selection_cascade():
     batch = _create_test_batch()
 
@@ -59,6 +48,72 @@ def test_selection_cascade():
     for record in batch:
         n += 1
     eq_(n, 1)
+
+
+def test_selection_all_match_op():
+    op    = Selection(0, op1='=', val1=333)
+    batch = op.execute(_create_test_batch())
+    n = 0
+    for record in batch: n += 1
+    eq_(n, 1)
+
+    op    = Selection(0, op1='!=', val1=333)
+    batch = op.execute(_create_test_batch())
+    n = 0
+    for record in batch: n += 1
+    eq_(n, 3)
+
+
+def test_selection_all_range_op():
+    op    = Selection(0, op1='>', val1=333)
+    batch = op.execute(_create_test_batch())
+    n = 0
+    for record in batch: n += 1
+    eq_(n, 2)
+
+    op    = Selection(0, op1='>=', val1=333)
+    batch = op.execute(_create_test_batch())
+    n = 0
+    for record in batch: n += 1
+    eq_(n, 3)
+
+    op    = Selection(0, op1='<', val1=333)
+    batch = op.execute(_create_test_batch())
+    n = 0
+    for record in batch: n += 1
+    eq_(n, 1)
+
+    op    = Selection(0, op1='<=', val1=333)
+    batch = op.execute(_create_test_batch())
+    n = 0
+    for record in batch: n += 1
+    eq_(n, 2)
+
+
+def test_selection_all_closed_range():
+    op = Selection(0, op1='>', val1=123, op2='<', val2=777)
+    batch = op.execute(_create_test_batch())
+    n = 0
+    for record in batch: n += 1
+    eq_(n, 1)
+
+    op = Selection(0, op1='>', val1=123, op2='<=', val2=777)
+    batch = op.execute(_create_test_batch())
+    n = 0
+    for record in batch: n += 1
+    eq_(n, 3)
+
+    op = Selection(0, op1='>=', val1=123, op2='<', val2=777)
+    batch = op.execute(_create_test_batch())
+    n = 0
+    for record in batch: n += 1
+    eq_(n, 2)
+
+    op = Selection(0, op1='>=', val1=123, op2='<=', val2=777)
+    batch = op.execute(_create_test_batch())
+    n = 0
+    for record in batch: n += 1
+    eq_(n, 4)
 
 
 @raises(OperatorInitError)

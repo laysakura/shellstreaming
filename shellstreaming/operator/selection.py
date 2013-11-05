@@ -73,6 +73,8 @@ class Selection(Base):
             if op2 is not None: raise OperatorInitError('`op2` must be `None` when `op1` is `%s`' % (op1))
         elif op1 in ('>', '>='):
             if op2 not in (None, '<', '<='): raise OperatorInitError('`op2` must be `<` or `<=` when `op1` is `%s`' % (op1))
+        else:  # pragma: no cover
+            assert(False)
 
     @staticmethod
     def _cmp(col_val, op1, val1, op2, val2):
@@ -95,3 +97,5 @@ class Selection(Base):
             assert(op2 in ('<', '<='))
             if   op2 == '<' : return val1 <= col_val <  val2
             elif op2 == '<=': return val1 <= col_val <= val2
+        else:  # pragma: no cover
+            assert(False)
