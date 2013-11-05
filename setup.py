@@ -22,10 +22,12 @@ setup(
     tests_require    = [
         'nose',
         'coverage',
+        'nose-cov',
     ],
     packages         = [
         'shellstreaming',
         'shellstreaming.inputstream',
+        'shellstreaming.operator',
         'shellstreaming.test'
     ],
     scripts          = [

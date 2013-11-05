@@ -111,7 +111,6 @@ class Base(threading.Thread):
             _no_more_batch()
 
         def _produce_next_batch():
-            self._next_batch.put(None)
             batch = Batch(self._next_batch_span, self._next_batch)
             self._batch_q.put(batch)
 
@@ -142,11 +141,11 @@ class Base(threading.Thread):
         return self
 
     @abstractmethod
-    def next(self):
+    def next(self):  # pragma: no cover
         pass
 
     @abstractmethod
-    def run(self):
+    def run(self):  # pragma: no cover
         pass
 
 
@@ -207,10 +206,6 @@ class FiniteStream(Base):
         self._fetch_finished = False
         Base.__init__(self, batch_span_ms)
 
-    def finish_fetching(self):
-        """Function FiniteStream's subclasses must call after finishing data fetching"""
-        self._fetch_finished = True
-
     def next(self):
         """Return one of batches in out-of-order.
 
@@ -224,7 +219,3 @@ class FiniteStream(Base):
         if batch is None:  # means producer thread has sent end signal
             raise StopIteration
         return batch
-
-    # private functions
-    def _no_more_input(self):
-        return self._fetch_finished and len(self._batches) == 0

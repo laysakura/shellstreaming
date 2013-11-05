@@ -22,3 +22,12 @@ def test_textfile_usage():
     print('number of batches (%d) >= 1 ?' % (n_batches))
     assert_greater_equal(n_batches, 1)
     eq_(n_records, 100)
+
+
+def test_textfile_interrupt():
+    n_batches = 0
+    stream = TextFile(TEST_FILE, batch_span_ms=20)
+    for batch in stream:
+        n_batches += 1
+        stream.interrupt()
+    eq_(n_batches, 1)

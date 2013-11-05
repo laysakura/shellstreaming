@@ -163,7 +163,6 @@
             <span class="n">_no_more_batch</span><span class="p">()</span>
 
         <span class="k">def</span> <span class="nf">_produce_next_batch</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_next_batch</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="n">Batch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_next_batch_span</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_batch</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_batch_q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
 
@@ -194,11 +193,11 @@
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c"># pragma: no cover</span>
         <span class="k">pass</span>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c"># pragma: no cover</span>
         <span class="k">pass</span>
 
 </div>
@@ -259,10 +258,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_finished</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="n">Base</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_span_ms</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="FiniteStream.finish_fetching"><a class="viewcode-back" href="../../../index.html#shellstreaming.inputstream.base.FiniteStream.finish_fetching">[docs]</a>    <span class="k">def</span> <span class="nf">finish_fetching</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Function FiniteStream&#39;s subclasses must call after finishing data fetching&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_finished</span> <span class="o">=</span> <span class="bp">True</span>
-</div>
 <div class="viewcode-block" id="FiniteStream.next"><a class="viewcode-back" href="../../../index.html#shellstreaming.inputstream.base.FiniteStream.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return one of batches in out-of-order.</span>
 
@@ -275,11 +270,7 @@
         <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">batch</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>  <span class="c"># means producer thread has sent end signal</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span>
-        <span class="k">return</span> <span class="n">batch</span>
-
-    <span class="c"># private functions</span></div>
-    <span class="k">def</span> <span class="nf">_no_more_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_finished</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_batches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></div>
+        <span class="k">return</span> <span class="n">batch</span></div></div>
 </pre></div>
 
           </div>

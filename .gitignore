@@ -11,7 +11,7 @@ include/
 *.egg-info/
 *.egg/
 
-.coverage
+.coverage.*
 pyvenv.cfg
 .python-version
 MANIFEST
@@ -24,3 +24,5 @@ doc/html/.buildinfo
 doc/html/_sources/
 doc/html/objects.inv
 doc/coverage/
+
+htmlcov/

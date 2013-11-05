@@ -155,6 +155,13 @@
 </dd></dl>
 
 <dl class="exception">
+<dt id="shellstreaming.error.OperatorInitError">
+<em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">OperatorInitError</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/error.html#OperatorInitError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.OperatorInitError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.error.BaseError" title="shellstreaming.error.BaseError"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.error.BaseError</span></tt></a></p>
+<p>An exception raised when operator is illegally generated</p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="shellstreaming.error.RecordDefError">
 <em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">RecordDefError</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/error.html#RecordDefError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.RecordDefError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#shellstreaming.error.BaseError" title="shellstreaming.error.BaseError"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.error.BaseError</span></tt></a></p>
@@ -333,7 +340,14 @@ for each column&#8217;s specification.</p>
 </div>
 <span class="target" id="module-shellstreaming.batch"></span><div class="section" id="shellstreaming-batch">
 <h3>shellstreaming.batch<a class="headerlink" href="#shellstreaming-batch" title="Permalink to this headline">¶</a></h3>
-<p>Set of records assembled by timestamp.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Set of records assembled by timestamp.</td>
+</tr>
+</tbody>
+</table>
 <p>From users&#8217; perspective, <cite>Batch</cite> is equivalent to so-called <cite>window</cite> in stream processing&#8217;s context.
 Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 <dl class="class">
@@ -351,7 +365,7 @@ Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>timespan</strong> &#8211; timespan of this batch</li>
-<li><strong>record_q</strong> (instance of <cite>Queue.Queue</cite>) &#8211; Records. <em>Last element must be `None`</em>.</li>
+<li><strong>record_q</strong> (instance of <cite>Queue.Queue</cite>) &#8211; records</li>
 <li><strong>timestamp_check</strong> &#8211; if <cite>True</cite>, checks timestamp of each record is between <cite>[timestamps_start, timestamps_end)</cite></li>
 </ul>
 </td>
@@ -438,7 +452,14 @@ Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 </div>
 <span class="target" id="module-shellstreaming.timestamp"></span><div class="section" id="shellstreaming-timestamp">
 <h3>shellstreaming.timestamp<a class="headerlink" href="#shellstreaming-timestamp" title="Permalink to this headline">¶</a></h3>
-<p>Provides efficient data structure to represent timestamp</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Provides efficient data structure to represent timestamp</td>
+</tr>
+</tbody>
+</table>
 <dl class="class">
 <dt id="shellstreaming.timestamp.Timestamp">
 <em class="property">class </em><tt class="descclassname">shellstreaming.timestamp.</tt><tt class="descname">Timestamp</tt><big>(</big><em>timestamp</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp" title="Permalink to this definition">¶</a></dt>
@@ -553,7 +574,14 @@ Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 </div>
 <span class="target" id="module-shellstreaming.timespan"></span><div class="section" id="shellstreaming-timespan">
 <h3>shellstreaming.timespan<a class="headerlink" href="#shellstreaming-timespan" title="Permalink to this headline">¶</a></h3>
-<p>Provides timespan [t0, t1]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Provides timespan [t0, t1]</td>
+</tr>
+</tbody>
+</table>
 <dl class="class">
 <dt id="shellstreaming.timespan.Timespan">
 <em class="property">class </em><tt class="descclassname">shellstreaming.timespan.</tt><tt class="descname">Timespan</tt><big>(</big><em>start</em>, <em>span_ms</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/timespan.html#Timespan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timespan.Timespan" title="Permalink to this definition">¶</a></dt>
@@ -741,12 +769,6 @@ method after all data are fetched.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="shellstreaming.inputstream.base.FiniteStream.finish_fetching">
-<tt class="descname">finish_fetching</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/inputstream/base.html#FiniteStream.finish_fetching"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.inputstream.base.FiniteStream.finish_fetching" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function FiniteStream&#8217;s subclasses must call after finishing data fetching</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="shellstreaming.inputstream.base.FiniteStream.next">
 <tt class="descname">next</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/inputstream/base.html#FiniteStream.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.inputstream.base.FiniteStream.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return one of batches in out-of-order.</p>
@@ -849,6 +871,14 @@ method after all data are fetched.</p>
 </div>
 <span class="target" id="module-shellstreaming.inputstream.stdin"></span><div class="section" id="shellstreaming-inputstream-stdin">
 <h3>shellstreaming.inputstream.stdin<a class="headerlink" href="#shellstreaming-inputstream-stdin" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Infinite input stream from stdin</td>
+</tr>
+</tbody>
+</table>
 <dl class="class">
 <dt id="shellstreaming.inputstream.stdin.Stdin">
 <em class="property">class </em><tt class="descclassname">shellstreaming.inputstream.stdin.</tt><tt class="descname">Stdin</tt><big>(</big><em>batch_span_ms=1000</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/inputstream/stdin.html#Stdin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.inputstream.stdin.Stdin" title="Permalink to this definition">¶</a></dt>
@@ -863,6 +893,187 @@ method after all data are fetched.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_span_ms</strong> &#8211; time span to assemble records as batch</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-shellstreaming.operator.base"></span><div class="section" id="shellstreaming-operator-base">
+<h3>shellstreaming.operator.base<a class="headerlink" href="#shellstreaming-operator-base" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Provides abstract class for operators</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="shellstreaming.operator.base.Base">
+<em class="property">class </em><tt class="descclassname">shellstreaming.operator.base.</tt><tt class="descname">Base</tt><a class="reference internal" href="_modules/shellstreaming/operator/base.html#Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.base.Base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Base class for operators</p>
+<dl class="method">
+<dt id="shellstreaming.operator.base.Base.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/base.html#Base.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.base.Base.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shellstreaming.operator.base.Base.__metaclass__">
+<tt class="descname">__metaclass__</tt><a class="headerlink" href="#shellstreaming.operator.base.Base.__metaclass__" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ABCMeta</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.operator.base.Base.execute">
+<tt class="descname">execute</tt><big>(</big><em>batch</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/base.html#Base.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.base.Base.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute operator</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch</strong> &#8211; input</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">output batch</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-shellstreaming.operator.selection"></span><div class="section" id="shellstreaming-operator-selection">
+<h3>shellstreaming.operator.selection<a class="headerlink" href="#shellstreaming-operator-selection" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Provides filtering operators</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="shellstreaming.operator.selection.Selection">
+<em class="property">class </em><tt class="descclassname">shellstreaming.operator.selection.</tt><tt class="descname">Selection</tt><big>(</big><em>column_index</em>, <em>op1</em>, <em>val1</em>, <em>op2=None</em>, <em>val2=None</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/selection.html#Selection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.selection.Selection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.operator.base.Base" title="shellstreaming.operator.base.Base"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.operator.base.Base</span></tt></a></p>
+<p>Filtering operator</p>
+<dl class="method">
+<dt id="shellstreaming.operator.selection.Selection.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>column_index</em>, <em>op1</em>, <em>val1</em>, <em>op2=None</em>, <em>val2=None</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/selection.html#Selection.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.selection.Selection.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates various kinds of selection operators.</p>
+<p><a class="reference external" href="#shellstreaming.operator.Selection.match_op">match operators</a> and
+<a class="reference external" href="#shellstreaming.operator.Selection.range_op">range operators</a>
+can be used.</p>
+<p>Works like SQL&#8217;s <tt class="docutils literal"><span class="pre">where</span> <span class="pre">col_val</span> <span class="pre">&lt;op1&gt;</span> <span class="pre">val1</span>&nbsp; <span class="pre">[and</span> <span class="pre">col_val</span> <span class="pre">&lt;op2&gt;</span> <span class="pre">val2]</span></tt> clause.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>column_index</strong> &#8211; index of column to filter</li>
+<li><strong>op1</strong> &#8211; <p>one of <a class="reference external" href="#shellstreaming.operator.Selection.match_op">match operators</a> or
+<a class="reference external" href="#shellstreaming.operator.Selection.range_op">range operators</a></p>
+</li>
+<li><strong>val1</strong> &#8211; used like <cite>col &lt;op1&gt; val1</cite></li>
+<li><strong>op2</strong> &#8211; <dl class="docutils">
+<dt><cite>&lt;</cite> or <cite>&lt;=</cite></dt>
+<dd>when <cite>op1</cite> is either of <cite>&gt;</cite> or <cite>&gt;=</cite></dd>
+<dt><cite>None</cite></dt>
+<dd>otherwise</dd>
+</dl>
+</li>
+<li><strong>val2</strong> &#8211; used like <cite>col &lt;op1&gt; val1 and col &lt;op2&gt; val2</cite></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference external" href="#shellstreaming.error.OperatorInitError">OperatorInitError</a> when <cite>op1</cite> and <cite>op2</cite> are invalid.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.operator.selection.Selection.execute">
+<tt class="descname">execute</tt><big>(</big><em>batch</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/selection.html#Selection.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.selection.Selection.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter records</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch</strong> &#8211; batch to filter</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">batch w/ filtered records</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shellstreaming.operator.selection.Selection.match_op">
+<tt class="descname">match_op</tt><em class="property"> = ['=', '!=']</em><a class="headerlink" href="#shellstreaming.operator.selection.Selection.match_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match operators</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shellstreaming.operator.selection.Selection.range_op">
+<tt class="descname">range_op</tt><em class="property"> = ['&lt;', '&gt;', '&lt;=', '&gt;=']</em><a class="headerlink" href="#shellstreaming.operator.selection.Selection.range_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range operators</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-shellstreaming.operator.sort"></span><div class="section" id="shellstreaming-operator-sort">
+<h3>shellstreaming.operator.sort<a class="headerlink" href="#shellstreaming-operator-sort" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Provides sort operators</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="shellstreaming.operator.sort.Sort">
+<em class="property">class </em><tt class="descclassname">shellstreaming.operator.sort.</tt><tt class="descname">Sort</tt><big>(</big><em>column_index</em>, <em>desc=False</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/sort.html#Sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.sort.Sort" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.operator.base.Base" title="shellstreaming.operator.base.Base"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.operator.base.Base</span></tt></a></p>
+<p>Sort operator</p>
+<dl class="method">
+<dt id="shellstreaming.operator.sort.Sort.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>column_index</em>, <em>desc=False</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/sort.html#Sort.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.sort.Sort.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates sort operators.</p>
+<p>Works like SQL&#8217;s <tt class="docutils literal"><span class="pre">order</span> <span class="pre">by</span> <span class="pre">[desc]</span> <span class="pre">col_val</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>column_index</strong> &#8211; index of column to filter</li>
+<li><strong>desc</strong> &#8211; sort in reverse order when <cite>True</cite></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.operator.sort.Sort.execute">
+<tt class="descname">execute</tt><big>(</big><em>batch</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/operator/sort.html#Sort.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.operator.sort.Sort.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort records</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch</strong> &#8211; batch to sort</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">sorted batch</td>
 </tr>
 </tbody>
 </table>
@@ -896,6 +1107,9 @@ method after all data are fetched.</p>
 <li><a class="reference internal" href="#shellstreaming-inputstream-base">shellstreaming.inputstream.base</a></li>
 <li><a class="reference internal" href="#shellstreaming-inputstream-textfile">shellstreaming.inputstream.textfile</a></li>
 <li><a class="reference internal" href="#shellstreaming-inputstream-stdin">shellstreaming.inputstream.stdin</a></li>
+<li><a class="reference internal" href="#shellstreaming-operator-base">shellstreaming.operator.base</a></li>
+<li><a class="reference internal" href="#shellstreaming-operator-selection">shellstreaming.operator.selection</a></li>
+<li><a class="reference internal" href="#shellstreaming-operator-sort">shellstreaming.operator.sort</a></li>
 </ul>
 </li>
 </ul>
