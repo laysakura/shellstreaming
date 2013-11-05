@@ -3,7 +3,7 @@
     shellstreaming.timespan
     ~~~~~~~~~~~~~~~~~~~~~~~
 
-    Provides timespan [t0, t1]
+    :synopsis: Provides timespan [t0, t1]
 """
 from shellstreaming.timestamp import Timestamp
 

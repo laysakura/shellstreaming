@@ -3,7 +3,7 @@
     shellstreaming.inputstream.randint
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Generates random integer sequence.
+    :synopsis: Generates random integer sequence.
 
     Mainly for testing `InfiniteStream <#shellstreaming.infinitestream.base.Infinitestream>`_
 """

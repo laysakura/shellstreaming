@@ -111,7 +111,6 @@ class Base(threading.Thread):
             _no_more_batch()
 
         def _produce_next_batch():
-            self._next_batch.put(None)
             batch = Batch(self._next_batch_span, self._next_batch)
             self._batch_q.put(batch)
 

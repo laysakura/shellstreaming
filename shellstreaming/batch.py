@@ -3,7 +3,7 @@
     shellstreaming.batch
     ~~~~~~~~~~~~~~~~~~~~
 
-    Set of records assembled by timestamp.
+    :synopsis: Set of records assembled by timestamp.
 
     From users' perspective, `Batch` is equivalent to so-called `window` in stream processing's context.
     Also, a `Batch` is passed to an operator at-a-time internally.
@@ -18,7 +18,7 @@ class Batch(object):
         """Create an *immutable* batch of records
 
         :param timespan: timespan of this batch
-        :param record_q: Records. *Last element must be `None`*.
+        :param record_q: records
         :type record_q:  instance of `Queue.Queue`
         :param timestamp_check: if `True`, checks timestamp of each record is between `[timestamps_start, timestamps_end)`
         :raises: TimestampError when at least one of record's timestamp exceeds `[timestamps_start, timestamps_end)`
@@ -27,6 +27,7 @@ class Batch(object):
 
         self.timespan  = timespan
         self._record_q = record_q
+        self._record_q.put(None)  # last element must be `None`
 
         if timestamp_check:
             Batch._chk_timestamp(self.timespan, self._record_q)

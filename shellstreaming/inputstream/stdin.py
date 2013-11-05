@@ -2,6 +2,8 @@
 """
     shellstreaming.inputstream.stdin
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    :synopsis: Infinite input stream from stdin
 """
 import sys
 from shellstreaming.inputstream.base import InfiniteStream

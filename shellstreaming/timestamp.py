@@ -3,7 +3,7 @@
     shellstreaming.timestamp
     ~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Provides efficient data structure to represent timestamp
+    :synopsis: Provides efficient data structure to represent timestamp
 """
 import datetime
 
