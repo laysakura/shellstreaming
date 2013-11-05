@@ -52,7 +52,7 @@ class Selection(Base):
         Base.__init__(self)
 
     def execute(self, batch):
-        """Match-filters records
+        """Filter records
 
         :param batch: batch to filter
         :returns:     batch w/ filtered records
