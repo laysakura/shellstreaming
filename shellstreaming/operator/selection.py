@@ -15,7 +15,7 @@ class MatchSelection(Base):
     def __init__(self, column_index, value_to_match):
         """Constructor.
 
-        Works like SQL's ``where column_name = value_to_match``.
+        Works like SQL's ``where column = value_to_match``.
 
         :param column_index:   index of column
         :param value_to_match: value to match
@@ -25,6 +25,11 @@ class MatchSelection(Base):
         Base.__init__(self)
 
     def execute(self, batch):
+        """Match-filters records
+
+        :param batch: batch to filter
+        :returns:     batch w/ filtered records
+        """
         q = Queue()
         for rec in batch:
             if rec[self._col] == self._val:

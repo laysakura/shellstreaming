@@ -18,4 +18,9 @@ class Base(object):
 
     @abstractmethod
     def execute(self, batch):  # pragma: no cover
+        """Execute operator
+
+        :param batch: input
+        :returns:     output batch
+        """
         pass
