@@ -168,8 +168,11 @@ class InfiniteStream(Base):
         """
         if self.interrupted():
             raise StopIteration
+
         # TODO: return batch with oldest timestamp?
-        return self._batches.pop()
+        batch = self._batch_q.get()
+        assert(batch is not None)
+        return batch
 
 
 class FiniteStream(Base):
