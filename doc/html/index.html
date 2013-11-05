@@ -169,6 +169,13 @@
 </dd></dl>
 
 <dl class="exception">
+<dt id="shellstreaming.error.TimestampError">
+<em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">TimestampError</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/error.html#TimestampError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.TimestampError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.error.BaseError" title="shellstreaming.error.BaseError"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.error.BaseError</span></tt></a></p>
+<p>An exception raised when timestamp constraint is not satisfied</p>
+</dd></dl>
+
+<dl class="exception">
 <dt id="shellstreaming.error.UnsupportedTypeError">
 <em class="property">exception </em><tt class="descclassname">shellstreaming.error.</tt><tt class="descname">UnsupportedTypeError</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/error.html#UnsupportedTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.error.UnsupportedTypeError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#shellstreaming.error.BaseError" title="shellstreaming.error.BaseError"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.error.BaseError</span></tt></a></p>
@@ -229,6 +236,20 @@
 <dt id="shellstreaming.record.Record.__str__">
 <tt class="descname">__str__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/record.html#Record.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.record.Record.__str__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns string representation of record</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.record.Record.next">
+<tt class="descname">next</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/record.html#Record.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.record.Record.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a column one by one</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">StopIteration</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -317,41 +338,29 @@ for each column&#8217;s specification.</p>
 Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 <dl class="class">
 <dt id="shellstreaming.batch.Batch">
-<em class="property">class </em><tt class="descclassname">shellstreaming.batch.</tt><tt class="descname">Batch</tt><big>(</big><em>timestamp_start</em>, <em>timestamp_end</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch.html#Batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch.Batch" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">shellstreaming.batch.</tt><tt class="descname">Batch</tt><big>(</big><em>timespan</em>, <em>record_q</em>, <em>timestamp_check=False</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch.html#Batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch.Batch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Set of records assembled by timestamp</p>
 <dl class="method">
 <dt id="shellstreaming.batch.Batch.__init__">
-<tt class="descname">__init__</tt><big>(</big><em>timestamp_start</em>, <em>timestamp_end</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch.html#Batch.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch.Batch.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a batch to assemble records whose timestamps are within <cite>[timestamps_start, timestamps_end)</cite></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="shellstreaming.batch.Batch.__len__">
-<tt class="descname">__len__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch.html#Batch.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch.Batch.__len__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return number of records in this batch</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="shellstreaming.batch.Batch.add">
-<tt class="descname">add</tt><big>(</big><em>record</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch.html#Batch.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch.Batch.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add <cite>record</cite> to this batch.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last"><cite>record.timestamp_end</cite> must be within <cite>[timestamps_start, timestamps_end)</cite></p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="shellstreaming.batch.Batch.get_timestamp_end">
-<tt class="descname">get_timestamp_end</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch.html#Batch.get_timestamp_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch.Batch.get_timestamp_end" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return this batch&#8217;s end-timestamp</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="shellstreaming.batch.Batch.get_timestamp_start">
-<tt class="descname">get_timestamp_start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch.html#Batch.get_timestamp_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch.Batch.get_timestamp_start" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return this batch&#8217;s start-timestamp</p>
+<tt class="descname">__init__</tt><big>(</big><em>timespan</em>, <em>record_q</em>, <em>timestamp_check=False</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch.html#Batch.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch.Batch.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an <em>immutable</em> batch of records</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timespan</strong> &#8211; timespan of this batch</li>
+<li><strong>record_q</strong> (instance of <cite>Queue.Queue</cite>) &#8211; Records. <em>Last element must be `None`</em>.</li>
+<li><strong>timestamp_check</strong> &#8211; if <cite>True</cite>, checks timestamp of each record is between <cite>[timestamps_start, timestamps_end)</cite></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">TimestampError when at least one of record&#8217;s timestamp exceeds <cite>[timestamps_start, timestamps_end)</cite></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -363,69 +372,6 @@ Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><cite>StopIteration</cite> when no more record is in this batch</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<span class="target" id="module-shellstreaming.batch_set"></span><div class="section" id="shellstreaming-batch-set">
-<h3>shellstreaming.batch_set<a class="headerlink" href="#shellstreaming-batch-set" title="Permalink to this headline">¶</a></h3>
-<p>Set of batches.</p>
-<dl class="class">
-<dt id="shellstreaming.batch_set.BatchSet">
-<em class="property">class </em><tt class="descclassname">shellstreaming.batch_set.</tt><tt class="descname">BatchSet</tt><a class="reference internal" href="_modules/shellstreaming/batch_set.html#BatchSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch_set.BatchSet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Set of batches.</p>
-<p>Purpose of this class is to provide fast way to select a batch who has specific record
-(Provides timestamp index in other words).</p>
-<dl class="method">
-<dt id="shellstreaming.batch_set.BatchSet.__init__">
-<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch_set.html#BatchSet.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch_set.BatchSet.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructor</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="shellstreaming.batch_set.BatchSet.__len__">
-<tt class="descname">__len__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch_set.html#BatchSet.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch_set.BatchSet.__len__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return number of batches in this batch set.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="shellstreaming.batch_set.BatchSet.add">
-<tt class="descname">add</tt><big>(</big><em>batch</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch_set.html#BatchSet.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch_set.BatchSet.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add <cite>batch</cite> to this batch set.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last"><cite>[batch.get_timestamp_start(), batch.get_timestamp_end())</cite> must not overwrap with other batches&#8217; ones.</p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="shellstreaming.batch_set.BatchSet.find_batch">
-<tt class="descname">find_batch</tt><big>(</big><em>timestamp</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch_set.html#BatchSet.find_batch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch_set.BatchSet.find_batch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find a batch who is in charge of <cite>timestamp</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None when no batch is in charge of <cite>timestamp</cite></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="shellstreaming.batch_set.BatchSet.pop">
-<tt class="descname">pop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/batch_set.html#BatchSet.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.batch_set.BatchSet.pop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pop (fetch &amp; remove) a batch from this batch set in out-of-order.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None when no batch is in this batch set.</td>
 </tr>
 </tbody>
 </table>
@@ -508,12 +454,20 @@ Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 <dt id="shellstreaming.timestamp.Timestamp.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>timestamp</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timestamp</strong> (instance of <cite>datetime.datetime</cite>) &#8211; timestamp</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
-<dt id="shellstreaming.timestamp.Timestamp.__int__">
-<tt class="descname">__int__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.__int__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.__int__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return int representation of this timestamp</p>
+<dt id="shellstreaming.timestamp.Timestamp.__long__">
+<tt class="descname">__long__</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.__long__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.__long__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return long representation of this timestamp</p>
 </dd></dl>
 
 <dl class="method">
@@ -526,6 +480,12 @@ Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 <dt id="shellstreaming.timestamp.Timestamp.__sub__">
 <tt class="descname">__sub__</tt><big>(</big><em>ms</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.__sub__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.__sub__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subtract <cite>ms</cite> to this timestamp</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.timestamp.Timestamp.between">
+<tt class="descname">between</tt><big>(</big><em>timespan</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.between"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if this timestamp is between t0 and t1 of [t0, t1]</p>
 </dd></dl>
 
 <dl class="method">
@@ -547,9 +507,9 @@ Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="shellstreaming.timestamp.Timestamp.microsecond">
-<tt class="descname">microsecond</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.microsecond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.microsecond" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return microsecond</p>
+<dt id="shellstreaming.timestamp.Timestamp.millisecond">
+<tt class="descname">millisecond</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.millisecond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.millisecond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return millisecond</p>
 </dd></dl>
 
 <dl class="method">
@@ -565,6 +525,18 @@ Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="shellstreaming.timestamp.Timestamp.runoff_higher">
+<tt class="descname">runoff_higher</tt><big>(</big><em>timespan</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.runoff_higher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.runoff_higher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if this timestamp is higher than t1 of [t0, t1]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.timestamp.Timestamp.runoff_lower">
+<tt class="descname">runoff_lower</tt><big>(</big><em>timespan</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.runoff_lower"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.runoff_lower" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if this timestamp is lower than t0 of [t0, t1]</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="shellstreaming.timestamp.Timestamp.second">
 <tt class="descname">second</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.second"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.second" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return self</p>
@@ -574,6 +546,47 @@ Also, a <cite>Batch</cite> is passed to an operator at-a-time internally.</p>
 <dt id="shellstreaming.timestamp.Timestamp.year">
 <tt class="descname">year</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/timestamp.html#Timestamp.year"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timestamp.Timestamp.year" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return year</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-shellstreaming.timespan"></span><div class="section" id="shellstreaming-timespan">
+<h3>shellstreaming.timespan<a class="headerlink" href="#shellstreaming-timespan" title="Permalink to this headline">¶</a></h3>
+<p>Provides timespan [t0, t1]</p>
+<dl class="class">
+<dt id="shellstreaming.timespan.Timespan">
+<em class="property">class </em><tt class="descclassname">shellstreaming.timespan.</tt><tt class="descname">Timespan</tt><big>(</big><em>start</em>, <em>span_ms</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/timespan.html#Timespan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timespan.Timespan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Provides timespan [start, start + span_ms]</p>
+<dl class="method">
+<dt id="shellstreaming.timespan.Timespan.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>start</em>, <em>span_ms</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/timespan.html#Timespan.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timespan.Timespan.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start</strong> &#8211; beginning of timespan</li>
+<li><strong>span_ms</strong> &#8211; timespan</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.timespan.Timespan.get_end">
+<tt class="descname">get_end</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/timespan.html#Timespan.get_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timespan.Timespan.get_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get end timestamp</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.timespan.Timespan.get_start">
+<tt class="descname">get_start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/timespan.html#Timespan.get_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.timespan.Timespan.get_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get start timestamp</p>
 </dd></dl>
 
 </dd></dl>
@@ -624,7 +637,21 @@ Use <a class="reference external" href="#shellstreaming.inputstream.base.FiniteS
 <dl class="method">
 <dt id="shellstreaming.inputstream.base.Base.add">
 <tt class="descname">add</tt><big>(</big><em>record</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/inputstream/base.html#Base.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.inputstream.base.Base.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function for inputstream subclasses to add records fetched</p>
+<dd><p>Function for inputstream subclasses to add records fetched.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Current constraint: <cite>record.timestamp</cite> of formmer must be not greater than that of later one.
+i.e. asserting <tt class="docutils literal"><span class="pre">rec1.timestamp</span> <span class="pre">&lt;=</span> <span class="pre">rec2.timestamp</span></tt> where <tt class="docutils literal"><span class="pre">add(rec1)</span> <span class="pre">;</span> <span class="pre">add(rec2)</span></tt></p>
+<p class="last">Therefore, current version does not support user-defined timestamp.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>record</strong> &#8211; Give <cite>None</cite> to signal consumer that data-fetching process has end.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -722,7 +749,7 @@ method after all data are fetched.</p>
 <dl class="method">
 <dt id="shellstreaming.inputstream.base.FiniteStream.next">
 <tt class="descname">next</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/inputstream/base.html#FiniteStream.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.inputstream.base.FiniteStream.next" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return one of batches in out-of-order</p>
+<dd><p>Return one of batches in out-of-order.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -777,6 +804,73 @@ method after all data are fetched.</p>
 </dd></dl>
 
 </div>
+<span class="target" id="module-shellstreaming.inputstream.textfile"></span><div class="section" id="shellstreaming-inputstream-textfile">
+<h3>shellstreaming.inputstream.textfile<a class="headerlink" href="#shellstreaming-inputstream-textfile" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">FiniteStream for text files.</td>
+</tr>
+</tbody>
+</table>
+<p>A line is used as record with single column.</p>
+<dl class="class">
+<dt id="shellstreaming.inputstream.textfile.TextFile">
+<em class="property">class </em><tt class="descclassname">shellstreaming.inputstream.textfile.</tt><tt class="descname">TextFile</tt><big>(</big><em>path</em>, <em>batch_span_ms=1000</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/inputstream/textfile.html#TextFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.inputstream.textfile.TextFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.inputstream.base.FiniteStream" title="shellstreaming.inputstream.base.FiniteStream"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.inputstream.base.FiniteStream</span></tt></a></p>
+<p>FiniteStream for text files</p>
+<dl class="method">
+<dt id="shellstreaming.inputstream.textfile.TextFile.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>path</em>, <em>batch_span_ms=1000</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/inputstream/textfile.html#TextFile.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.inputstream.textfile.TextFile.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> &#8211; path to text file</li>
+<li><strong>batch_span_ms</strong> &#8211; time span to assemble records as batch</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.inputstream.textfile.TextFile.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/inputstream/textfile.html#TextFile.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.inputstream.textfile.TextFile.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a text file line-by-line until EOF</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-shellstreaming.inputstream.stdin"></span><div class="section" id="shellstreaming-inputstream-stdin">
+<h3>shellstreaming.inputstream.stdin<a class="headerlink" href="#shellstreaming-inputstream-stdin" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="shellstreaming.inputstream.stdin.Stdin">
+<em class="property">class </em><tt class="descclassname">shellstreaming.inputstream.stdin.</tt><tt class="descname">Stdin</tt><big>(</big><em>batch_span_ms=1000</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/inputstream/stdin.html#Stdin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.inputstream.stdin.Stdin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shellstreaming.inputstream.base.InfiniteStream" title="shellstreaming.inputstream.base.InfiniteStream"><tt class="xref py py-class docutils literal"><span class="pre">shellstreaming.inputstream.base.InfiniteStream</span></tt></a></p>
+<p>Infinite input stream from stdin</p>
+<dl class="method">
+<dt id="shellstreaming.inputstream.stdin.Stdin.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>batch_span_ms=1000</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/inputstream/stdin.html#Stdin.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.inputstream.stdin.Stdin.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_span_ms</strong> &#8211; time span to assemble records as batch</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 </div>
 
@@ -796,10 +890,12 @@ method after all data are fetched.</p>
 <li><a class="reference internal" href="#shellstreaming-record">shellstreaming.record</a></li>
 <li><a class="reference internal" href="#shellstreaming-recorddef">shellstreaming.recorddef</a></li>
 <li><a class="reference internal" href="#shellstreaming-batch">shellstreaming.batch</a></li>
-<li><a class="reference internal" href="#shellstreaming-batch-set">shellstreaming.batch_set</a></li>
 <li><a class="reference internal" href="#shellstreaming-type">shellstreaming.type</a></li>
 <li><a class="reference internal" href="#shellstreaming-timestamp">shellstreaming.timestamp</a></li>
+<li><a class="reference internal" href="#shellstreaming-timespan">shellstreaming.timespan</a></li>
 <li><a class="reference internal" href="#shellstreaming-inputstream-base">shellstreaming.inputstream.base</a></li>
+<li><a class="reference internal" href="#shellstreaming-inputstream-textfile">shellstreaming.inputstream.textfile</a></li>
+<li><a class="reference internal" href="#shellstreaming-inputstream-stdin">shellstreaming.inputstream.stdin</a></li>
 </ul>
 </li>
 </ul>
