@@ -27,8 +27,6 @@ class TextFile(FiniteStream):
         """Reads a text file line-by-line until EOF"""
         with open(self._path) as f:
             rdef = RecordDef([{'name': 'line', 'type': 'STRING'}])
-            line = f.readline()
-            while line:
+            for line in f:
                 self.add(Record(rdef, line))
-                line = f.readline()
         self.add(None)  # producer has end data-fetching
