@@ -1,5 +1,5 @@
 [run]
-omit = shellstreaming/test/*
+omit = shellstreaming/test/*,shellstreaming/inputstream/stdin.py
 branch = True
 parallel = True
 
