@@ -9,7 +9,7 @@ For developers
 API documents
 -------------
 
-Sphinx-powered documents are available on `http://packages.python.org/shellstreaming/`_
+Sphinx-powered documents are available on http://packages.python.org/shellstreaming
 
 
 Building and uploading documents
@@ -42,7 +42,7 @@ Uploading packages to PyPI
 Thanks
 ------
 
-- modcache for a few pull requests!
+- [modocache](https://github.com/modocache) for a few pull requests!
 
 
 TODO
@@ -73,29 +73,35 @@ select b, a from T group by b;  -- sum(a) とかだと直感的な結果．aだ�
 ----------
 
 - どうやってデータを分配するか
+
   - HDFS
   - Spark Streamingはinput stream -> RDDという風にすぐさま分散している
   - 「ユーザから見たらどのワーカにデータが行くかはわからない」かつ「どうせストリームだし，裏側では勝手にデータが分散されている」みたいなのが一番目指すべき所．
   - naiveな分散のさせかたは，バッチ11をノード1に，バッチ12をノード2に，・・・みたいな感じだけど，そんな風にパイプラインチックにやるのがいいのか，どのバッチもどかんと分散するのがいいのか，それは分からない
 
 - マスタ・ワーカなどの分散構成
+
   - inputstream処理の分散
   - 各種operator処理の分散
 
 - 分散構成を定義するためにユーザがやらなければならないことを考える
+
   - zookeeperはUX糞だったなぁ・・・
 
 - フォールトトレランス
+
   - マスタのトレランス
   - ワーカのトレランス
   - 実装しないまでも，「こう実装すれば大丈夫」という案は持っておくべき
 
 - shellオペレータ
+
   - 通常のオペレータと同様，どこでオペレータ起動するか問題
   - 「オペレータの起動」と「オペレータのプロセスの起動」は別管理する必要がある
   - 「オペレータのプロセスの起動」あるいはサーバ化みたいなものをちゃんと自前管理する方策
 
 - ワークフロー記述のDSL
+
   - 既存のものは本当に使えないか
   - 結局，JSONベース+webUIでセーブ時に毎回絵が更新みたいなのが嬉しいような気もする(GUIで細かいscript pathとか書きたくない気がするので)
 
