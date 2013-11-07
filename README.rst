@@ -52,19 +52,24 @@ TODO
 --------
 
 - group by で集約関数適用しない時はどんな結果が期待されているのだろう?
+
   - SQLite3だと，最後の行の値が返ってきた
 
-```sql
-select b, a from T group by b;  -- sum(a) とかだと直感的な結果．aだと，最後の行のaが返ってきた．
-```
+    .. code-block:: sql
+
+        select b, a from T group by b;  -- sum(a) とかだと直感的な結果．aだと，最後の行のaが返ってきた．
+
 
 - 俺のシステムでリレーションを作るよりは，既存のDBからリレーションを取ってこれるadapterとリレーションにappendできるoutput opを作るほうが賢明．
+
   - システム的には飽くまでもRecordBatch同士の演算
 
 - もしかしたらrecord一つ一つにtimestamp持たせるよりもbatchにtimespanだけ持たせればいいかも(?)
+
   - どんなアプリを使いたいか次第だし，両方のoptionがあったほうがいいだろうね
 
 - 基本operatorを実装する
+
 - recordがtimestampとlineage情報を持つようにする(?)
 
 - data-fetcher とかいうのを producer に置き換える
