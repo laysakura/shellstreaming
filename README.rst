@@ -18,7 +18,7 @@ Building and uploading documents
 .. code-block:: bash
 
     $ ./setup.py build_sphinx
-    $ ls doc/html/index.html
+    $ browser doc/html/index.html
     $ ./setup.py upload_sphinx
 
 Testing
@@ -27,24 +27,75 @@ Testing
 .. code-block:: bash
 
     $ ./setup.py nosetests
+    $ browser htmlcov/index.html  # check coverage
 
 Uploading packages to PyPI
 --------------------------
 
 .. code-block:: bash
 
-    $ emacs shellstreaming/__init__.py   # edit __version__
+    $ emacs setup.py   # edit `version` string
     $ emacs CHANGES.txt
     $ ./setup.py sdist upload
+
+
+Thanks
+------
+
+- modcache for a few pull requests!
 
 
 TODO
 ====
 
-- _internal_replをlistにしても動くことを確認するテスト
+細かい話
+--------
+
+- group by で集約関数適用しない時はどんな結果が期待されているのだろう?
+  - SQLite3だと，最後の行の値が返ってきた
+
+```sql
+select b, a from T group by b;  -- sum(a) とかだと直感的な結果．aだと，最後の行のaが返ってきた．
+```
+
 - 俺のシステムでリレーションを作るよりは，既存のDBからリレーションを取ってこれるadapterとリレーションにappendできるoutput opを作るほうが賢明．
   - システム的には飽くまでもRecordBatch同士の演算
+
+- もしかしたらrecord一つ一つにtimestamp持たせるよりもbatchにtimespanだけ持たせればいいかも(?)
+  - どんなアプリを使いたいか次第だし，両方のoptionがあったほうがいいだろうね
+
 - 基本operatorを実装する
 - recordがtimestampとlineage情報を持つようにする(?)
 
 - data-fetcher とかいうのを producer に置き換える
+
+全体の展望
+----------
+
+- どうやってデータを分配するか
+  - HDFS
+  - Spark Streamingはinput stream -> RDDという風にすぐさま分散している
+  - 「ユーザから見たらどのワーカにデータが行くかはわからない」かつ「どうせストリームだし，裏側では勝手にデータが分散されている」みたいなのが一番目指すべき所．
+  - naiveな分散のさせかたは，バッチ11をノード1に，バッチ12をノード2に，・・・みたいな感じだけど，そんな風にパイプラインチックにやるのがいいのか，どのバッチもどかんと分散するのがいいのか，それは分からない
+
+- マスタ・ワーカなどの分散構成
+  - inputstream処理の分散
+  - 各種operator処理の分散
+
+- 分散構成を定義するためにユーザがやらなければならないことを考える
+  - zookeeperはUX糞だったなぁ・・・
+
+- フォールトトレランス
+  - マスタのトレランス
+  - ワーカのトレランス
+  - 実装しないまでも，「こう実装すれば大丈夫」という案は持っておくべき
+
+- shellオペレータ
+  - 通常のオペレータと同様，どこでオペレータ起動するか問題
+  - 「オペレータの起動」と「オペレータのプロセスの起動」は別管理する必要がある
+  - 「オペレータのプロセスの起動」あるいはサーバ化みたいなものをちゃんと自前管理する方策
+
+- ワークフロー記述のDSL
+  - 既存のものは本当に使えないか
+  - 結局，JSONベース+webUIでセーブ時に毎回絵が更新みたいなのが嬉しいような気もする(GUIで細かいscript pathとか書きたくない気がするので)
+
