@@ -75,4 +75,4 @@ class ColumnDef(object):
         try:
             return Type(_type)
         except UnsupportedTypeError as e:
-            raise ColumnDefError("%s")
+            raise ColumnDefError("'%s' is invalid for 'type'" % (_type))

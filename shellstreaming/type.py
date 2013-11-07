@@ -50,7 +50,7 @@ class Type:
         """
         builtin_type = type(val)
         if builtin_type not in Type._typemap:
-            raise UnsupportedTypeError("builtin type %s is not convirtible to shellstreaming type" %
+            raise UnsupportedTypeError("builtin type %s is not convertible to shellstreaming type" %
                                        (builtin_type))
         ss_type_str = Type._typemap[builtin_type]
         return Type(ss_type_str)
