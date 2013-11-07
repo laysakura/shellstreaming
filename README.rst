@@ -18,7 +18,7 @@ Building and uploading documents
 .. code-block:: bash
 
     $ ./setup.py build_sphinx
-    $ ls doc/html/index.html
+    $ browser doc/html/index.html
     $ ./setup.py upload_sphinx
 
 Testing
@@ -27,13 +27,14 @@ Testing
 .. code-block:: bash
 
     $ ./setup.py nosetests
+    $ browser htmlcov/index.html  # check coverage
 
 Uploading packages to PyPI
 --------------------------
 
 .. code-block:: bash
 
-    $ emacs shellstreaming/__init__.py   # edit __version__
+    $ emacs setup.py   # edit `version` string
     $ emacs CHANGES.txt
     $ ./setup.py sdist upload
 
