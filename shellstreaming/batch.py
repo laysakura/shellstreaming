@@ -8,7 +8,10 @@
     From users' perspective, `Batch` is equivalent to so-called `window` in stream processing's context.
     Also, a `Batch` is passed to an operator at-a-time internally.
 """
-from Queue import Queue, Empty
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
 from shellstreaming.error import TimestampError
 
 
