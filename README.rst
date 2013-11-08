@@ -1,7 +1,8 @@
 shellstreaming
 ~~~~~~~~~~~~~~
 
-.. image:: https://travis-ci.org/laysakura/shellstreaming.png?branch=dev   :target: https://travis-ci.org/laysakura/shellstreaming
+.. image:: https://travis-ci.org/laysakura/shellstreaming.png?branch=dev
+   :target: https://travis-ci.org/laysakura/shellstreaming
 
 A stream processor working with shell commands
 
