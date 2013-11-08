@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
-from Queue import Queue
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
 from datetime import datetime
 from shellstreaming.timestamp import Timestamp
 from shellstreaming.timespan import Timespan

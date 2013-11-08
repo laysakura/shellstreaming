@@ -5,7 +5,10 @@
 
     :synopsis: Provides filtering operators
 """
-from Queue import Queue
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
 from shellstreaming.batch import Batch
 from shellstreaming.error import OperatorInitError
 from shellstreaming.operator.base import Base
