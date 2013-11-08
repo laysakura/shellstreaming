@@ -6,7 +6,10 @@
     :synopsis: Provides abstract FiniteStream and InfiniteStream.
 """
 import threading
-from Queue import Queue
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue
 from abc import ABCMeta, abstractmethod
 from shellstreaming.batch import Batch
 from shellstreaming.timespan import Timespan
