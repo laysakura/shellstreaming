@@ -8,11 +8,10 @@ from shellstreaming.inputstream.textfile import TextFile
 
 class InputStreamStarterService(rpyc.Service):
     class exposed_InputStreamStarter(object):
-        def __init__(self, callback, inputstream):
+        def __init__(self, callback, inputstream, args):
             n_records = 0
-            # stream = inputstream(args)
-            print('/home/nakatani/git/shellstreaming/shellstreaming/test/inputstream/test_textfile_input01.txt')
-            stream = TextFile('/home/nakatani/git/shellstreaming/shellstreaming/test/inputstream/test_textfile_input01.txt')
+            stream = TextFile(*args)
+            # stream = TextFile('/home/nakatani/git/shellstreaming/shellstreaming/test/inputstream/test_textfile_input01.txt')
             for batch in stream:
                 for record in batch:
                     eq_(len(record), 1)
@@ -61,6 +60,7 @@ def test_jobdispatcher_makes_worker_input_file():
     obj = conn.root.InputStreamStarter(
         f,
         'hoge',
+        ('/home/nakatani/git/shellstreaming/shellstreaming/test/inputstream/test_textfile_input01.txt', )
     )
     # obj = conn.root.InputStreamStarter(
     #     f,
