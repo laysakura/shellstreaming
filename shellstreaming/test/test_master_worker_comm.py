@@ -9,8 +9,10 @@ from shellstreaming.inputstream.textfile import TextFile
 class InputStreamStarterService(rpyc.Service):
     class exposed_InputStreamStarter(object):
         def __init__(self, callback, inputstream, args):
+            module = __import__('shellstreaming.inputstream.textfile', globals(), locals(), [inputstream], -1)
+            stream = eval('%s %s' % (inputstream, args))
+
             n_records = 0
-            stream = inputstream(*args)
             for batch in stream:
                 for record in batch:
                     eq_(len(record), 1)
@@ -53,19 +55,16 @@ def f(number_of_lines):
 
 def test_jobdispatcher_makes_worker_input_file():
     global bgsrv, conn
-    conn = rpyc.connect("localhost", 18871)  # conn to worker
+    conn = rpyc.connect("localhost", 18871)  # conn to worker  (arg of config={'allow_pickle': True}) does not fasten execution
+    # もしかしたら，確実にサーバ側(worker側)の方のTextFileクラスを読ませるためにeval的なのが必要かも．
+    # eval('os.path')は成功した
     bgsrv = rpyc.BgServingThread(conn)
 
     obj = conn.root.InputStreamStarter(
         f,
-        TextFile,
+        'TextFile',
         ('/home/nakatani/git/shellstreaming/shellstreaming/test/inputstream/test_textfile_input01.txt', )
     )
-    # obj = conn.root.InputStreamStarter(
-    #     f,
-    #     shellstreaming.inputstream.textfile.TextFile,
-    #     ('/home/nakatani/git/shellstreaming/shellstreaming/test/inputstream/test_textfile_input01.txt', ),
-    # )
 
     print('can do everything here!!')
     time.sleep(3)
