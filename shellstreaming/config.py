@@ -19,20 +19,21 @@ Only one is used as config file. Left one is more prioritized.
 """
 
 
-def _read_config_file():
-    """Read a config file from `CONFIG_FILE <#shellstreaming.config.CONFIG_FILE>`_
+def _read_config_file(config_file):
+    """Read a config file from `config_file`
 
+    :param:  tuple of config file candidates
     :raises: `IOError` if no config file exists
     """
     found = False
     config = ConfigParser()
-    for conf_file in CONFIG_FILE:
-        if config.read([conf_file]):
+    for f in config_file:
+        if config.read([f]):
             found = True
             break
     if not found:
-        raise IOError('None of %s exists' % (', '.join(CONFIG_FILE)))
+        raise IOError('None of %s exists' % (', '.join(config_file)))
     return config
 
 
-config = _read_config_file()
+config = _read_config_file(CONFIG_FILE)

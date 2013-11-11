@@ -22,6 +22,7 @@ def setup():
     # setting up worker
     global process
     process = Process(target=_start_worker_thread)
+    process.daemon = True  # child process is killed when parent process ends
     process.start()
     # wait for worker process to really start
     while True:
@@ -36,9 +37,7 @@ def setup():
 
 
 def teardown():
-    global process
     print('worker process is being killed')
-    process.terminate()
 
 
 def test_inputstream_dispatcher():

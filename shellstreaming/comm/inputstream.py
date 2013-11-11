@@ -10,7 +10,10 @@ from importlib import import_module
 from shellstreaming.config import config
 
 
-class InputStreamExecutorService(rpyc.Service):
+class InputStreamExecutorService(rpyc.Service):  # pragma: no cover
+                                                 # Because this class is executed by separated process,
+                                                 # it's difficult to trace execution of statements inside it.
+                                                 # TODO: must be tested
     """Provides `InputStreamExecutor <shellstreaming.comm.InputStreamExecutorService.exposed_InputStreamExecutor>`_ for worker.
 
     .. note::
@@ -85,7 +88,7 @@ class InputStreamDispatcher(object):
         :raises: any exception raised from `_async_execute`
         """
         self._async_res.wait()
-        if self._async_res.error:
+        if self._async_res.error:  # pragma: no cover
             raise self._async_res.value
 
         (worker, connection, conn_thread) = self._conn
