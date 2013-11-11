@@ -27,13 +27,14 @@ class InputStreamStarterService(rpyc.Service):
                     ok_(0 <= int(line[5:]) < 100)  # record order in a batch is not always 'oldest-first'
                     n_records += 1
             self._callback(n_records)
+            return 'hoge'
 
 
 process = None
 
 
 def _start_worker_thread():
-    from rpyc.utils.server import ThreadedServer as Server  # can be ThreadedServer or ThreadPoolServer for performance
+    from rpyc.utils.server import ThreadPoolServer as Server  # can be ThreadedServer or ThreadPoolServer for performance
     print('[pid=%d] strating worker server' % (os.getpid()))
     Server(InputStreamStarterService, port=18871).start()
 
@@ -68,9 +69,6 @@ stop = False
 def f(number_of_lines):  # masterの呼び出すcallback
     global bgsrv, conn, stop
     print '[pid=%d] finish!!! (%d lines)' % (os.getpid(), number_of_lines)
-    stop = True
-    bgsrv.stop()
-    conn.close()
 
 
 def test_jobdispatcher_makes_worker_input_file():
@@ -86,9 +84,11 @@ def test_jobdispatcher_makes_worker_input_file():
 
     # async
     astart = rpyc.async(starter.start)
-    astart()
+    async_res = astart()
 
-    global stop
-    while not stop:
-        print('[pid=%d] waiting for worker\'s inputstream to finish' % (os.getpid()))
-        time.sleep(0.1)
+    # do everything master want to do
+
+    async_res.wait()
+
+    bgsrv.stop()
+    conn.close()
