@@ -5,13 +5,14 @@
 
     :synopsis: Provides config values read from config file
 """
-from os.path import expanduser, join
+from os.path import expanduser, join, abspath, dirname
 from ConfigParser import SafeConfigParser as ConfigParser
 
 
 CONFIG_FILE = (
     expanduser(join('~', '.shellstreaming.cnf')),
     expanduser(join('~', '.shellstreaming', 'shellstreaming.cnf')),
+    join(abspath(dirname(__file__)), 'test', 'data', '.shellstreaming.cnf'),
 )
 """List of candidate config file locations.
 
