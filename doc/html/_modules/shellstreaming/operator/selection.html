@@ -57,7 +57,10 @@
 
 <span class="sd">    :synopsis: Provides filtering operators</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">Queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">Queue</span> <span class="kn">import</span> <span class="n">Queue</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">Queue</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.batch</span> <span class="kn">import</span> <span class="n">Batch</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.error</span> <span class="kn">import</span> <span class="n">OperatorInitError</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.operator.base</span> <span class="kn">import</span> <span class="n">Base</span>

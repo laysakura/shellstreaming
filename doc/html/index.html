@@ -1082,6 +1082,103 @@ can be used.</p>
 </dd></dl>
 
 </div>
+<span class="target" id="module-shellstreaming.comm.inputstream"></span><div class="section" id="shellstreaming-comm-inputstream">
+<h3>shellstreaming.comm.inputstream<a class="headerlink" href="#shellstreaming-comm-inputstream" title="Permalink to this headline">¶</a></h3>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">synopsis:</th><td class="field-body">Dispatch | Execute inputstreams</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="shellstreaming.comm.inputstream.InputStreamDispatcher">
+<em class="property">class </em><tt class="descclassname">shellstreaming.comm.inputstream.</tt><tt class="descname">InputStreamDispatcher</tt><big>(</big><em>worker</em>, <em>inputstream_name</em>, <em>inputstream_args</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/comm/inputstream.html#InputStreamDispatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.comm.inputstream.InputStreamDispatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Asynchronous inputstream dispatcher</p>
+<dl class="method">
+<dt id="shellstreaming.comm.inputstream.InputStreamDispatcher.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>worker</em>, <em>inputstream_name</em>, <em>inputstream_args</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/comm/inputstream.html#InputStreamDispatcher.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.comm.inputstream.InputStreamDispatcher.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create inputstream dispatcher</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>worker</strong> &#8211; worker&#8217;s reachable hostname or IP address</li>
+<li><strong>inputstream_name</strong> &#8211; class name of inputstreams</li>
+<li><strong>inputstream_args</strong> &#8211; arguments for specified inputstream</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.comm.inputstream.InputStreamDispatcher.join">
+<tt class="descname">join</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/comm/inputstream.html#InputStreamDispatcher.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.comm.inputstream.InputStreamDispatcher.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for inputstream to finish.</p>
+<p>After inputstream finishes, connection to worker is closed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">any exception raised from <cite>_async_execute</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="shellstreaming.comm.inputstream.InputStreamExecutorService">
+<em class="property">class </em><tt class="descclassname">shellstreaming.comm.inputstream.</tt><tt class="descname">InputStreamExecutorService</tt><big>(</big><em>conn</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/comm/inputstream.html#InputStreamExecutorService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.comm.inputstream.InputStreamExecutorService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">rpyc.core.service.Service</span></tt></p>
+<p>Provides <a class="reference external" href="shellstreaming.comm.InputStreamExecutorService.exposed_InputStreamExecutor">InputStreamExecutor</a> for worker.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Any class &amp; functions in <cite>InputStreamExecutorService</cite> are executed by worker process.</p>
+</div>
+<dl class="class">
+<dt id="shellstreaming.comm.inputstream.InputStreamExecutorService.exposed_InputStreamExecutor">
+<em class="property">class </em><tt class="descname">exposed_InputStreamExecutor</tt><big>(</big><em>conn</em>, <em>inputstream_name</em>, <em>inputstream_args</em>, <em>on_new_batch</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/comm/inputstream.html#InputStreamExecutorService.exposed_InputStreamExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.comm.inputstream.InputStreamExecutorService.exposed_InputStreamExecutor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Asynchronous executor of inputstreams</p>
+<dl class="method">
+<dt id="shellstreaming.comm.inputstream.InputStreamExecutorService.exposed_InputStreamExecutor.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>conn</em>, <em>inputstream_name</em>, <em>inputstream_args</em>, <em>on_new_batch</em><big>)</big><a class="reference internal" href="_modules/shellstreaming/comm/inputstream.html#InputStreamExecutorService.exposed_InputStreamExecutor.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.comm.inputstream.InputStreamExecutorService.exposed_InputStreamExecutor.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates asynchronous executor of inputstreams</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>conn</strong> (<cite>(worker name, result of rpyc.connection(), connection thread)</cite>) &#8211; connection info</li>
+<li><strong>inputstream_name</strong> &#8211; class name of inputstreams</li>
+<li><strong>inputstream_args</strong> (<cite>tuple</cite>) &#8211; arguments for specified inputstream</li>
+<li><strong>on_new_batch</strong> &#8211; callback function called when new batch is created</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shellstreaming.comm.inputstream.InputStreamExecutorService.exposed_InputStreamExecutor.exposed_execute">
+<tt class="descname">exposed_execute</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/shellstreaming/comm/inputstream.html#InputStreamExecutorService.exposed_InputStreamExecutor.exposed_execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shellstreaming.comm.inputstream.InputStreamExecutorService.exposed_InputStreamExecutor.exposed_execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start inputsream.</p>
+<p>This function is supposed to be wrapped by <cite>rpyc.async</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 </div>
 
@@ -1110,6 +1207,7 @@ can be used.</p>
 <li><a class="reference internal" href="#shellstreaming-operator-base">shellstreaming.operator.base</a></li>
 <li><a class="reference internal" href="#shellstreaming-operator-selection">shellstreaming.operator.selection</a></li>
 <li><a class="reference internal" href="#shellstreaming-operator-sort">shellstreaming.operator.sort</a></li>
+<li><a class="reference internal" href="#shellstreaming-comm-inputstream">shellstreaming.comm.inputstream</a></li>
 </ul>
 </li>
 </ul>

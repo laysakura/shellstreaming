@@ -11,6 +11,7 @@ include/
 *.egg-info/
 *.egg/
 
+.coverage
 .coverage.*
 pyvenv.cfg
 .python-version
