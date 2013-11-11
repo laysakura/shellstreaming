@@ -44,7 +44,15 @@ def setup():
     print('[pid=%d] starting worker process' % (os.getpid()))
     process = Process(target=_start_worker_thread)
     process.start()
-    time.sleep(1)
+    # wait for worker process to start server
+    while True:
+        try:
+            conn = rpyc.connect('localhost', 18871)
+            conn.close()
+            break
+        except:  # connection refused
+            time.sleep(0.1)
+            continue
 
 
 def teardown():
