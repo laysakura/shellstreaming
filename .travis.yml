@@ -12,7 +12,8 @@ install:
   - "pip install nose-cov"  # why `nose-cov` isn't correctlly installed by `setup.py test` ?
 
 # command to run tests
-script: python setup.py nosetests
+script:
+  - "python setup.py nosetests"
 
 branches:
   only:
