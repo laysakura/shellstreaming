@@ -2,8 +2,12 @@ from nose.tools import *
 import rpyc
 from multiprocessing import Process
 import time
+from os.path import abspath, dirname, join
 from shellstreaming.config import config
 from shellstreaming.comm.inputstream import InputStreamDispatcher, InputStreamExecutorService
+
+
+TEST_FILE = join(abspath(dirname(__file__)), '..', 'data', 'comm_inputstream_input01.txt')
 
 
 process = None
@@ -42,7 +46,7 @@ def test_inputstream_dispatcher():
     stream = InputStreamDispatcher(
         'localhost',
         'TextFile',
-        ('/home/nakatani/git/shellstreaming/shellstreaming/test/inputstream/test_textfile_input01.txt', 20),
+        (TEST_FILE, 20),
     )
 
     # do everything master needs to do

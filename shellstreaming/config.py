@@ -5,13 +5,13 @@
 
     :synopsis: Provides config values read from config file
 """
-from os.path import expanduser
+from os.path import expanduser, join
 from ConfigParser import SafeConfigParser as ConfigParser
 
 
 CONFIG_FILE = (
-    expanduser('~/.shellstreaming.cnf'),
-    expanduser('~/.shellstreaming/shellstreaming.cnf'),
+    expanduser(join('~', '.shellstreaming.cnf')),
+    expanduser(join('~', '.shellstreaming', 'shellstreaming.cnf')),
 )
 """List of candidate config file locations.
 
@@ -24,7 +24,6 @@ def _read_config_file():
 
     :raises: `IOError` if no config file exists
     """
-    global CONFIG_FILE
     found = False
     config = ConfigParser()
     for conf_file in CONFIG_FILE:
