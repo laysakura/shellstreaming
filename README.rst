@@ -45,7 +45,7 @@ Uploading packages to PyPI
 Thanks
 ------
 
-- [modocache](https://github.com/modocache) for a few pull requests!
+- `modocache <https://github.com/modocache>`_ for a few pull requests!
 
 
 TODO
