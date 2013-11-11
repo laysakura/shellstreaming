@@ -4,7 +4,7 @@ from multiprocessing import Process
 import time
 import os
 
-from shellstreaming.inputstream.textfile import TextFile
+from importlib import import_module
 
 
 class InputStreamStarterService(rpyc.Service):
@@ -15,8 +15,9 @@ class InputStreamStarterService(rpyc.Service):
             self._args        = args
 
         def exposed_start(self):
-            module = __import__('shellstreaming.inputstream.textfile', globals(), locals(), [self._inputstream], -1)
-            stream = eval('%s %s' % (self._inputstream, self._args))
+            module       = import_module('shellstreaming.inputstream.textfile')
+            stream_class = getattr(module, self._inputstream)
+            stream       = stream_class(*self._args)
 
             n_records = 0
             for batch in stream:
@@ -27,7 +28,6 @@ class InputStreamStarterService(rpyc.Service):
                     ok_(0 <= int(line[5:]) < 100)  # record order in a batch is not always 'oldest-first'
                     n_records += 1
             self._callback(n_records)
-            return 'hoge'
 
 
 process = None
@@ -89,6 +89,8 @@ def test_jobdispatcher_makes_worker_input_file():
     # do everything master want to do
 
     async_res.wait()
+    if async_res.error:
+        raise async_res.value
 
     bgsrv.stop()
     conn.close()
