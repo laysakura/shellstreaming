@@ -68,8 +68,6 @@ def f(number_of_lines):  # masterの呼び出すcallback
 def test_jobdispatcher_makes_worker_input_file():
     global bgsrv, conn
     conn = rpyc.connect("localhost", 18871)  # conn to worker  (arg of config={'allow_pickle': True}) does not fasten execution
-    # もしかしたら，確実にサーバ側(worker側)の方のTextFileクラスを読ませるためにeval的なのが必要かも．
-    # eval('os.path')は成功した
     bgsrv = rpyc.BgServingThread(conn)
 
     starter = conn.root.InputStreamStarter(
