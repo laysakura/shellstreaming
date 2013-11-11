@@ -102,7 +102,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">builtin_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">builtin_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Type</span><span class="o">.</span><span class="n">_typemap</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">UnsupportedTypeError</span><span class="p">(</span><span class="s">&quot;builtin type </span><span class="si">%s</span><span class="s"> is not convirtible to shellstreaming type&quot;</span> <span class="o">%</span>
+            <span class="k">raise</span> <span class="n">UnsupportedTypeError</span><span class="p">(</span><span class="s">&quot;builtin type </span><span class="si">%s</span><span class="s"> is not convertible to shellstreaming type&quot;</span> <span class="o">%</span>
                                        <span class="p">(</span><span class="n">builtin_type</span><span class="p">))</span>
         <span class="n">ss_type_str</span> <span class="o">=</span> <span class="n">Type</span><span class="o">.</span><span class="n">_typemap</span><span class="p">[</span><span class="n">builtin_type</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">Type</span><span class="p">(</span><span class="n">ss_type_str</span><span class="p">)</span></div></div>

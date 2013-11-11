@@ -44,7 +44,7 @@ def teardown():
 def test_inputstream_dispatcher():
     # master's code
     stream = InputStreamDispatcher(
-        'localhost',
+        'localhost',  # config.get('worker', 'worker1')
         'TextFile',
         (TEST_FILE, 20),
     )
@@ -52,3 +52,5 @@ def test_inputstream_dispatcher():
     # do everything master needs to do
 
     stream.join()
+    # TODO: need another way to close dispatched stream?
+    # (maybe by adding callback to InputStreamDispatcher.__init__)

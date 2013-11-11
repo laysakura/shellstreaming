@@ -11,25 +11,37 @@ from shellstreaming.config import config
 
 
 class InputStreamExecutorService(rpyc.Service):
-    """"""
+    """Provides `InputStreamExecutor <shellstreaming.comm.InputStreamExecutorService.exposed_InputStreamExecutor>`_ for worker.
+
+    .. note::
+        Any class & functions in `InputStreamExecutorService` are executed by worker process.
+    """
     class exposed_InputStreamExecutor(object):
-        def __init__(self, conn, inputstream_name, inputstream_args, on_new_batch, on_stream_close):
-            """
-            :param conn: for closing connection on close
+        """Asynchronous executor of inputstreams"""
+        def __init__(self, conn, inputstream_name, inputstream_args, on_new_batch):
+            """Creates asynchronous executor of inputstreams
+
+            :param conn:             connection info
+            :type conn:              `(worker name, result of rpyc.connection(), connection thread)`
+            :param inputstream_name: class name of inputstreams
+            :param inputstream_args: arguments for specified inputstream
+            :type inputstream_args:  `tuple`
+            :param on_new_batch:     callback function called when new batch is created
             """
             self._conn             = conn
             self._inputstream_name = inputstream_name
             self._inputstream_args = inputstream_args
             self._on_new_batch     = on_new_batch
-            self._on_stream_close  = on_stream_close
 
         def exposed_execute(self):
-            """"""
+            """Start inputsream.
+
+            This function is supposed to be wrapped by `rpyc.async`
+            """
             stream = InputStreamExecutorService._create_stream(self._inputstream_name, self._inputstream_args)
             for batch in stream:
                 InputStreamExecutorService._store_new_batch(batch)
                 self._on_new_batch(self._conn, batch)
-            self._on_stream_close(self._conn)
 
     @staticmethod
     def _create_stream(inputstream_name, inputstream_args):
@@ -47,15 +59,21 @@ class InputStreamExecutorService(rpyc.Service):
 
     @staticmethod
     def _store_new_batch(batch):
-        """"""
-        
-        print('[worker] new batch is stored: %s' % (batch))
+        """Store batch into worker's memory"""
+        pass
+        # print('[worker] new batch is stored: %s' % (batch))
+        # TODO: put batch into worker's memory
 
 
 class InputStreamDispatcher(object):
-    """"""
+    """Asynchronous inputstream dispatcher"""
     def __init__(self, worker, inputstream_name, inputstream_args):
-        """async"""
+        """Create inputstream dispatcher
+
+        :param worker:           worker's reachable hostname or IP address
+        :param inputstream_name: class name of inputstreams
+        :param inputstream_args: arguments for specified inputstream
+        """
         self._conn = _connect(worker)
         self._async_res = _async_execute(self._conn, inputstream_name, inputstream_args)
 
@@ -76,21 +94,19 @@ class InputStreamDispatcher(object):
 
 
 def _connect(worker):
-    """"""
+    """Connect to worker"""
     connection  = rpyc.connect(worker, int(config.get('worker', 'port')))
     conn_thread = rpyc.BgServingThread(connection)
     return (worker, connection, conn_thread)
 
 
 def _async_execute(conn, inputstream_name, inputstream_args):
-    """"""
-    print('async exec')
+    """Asynchronously execute inputstream on worker process"""
     (worker, connection, conn_thread) = conn
     executor = connection.root.InputStreamExecutor(
         conn,
         inputstream_name, inputstream_args,
-        on_new_batch=_reg_new_batch,
-        on_stream_close=_close_connection
+        on_new_batch=_reg_new_batch
     )
 
     # asynchronously call `InputStreamExecutor.exposed_execute`, in which callbacks are called
@@ -99,12 +115,7 @@ def _async_execute(conn, inputstream_name, inputstream_args):
 
 
 def _reg_new_batch(conn, batch_id):
-    """called by master, callback"""
+    """Register newly created batch (called by master)"""
     (worker, connection, conn_thread) = conn
-    print('[%s] new batch: %s' % (worker, batch_id))
-
-
-def _close_connection(conn):
-    """"""
-    (worker, connection, conn_thread) = conn
-    print('%s\'s inputstream has closed' % (worker))
+    # print('[%s] new batch: %s' % (worker, batch_id))
+    # TODO: implement
