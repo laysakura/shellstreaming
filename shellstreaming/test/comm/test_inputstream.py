@@ -33,7 +33,9 @@ def _start_worker_process():
     # start worker server
     global server
     from rpyc.utils.server import ThreadedServer as Server
-    server = Server(InputStreamExecutorService, port=int(Config.instance().get('worker', 'port')))
+    config = Config.instance()
+    config.set_config_file(TEST_CONFIG)
+    server = Server(InputStreamExecutorService, port=int(config.get('worker', 'port')))
     server.start()
 
 
@@ -43,9 +45,11 @@ def setup():
     process = Process(target=_start_worker_process)
     process.start()
     # wait for worker process to really start
+    config = Config.instance()
+    config.set_config_file(TEST_CONFIG)
     while True:
         try:
-            conn = rpyc.connect('localhost', int(Config.instance().get('worker', 'port')))
+            conn = rpyc.connect('localhost', int(config.get('worker', 'port')))
             conn.close()
             break
         except (socket.gaierror, socket.error) as e:  # connection refused
