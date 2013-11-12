@@ -2,6 +2,8 @@ from nose.tools import *
 import rpyc
 from multiprocessing import Process
 import time
+import signal
+from os import kill
 from os.path import abspath, dirname, join
 from shellstreaming.config import Config
 from shellstreaming.comm.inputstream import InputStreamDispatcher, InputStreamExecutorService
@@ -11,19 +13,33 @@ TEST_CONFIG   = join(abspath(dirname(__file__)), '..', 'data', 'shellstreaming.c
 TEST_TEXTFILE = join(abspath(dirname(__file__)), '..', 'data', 'comm_inputstream_input01.txt')
 
 
-process = None
+process = None  # used by master process
+server  = None  # used by worker process
 
 
-def _start_worker_thread():
-    from rpyc.utils.server import ThreadPoolServer as Server
-    Server(InputStreamExecutorService, port=int(Config.instance().get('worker', 'port'))).start()
+def _sigusr1_handler(signum, stack):
+    # close worker server
+    global server
+    server.close()
+    exit(0)
+
+
+def _start_worker_process():
+    # register SIGUSR1 handler
+    import signal
+    signal.signal(signal.SIGUSR1, _sigusr1_handler)
+
+    # start worker server
+    global server
+    from rpyc.utils.server import ThreadedServer as Server
+    server = Server(InputStreamExecutorService, port=int(Config.instance().get('worker', 'port')))
+    server.start()
 
 
 def setup():
     # setting up worker
     global process
-    process = Process(target=_start_worker_thread)
-    process.daemon = True  # child process is killed when parent process ends
+    process = Process(target=_start_worker_process)
     process.start()
     # wait for worker process to really start
     while True:
@@ -39,6 +55,7 @@ def setup():
 
 def teardown():
     print('worker process is being killed')
+    kill(process.pid, signal.SIGUSR1)
 
 
 def test_inputstream_dispatcher():
