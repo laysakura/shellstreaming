@@ -5,6 +5,7 @@ import time
 import signal
 from os import kill
 from os.path import abspath, dirname, join
+import socket
 from shellstreaming.config import Config
 from shellstreaming.comm.inputstream import InputStreamDispatcher, InputStreamExecutorService
 
@@ -47,9 +48,11 @@ def setup():
             conn = rpyc.connect('localhost', int(Config.instance().get('worker', 'port')))
             conn.close()
             break
-        except:  # connection refused
+        except (socket.gaierror, socket.error) as e:  # connection refused
             time.sleep(0.1)
             continue
+        except:
+            raise
     print('worker server has been started')
 
 
