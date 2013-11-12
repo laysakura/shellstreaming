@@ -7,7 +7,7 @@
 """
 import rpyc
 from importlib import import_module
-from shellstreaming.config import config
+from shellstreaming.config import Config
 
 
 class InputStreamExecutorService(rpyc.Service):  # pragma: no cover
@@ -98,7 +98,7 @@ class InputStreamDispatcher(object):
 
 def _connect(worker):
     """Connect to worker"""
-    connection  = rpyc.connect(worker, int(config.get('worker', 'port')))
+    connection  = rpyc.connect(worker, int(Config.instance().get('worker', 'port')))
     conn_thread = rpyc.BgServingThread(connection)
     return (worker, connection, conn_thread)
 
@@ -120,5 +120,5 @@ def _async_execute(conn, inputstream_name, inputstream_args):
 def _reg_new_batch(conn, batch_id):
     """Register newly created batch (called by master)"""
     (worker, connection, conn_thread) = conn
-    # print('[%s] new batch: %s' % (worker, batch_id))
+    print('[%s] new batch: %s' % (worker, batch_id))
     # TODO: implement
