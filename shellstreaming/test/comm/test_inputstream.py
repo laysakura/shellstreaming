@@ -3,11 +3,12 @@ import rpyc
 from multiprocessing import Process
 import time
 from os.path import abspath, dirname, join
-from shellstreaming.config import config
+from shellstreaming.config import Config
 from shellstreaming.comm.inputstream import InputStreamDispatcher, InputStreamExecutorService
 
 
-TEST_FILE = join(abspath(dirname(__file__)), '..', 'data', 'comm_inputstream_input01.txt')
+TEST_CONFIG   = join(abspath(dirname(__file__)), '..', 'data', 'shellstreaming.cnf')
+TEST_TEXTFILE = join(abspath(dirname(__file__)), '..', 'data', 'comm_inputstream_input01.txt')
 
 
 process = None
@@ -15,7 +16,7 @@ process = None
 
 def _start_worker_thread():
     from rpyc.utils.server import ThreadPoolServer as Server
-    Server(InputStreamExecutorService, port=int(config.get('worker', 'port'))).start()
+    Server(InputStreamExecutorService, port=int(Config.instance().get('worker', 'port'))).start()
 
 
 def setup():
@@ -27,7 +28,7 @@ def setup():
     # wait for worker process to really start
     while True:
         try:
-            conn = rpyc.connect('localhost', int(config.get('worker', 'port')))
+            conn = rpyc.connect('localhost', int(Config.instance().get('worker', 'port')))
             conn.close()
             break
         except:  # connection refused
@@ -43,9 +44,9 @@ def teardown():
 def test_inputstream_dispatcher():
     # master's code
     stream = InputStreamDispatcher(
-        'localhost',  # config.get('worker', 'worker1')
+        'localhost',  # Config.instance().get('worker', 'worker1')
         'TextFile',
-        (TEST_FILE, 20),
+        (TEST_TEXTFILE, 20),
     )
 
     # do everything master needs to do
