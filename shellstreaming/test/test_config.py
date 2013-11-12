@@ -51,6 +51,18 @@ def test_specified_config_file_not_found():
         config.get('test_section', 'test_var')
 
 
+def test_default_config_file_found():
+    Config._clear()
+
+    prev_cand = Config.CONFIG_FILE_CANDIDATES
+    Config.CONFIG_FILE_CANDIDATES = (TEST_CONFIG1, )
+
+    config = Config.instance()
+    eq_('test_val1', config.get('test_section', 'test_var'))
+
+    Config.CONFIG_FILE_CANDIDATES = prev_cand
+
+
 def test_default_config_file_not_found():
     Config._clear()
 

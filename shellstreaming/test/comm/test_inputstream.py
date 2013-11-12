@@ -49,7 +49,7 @@ def setup():
     config.set_config_file(TEST_CONFIG)
     while True:
         try:
-            conn = rpyc.connect('localhost', int(config.get('worker', 'port')))
+            conn = rpyc.connect(config.get('worker_list', 'worker0'), int(config.get('worker', 'port')))
             conn.close()
             break
         except (socket.gaierror, socket.error) as e:  # connection refused
@@ -68,7 +68,7 @@ def teardown():
 def test_inputstream_dispatcher():
     # master's code
     stream = InputStreamDispatcher(
-        'localhost',  # Config.instance().get('worker', 'worker1')
+        Config.instance().get('worker_list', 'worker0'),
         'TextFile',
         (TEST_TEXTFILE, 20),
     )
