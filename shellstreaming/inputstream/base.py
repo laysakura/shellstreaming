@@ -114,14 +114,14 @@ class Base(threading.Thread):
             _no_more_batch()
 
         def _produce_next_batch():
-            batch = Batch(self._next_batch_span, self._next_batch)
+            batch = Batch(self._next_batch_span, tuple(self._next_batch))
             self._batch_q.put(batch)
 
         def _no_more_batch():
             self._batch_q.put(None)
 
         def _create_next_batch():
-            self._next_batch      = Queue()
+            self._next_batch      = []
             self._next_batch_span = Timespan(record.timestamp, self._batch_span_ms)
 
         if record is None:
@@ -138,7 +138,7 @@ class Base(threading.Thread):
             _produce_next_batch()
             _create_next_batch()
 
-        self._next_batch.put(record)
+        self._next_batch.append(record)
 
     def __iter__(self):
         return self

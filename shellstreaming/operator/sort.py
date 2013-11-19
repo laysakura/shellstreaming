@@ -5,10 +5,6 @@
 
     :synopsis: Provides sort operators
 """
-try:
-    from Queue import Queue
-except ImportError:
-    from queue import Queue
 from shellstreaming.batch import Batch
 from shellstreaming.error import OperatorInitError
 from shellstreaming.operator.base import Base
@@ -43,8 +39,4 @@ class Sort(Base):
             cmp=lambda rec_x, rec_y: cmp(rec_x[self._col], rec_y[self._col]),
             reverse=self._desc
         )  # TODO: faster algorithm. E.g. keep sorted order when inserting
-
-        q = Queue()
-        for rec in records:
-            q.put(rec)
-        return Batch(batch.timespan, q)  # TODO: is it OK to always use timestamp from inputstream?
+        return Batch(batch.timespan, tuple(records))  # TODO: is it OK to always use timestamp from inputstream?

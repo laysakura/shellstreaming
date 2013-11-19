@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
-try:
-    from Queue import Queue
-except ImportError:
-    from queue import Queue
 from datetime import datetime
 from shellstreaming.batch import Batch
 from shellstreaming.recorddef import RecordDef
@@ -19,12 +15,14 @@ def _create_test_batch():
         {'name': 'col0', 'type': 'INT'},
         {'name': 'col1', 'type': 'STRING'},
     ])
-    q = Queue()
-    q.put(Record(rdef, 123, '101'))
-    q.put(Record(rdef, 777, '11'))
-    q.put(Record(rdef, 333, '200'))
-    q.put(Record(rdef, 777, '30'))
-    return Batch(Timespan(Timestamp(datetime.now()), 10), q)
+    return Batch(
+        Timespan(Timestamp(datetime.now()), 10),
+        (
+            Record(rdef, 123, '101'),
+            Record(rdef, 777, '11'),
+            Record(rdef, 333, '200'),
+            Record(rdef, 777, '30'),
+        ))
 
 
 def test_sort_usage():
