@@ -8,32 +8,27 @@
     From users' perspective, `Batch` is equivalent to so-called `window` in stream processing's context.
     Also, a `Batch` is passed to an operator at-a-time internally.
 """
-try:
-    from Queue import Queue
-except ImportError:
-    from queue import Queue
 from shellstreaming.error import TimestampError
 
 
 class Batch(object):
     """Set of records assembled by timestamp"""
-    def __init__(self, timespan, record_q, timestamp_check=False):
+    def __init__(self, timespan, records, timestamp_check=False):
         """Create an *immutable* batch of records
 
         :param timespan: timespan of this batch
-        :param record_q: records
-        :type record_q:  instance of `Queue.Queue`
+        :param records:  records
+        :type record:    instance of `tuple`
         :param timestamp_check: if `True`, checks timestamp of each record is between `[timestamps_start, timestamps_end)`
         :raises: TimestampError when at least one of record's timestamp exceeds `[timestamps_start, timestamps_end)`
         """
-        assert(isinstance(record_q, Queue))
+        assert(isinstance(records, tuple))
 
-        self.timespan  = timespan
-        self._record_q = record_q
-        self._record_q.put(None)  # last element must be `None`
+        self.timespan = timespan
+        self._records = iter(records)
 
         if timestamp_check:
-            Batch._chk_timestamp(self.timespan, self._record_q)
+            Batch._chk_timestamp(self.timespan, self._records)
 
     def __iter__(self):
         return self
@@ -44,23 +39,17 @@ class Batch(object):
         :raises: `StopIteration` when no more record is in this batch
         """
         # TODO: return record with oldest timestamp? => possible if using Queue.PriorityQueue
-        record = self._record_q.get()
-        if record is None:
-            raise StopIteration
-        return record
+        return next(self._records)
 
     # private functions
     @staticmethod
-    def _chk_timestamp(timespan, record_q):
-        """Check if all records in `record_q` has timestamp between `timespan`
+    def _chk_timestamp(timespan, records):
+        """Check if all records in `records` has timestamp between `timespan`
 
         :raises: `TimestampError` if check failed
         """
-        while True:
-            rec = record_q.get()
-            record_q.put(rec)
-            if rec is None:
-                return
+        for rec in records:
+            assert(rec is not None)
             if not rec.timestamp.between(timespan):
                 raise TimestampError('Following record\'s timestamp is %s, which runs off %s: \n%s' %
                                      (rec.timestamp, timespan, rec))
