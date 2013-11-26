@@ -10,7 +10,7 @@ from shellstreaming.error import OperatorInitError
 from shellstreaming.operator.base import Base
 
 
-# TODO: top-k algorithm?
+# [todo] - top-k algorithm?
 class Sort(Base):
     """Sort operator"""
 
@@ -38,5 +38,5 @@ class Sort(Base):
         records.sort(
             cmp=lambda rec_x, rec_y: cmp(rec_x[self._col], rec_y[self._col]),
             reverse=self._desc
-        )  # TODO: faster algorithm. E.g. keep sorted order when inserting
-        return Batch(batch.timespan, tuple(records))  # TODO: is it OK to always use timestamp from inputstream?
+        )  # [todo] - faster algorithm. E.g. keep sorted order when inserting
+        return Batch(batch.timespan, tuple(records))  # [todo] - is it OK to always use timestamp from inputstream?

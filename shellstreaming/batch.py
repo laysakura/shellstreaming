@@ -38,7 +38,7 @@ class Batch(object):
 
         :raises: `StopIteration` when no more record is in this batch
         """
-        # TODO: return record with oldest timestamp? => possible if using Queue.PriorityQueue
+        # [todo] - return record with oldest timestamp? => possible if using Queue.PriorityQueue
         return next(self._records)
 
     # private functions

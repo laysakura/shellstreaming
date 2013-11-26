@@ -104,7 +104,7 @@ class Base(threading.Thread):
 
         :param record: Give `None` to signal consumer that data-fetching process has end.
         """
-        # FIXME: record.timestamp is asserted as arrival time. User defined timestamp is not supported.
+        # [fixme] - record.timestamp is asserted as arrival time. User defined timestamp is not supported.
         # To support it, this function may wait longer to collect records and then make multiple batchs
         # each of which has different timestamp range.
 
@@ -171,7 +171,7 @@ class InfiniteStream(Base):
         if self.interrupted():
             raise StopIteration
 
-        # TODO: return batch with oldest timestamp?
+        # [todo] - return batch with oldest timestamp?
         batch = self._batch_q.get()
         assert(batch is not None)
         return batch
@@ -217,7 +217,7 @@ class FiniteStream(Base):
         if self.interrupted():
             raise StopIteration
 
-        # TODO: return batch with oldest timestamp?
+        # [todo] - return batch with oldest timestamp?
         batch = self._batch_q.get()
         if batch is None:  # means producer thread has sent end signal
             raise StopIteration
