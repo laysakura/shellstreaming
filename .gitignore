@@ -28,3 +28,5 @@ doc/html/objects.inv
 doc/coverage/
 
 htmlcov/
+
+shellstreaming/test/data/shellstreaming_test_tweet.cnf
