@@ -53,8 +53,6 @@ class Tweet(InfiniteStream):
         for line in self._twitter_response.iter_lines():
             if self.interrupted():
                 break
-            if line == '':
-                continue
             line_dict = json.loads(line)
             if 'text' in line_dict:  # [fix] - wired condition...
                 (text, lang, created_at, screen_name) = (
