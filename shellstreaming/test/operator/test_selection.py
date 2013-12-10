@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
 from datetime import datetime
-from shellstreaming.batch import Batch
-from shellstreaming.recorddef import RecordDef
-from shellstreaming.record import Record
+from shellstreaming.timed_batch import TimedBatch
+from relshell.recorddef import RecordDef
+from shellstreaming.timed_record import TimedRecord
 from shellstreaming.timespan import Timespan
 from shellstreaming.timestamp import Timestamp
 from shellstreaming.error import OperatorInitError
@@ -15,13 +15,13 @@ def _create_test_batch():
         {'name': 'col0', 'type': 'INT'},
         {'name': 'col1', 'type': 'STRING'},
     ])
-    return Batch(
+    return TimedBatch(
         Timespan(Timestamp(datetime.now()), 10),
         (
-            Record(rdef, 123, 'aaa'),
-            Record(rdef, 777, 'aaa'),
-            Record(rdef, 333, 'bbb'),
-            Record(rdef, 777, 'bbb'),
+            TimedRecord(rdef, 123, 'aaa'),
+            TimedRecord(rdef, 777, 'aaa'),
+            TimedRecord(rdef, 333, 'bbb'),
+            TimedRecord(rdef, 777, 'bbb'),
         ))
 
 

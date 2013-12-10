@@ -11,7 +11,7 @@ try:
 except ImportError:
     from queue import Queue
 from abc import ABCMeta, abstractmethod
-from shellstreaming.batch import Batch
+from shellstreaming.timed_batch import TimedBatch
 from shellstreaming.timespan import Timespan
 
 
@@ -114,7 +114,7 @@ class Base(threading.Thread):
             _no_more_batch()
 
         def _produce_next_batch():
-            batch = Batch(self._next_batch_span, tuple(self._next_batch))
+            batch = TimedBatch(self._next_batch_span, tuple(self._next_batch))
             self._batch_q.put(batch)
 
         def _no_more_batch():

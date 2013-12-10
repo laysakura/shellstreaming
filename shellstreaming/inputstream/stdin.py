@@ -7,8 +7,8 @@
 """
 import sys
 from shellstreaming.inputstream.base import InfiniteStream
-from shellstreaming.record import Record
-from shellstreaming.recorddef import RecordDef
+from shellstreaming.timed_record import TimedRecord
+from relshell.recorddef import RecordDef
 
 
 class Stdin(InfiniteStream):
@@ -29,6 +29,6 @@ class Stdin(InfiniteStream):
             # sys.stderr.write('Enter record contents: ')
             try:
                 line = raw_input().rstrip('\r\n')
-                self.add(Record(rdef, line))
+                self.add(TimedRecord(rdef, line))
             except EOFError as e:
                 continue

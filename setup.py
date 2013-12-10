@@ -15,6 +15,7 @@ setup(
     test_suite       = 'nose.collector',
     install_requires = [
         'rpyc',
+        'relshell',
     ],
     tests_require    = [
         'nose',
