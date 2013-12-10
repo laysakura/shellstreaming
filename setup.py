@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from setuptools import setup
-# from pypi_release import Release
 
 
 setup(
-    # cmdclass      = {'release': Release},
-
     name             = 'shellstreaming',
     description      = '[under development] A stream processor working with shell commands',
     long_description = open('README.rst').read(),
@@ -17,8 +14,8 @@ setup(
     author_email     = 'lay.sakura@gmail.com',
     test_suite       = 'nose.collector',
     install_requires = [
-        # 'nextversion',
         'rpyc',
+        'relshell',
     ],
     tests_require    = [
         'nose',
