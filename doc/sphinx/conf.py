@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# shellstreaming documentation build configuration file, created by
+# relshell documentation build configuration file, created by
 # sphinx-quickstart on Thu Oct 24 11:02:18 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -11,7 +11,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys, os, time
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath', 'sphinx.ext.mathjax', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -40,7 +40,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'shellstreaming'
-copyright = u'2013 Sho Nakatani'
+(prj_start_year, cur_year) = (2013, time.gmtime().tm_year)
+copyright = u'%d%s Sho Nakatani' % (prj_start_year, '' if cur_year == prj_start_year else '-' + str(cur_year))
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -96,19 +97,41 @@ autodoc_default_flags = ['members', 'special-members', 'show-inheritance']
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'laysakura_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+html_theme_options = {
+    # 'rightsidebar': True,
+    # 'stickysidebar': True,
+
+    # # header color
+    # 'headbgcolor': '#000000',
+    # 'headtextcolor': '#d7523d',
+
+    # # body color
+    # 'bgcolor': '#f8f8fb',
+    # 'textcolor': '#000000',
+    # 'linkcolor': '#d7523d',
+
+    # # relation bar
+    # 'relbarbgcolor': '#000000',
+    # 'relbarlinkcolor': '#ffa698',
+    # 'relbartextcolor': '#ffffff',
+
+    # # side bar
+    # 'sidebarbgcolor': '#dbdbdb',
+    # 'sidebarlinkcolor': '#c10020',
+    # 'sidebartextcolor': '#3d3d3d',
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+html_theme_path = ['.']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = None
+html_title = '%s' % (project)
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -146,7 +169,7 @@ html_static_path = ['_static']
 #html_domain_indices = True
 
 # If false, no index is generated.
-#html_use_index = True
+html_use_index = True
 
 # If true, the index is split into individual pages for each letter.
 #html_split_index = False
@@ -155,10 +178,10 @@ html_static_path = ['_static']
 #html_show_sourcelink = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = False
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-#html_show_copyright = True
+html_show_copyright = True
 
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the

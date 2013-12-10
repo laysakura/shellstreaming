@@ -31,9 +31,9 @@ class Tweet(InfiniteStream):
     ):
         """Constructor
 
-        :param consumer_key       : Twitter app consumer key (got from twitter)
-        :param consumer_secret    : Twitter app consumer secret (got from twitter)
-        :param access_token       : Twitter app access token (got from twitter)
+        :param consumer_key:        Twitter app consumer key (got from twitter)
+        :param consumer_secret:     Twitter app consumer secret (got from twitter)
+        :param access_token:        Twitter app access token (got from twitter)
         :param access_token_secret: Twitter app access token secret (got from twitter)
         :raises: :class:`requests.HTTPError` if twitter API returns error response status
         """
