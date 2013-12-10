@@ -1,0 +1,6 @@
+[inputstream.tweet]
+consumer_key = hvyOQUJbzlAPuzYchh3lQ
+consumer_secret = U0xywp3RCO03KbwGhBZtxuqTonqVOT2acawtdtAps
+access_token = 131194703-oE73Bb2HcqAULQ3ZJrrQ2Lx4O186GDlKmFce24v4
+access_token_secret = x0BW8CMqSybxIg9EhvtSluYud2tuaia01ei2rKcAg
+public_tweets_url = https://stream.twitter.com/1.1/statuses/sample.json

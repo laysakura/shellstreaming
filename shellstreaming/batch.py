@@ -8,6 +8,7 @@
     From users' perspective, `Batch` is equivalent to so-called `window` in stream processing's context.
     Also, a `Batch` is passed to an operator at-a-time internally.
 """
+import os
 from shellstreaming.error import TimestampError
 
 
@@ -25,10 +26,18 @@ class Batch(object):
         assert(isinstance(records, tuple))
 
         self.timespan = timespan
-        self._records = iter(records)
+        self._records      = records
+        self._records_iter = iter(records)
 
         if timestamp_check:
             Batch._chk_timestamp(self.timespan, self._records)
+
+    def __str__(self):
+        ret_str_list = ['(%s' % (os.linesep)]
+        for i in xrange(len(self._records)):
+            ret_str_list.append('    %s%s' % (self._records[i], os.linesep))
+        ret_str_list.append(')%s' % (os.linesep))
+        return ''.join(ret_str_list)
 
     def __iter__(self):
         return self
