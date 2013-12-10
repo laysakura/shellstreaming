@@ -19,7 +19,8 @@ class Tweet(InfiniteStream):
 
     .. note::
         Not every attribute is fetched from API.
-        See `Tweets <https://dev.twitter.com/docs/platform-objects/tweets>`_ for further attributes to analyze.
+        You need to fix :class:`Tweet` to add other attributes, or develop another `inputstream`.
+        See `Tweets <https://dev.twitter.com/docs/platform-objects/tweets>`_ for further attributes.
     """
     def __init__(
         self,
@@ -30,6 +31,10 @@ class Tweet(InfiniteStream):
     ):
         """Constructor
 
+        :param consumer_key       : Twitter app consumer key (got from twitter)
+        :param consumer_secret    : Twitter app consumer secret (got from twitter)
+        :param access_token       : Twitter app access token (got from twitter)
+        :param access_token_secret: Twitter app access token secret (got from twitter)
         :raises: :class:`requests.HTTPError` if twitter API returns error response status
         """
         self._twitter_response = Tweet._get_twitter_streaming_response(
@@ -37,6 +42,7 @@ class Tweet(InfiniteStream):
         InfiniteStream.__init__(self, batch_span_ms)
 
     def run(self):
+        """Fetches tweets from Twitter public stream"""
         # [todo] - support more attributes from Twitter response (https://dev.twitter.com/docs/platform-objects/tweets)
         rdef = RecordDef([
             {'name': 'text'        , 'type': 'STRING'},
