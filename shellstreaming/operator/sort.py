@@ -5,8 +5,7 @@
 
     :synopsis: Provides sort operators
 """
-from shellstreaming.batch import Batch
-from shellstreaming.error import OperatorInitError
+from shellstreaming.timed_batch import TimedBatch
 from shellstreaming.operator.base import Base
 
 
@@ -39,4 +38,4 @@ class Sort(Base):
             cmp=lambda rec_x, rec_y: cmp(rec_x[self._col], rec_y[self._col]),
             reverse=self._desc
         )  # [todo] - faster algorithm. E.g. keep sorted order when inserting
-        return Batch(batch.timespan, tuple(records))  # [todo] - is it OK to always use timestamp from inputstream?
+        return TimedBatch(batch.timespan, tuple(records))  # [todo] - is it OK to always use timestamp from inputstream?

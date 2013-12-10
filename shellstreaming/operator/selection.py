@@ -5,7 +5,7 @@
 
     :synopsis: Provides filtering operators
 """
-from shellstreaming.batch import Batch
+from shellstreaming.timed_batch import TimedBatch
 from shellstreaming.error import OperatorInitError
 from shellstreaming.operator.base import Base
 
@@ -60,7 +60,7 @@ class Selection(Base):
         for rec in batch:
             if Selection._cmp(rec[self._col], self._op1, self._val1, self._op2, self._val2):
                 out_records.append(rec)
-        return Batch(batch.timespan, tuple(out_records))  # [todo] - is it OK to always use timestamp from inputstream?
+        return TimedBatch(batch.timespan, tuple(out_records))  # [todo] - is it OK to always use timestamp from inputstream?
 
     # private functions
     @staticmethod

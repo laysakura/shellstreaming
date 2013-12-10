@@ -14,6 +14,7 @@ setup(
     author_email     = 'lay.sakura@gmail.com',
     test_suite       = 'nose.collector',
     install_requires = [
+        'relshell',
         'rpyc',
         'requests',
         'requests_oauthlib',

@@ -8,10 +8,10 @@
 import json
 import requests
 from requests_oauthlib import OAuth1
+from relshell.recorddef import RecordDef
 from shellstreaming.inputstream.base import InfiniteStream
 from shellstreaming.config import Config
-from shellstreaming.record import Record
-from shellstreaming.recorddef import RecordDef
+from shellstreaming.timed_record import TimedRecord
 
 
 class Tweet(InfiniteStream):
@@ -59,7 +59,7 @@ class Tweet(InfiniteStream):
             if 'text' in line_dict:  # [fix] - wired condition...
                 (text, lang, created_at, screen_name) = (
                     line_dict['text'], line_dict['lang'], line_dict['created_at'], line_dict['user']['screen_name'])
-                self.add(Record(
+                self.add(TimedRecord(
                     rdef,
                     text.encode('utf-8') if type(text) == unicode else text,
                     lang.encode('utf-8') if type(text) == unicode else lang,
