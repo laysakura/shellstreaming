@@ -43,6 +43,11 @@ Testing
     $ ./setup.py nosetests
     $ browser htmlcov/index.html  # check coverage
 
+Some tests depend too much on personal configuration;
+one needs Twitter OAuth info and another needs access to remote machine via `ssh`.
+To enable all of these tests, comment out the line starts with `ignore-files` in `setup.cfg`
+and run `nosetests` again.
+
 Uploading packages to PyPI
 ##########################
 

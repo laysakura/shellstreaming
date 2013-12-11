@@ -19,8 +19,7 @@ def test_tweet_usage():
     # public_tweets_url = https://stream.twitter.com/1.1/statuses/sample.json
     #
     confpath = join(abspath(dirname(__file__)), '..', 'data', 'shellstreaming_test_tweet.cnf')
-    if not exists(confpath):
-        return
+    assert_true(exists(confpath))
 
     config = Config.instance()
     config.set_config_file(confpath)
