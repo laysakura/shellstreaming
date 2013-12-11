@@ -20,7 +20,7 @@ def test_textfile_usage():
             ok_(0 <= int(line[5:]) < 100)  # record order in a batch is not always 'oldest-first'
             n_records += 1
     print('number of batches (%d) >= 1 ?' % (n_batches))
-    assert_greater_equal(n_batches, 1)
+    ok_(n_batches >= 1)
     eq_(n_records, 100)
 
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from sys import version_info
 from setuptools import setup
 
 
@@ -15,6 +16,7 @@ setup(
     test_suite       = 'nose.collector',
     install_requires = [
         'relshell',
+        'importlib' if version_info < (2, 7, 0) else '',
         'rpyc',
         'fabric',
         'requests',
@@ -39,7 +41,9 @@ setup(
 Programming Language :: Python
 Development Status :: 1 - Planning
 License :: OSI Approved :: Apache Software License
+Programming Language :: Python :: 2.6
 Programming Language :: Python :: 2.7
+Programming Language :: Python :: Implementation :: PyPy
 Operating System :: POSIX :: Linux
 '''.strip().splitlines()
 )

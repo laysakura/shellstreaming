@@ -8,16 +8,16 @@ from shellstreaming.timestamp import Timestamp
 
 def test_timestamp_ops():
     ts = Timestamp(datetime.datetime.now())
-    assert_less         (ts, ts + 1)
-    assert_less_equal   (ts, ts)
-    assert_greater      (ts, ts - 1)
-    assert_greater_equal(ts, ts)
-    assert_equal        (ts, ts)
-    assert_not_equal    (ts, ts + 1)
+    ok_(ts <  ts + 1)
+    ok_(ts <= ts)
+    ok_(ts >  ts - 1)
+    ok_(ts >= ts)
+    assert_equal(ts, ts)
+    assert_not_equal(ts, ts + 1)
 
     # This fails if __ge__ is not implemented, although I expected __ne__ & __lt__ are enough
-    assert_greater_equal(Timestamp(datetime.datetime(2013, 10, 31, 18, 18, 48, 492000)),
-                         Timestamp(datetime.datetime(2013, 10, 31, 18, 18, 48, 488000)))
+    ok_(Timestamp(datetime.datetime(2013, 10, 31, 18, 18, 48, 492000)) >=
+        Timestamp(datetime.datetime(2013, 10, 31, 18, 18, 48, 488000)))
 
 
 def test_timestamp___long__():
@@ -28,7 +28,7 @@ def test_timestamp___long__():
 def test_timestamp_large_number():
     ts1 = Timestamp(datetime.datetime(1999, 7, 1))
     ts2 = Timestamp(datetime.datetime(2999, 7, 1))
-    assert_greater(ts2, ts1)
+    ok_(ts2 > ts1)
 
 
 def test_timestamp_timespan_ops():

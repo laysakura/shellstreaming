@@ -42,13 +42,13 @@ def test_singleton():
     eq_('test_val2', config1.get('test_section', 'test_var'))
 
 
+@raises(IOError)
 def test_specified_config_file_not_found():
     Config._clear()
 
     config = Config.instance()
     config.set_config_file('no_such_config.cnf')
-    with assert_raises(IOError) as e:
-        config.get('test_section', 'test_var')
+    config.get('test_section', 'test_var')
 
 
 def test_default_config_file_found():
@@ -63,6 +63,7 @@ def test_default_config_file_found():
     Config.CONFIG_FILE_CANDIDATES = prev_cand
 
 
+@raises(IOError)
 def test_default_config_file_not_found():
     Config._clear()
 
@@ -70,7 +71,8 @@ def test_default_config_file_not_found():
     Config.CONFIG_FILE_CANDIDATES = ('', )
 
     config = Config.instance()
-    with assert_raises(IOError) as context:
+    try:
         config.get('test_section', 'test_var')
-
-    Config.CONFIG_FILE_CANDIDATES = prev_cand
+    except:
+        Config.CONFIG_FILE_CANDIDATES = prev_cand
+        raise
