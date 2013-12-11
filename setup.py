@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from sys import version_info
 from setuptools import setup
 
 
@@ -15,6 +16,7 @@ setup(
     test_suite       = 'nose.collector',
     install_requires = [
         'relshell',
+        'importlib' if version_info < (2, 7, 0) else '',
         'rpyc',
         'fabric',
         'requests',
