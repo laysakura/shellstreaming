@@ -7,16 +7,16 @@
 """
 import threading
 try:
-    from Queue import Queue
+    from Queue import Queue, Empty
 except ImportError:
-    from queue import Queue
+    from queue import Queue, Empty
 from abc import ABCMeta, abstractmethod
 from shellstreaming.timed_batch import TimedBatch
 from shellstreaming.timespan import Timespan
 
 
 class Base(threading.Thread):
-    """Base class for FiniteStream & InfiniteStream.
+    """Base class for :class:`FiniteStream` & :class:`InfiniteStream`.
 
     .. warning::
         Do not create direct subclasses of `Base <#shellstreaming.inputstream.base.Base>`_ .
@@ -171,8 +171,14 @@ class InfiniteStream(Base):
         if self.interrupted():
             raise StopIteration
 
-        # [todo] - return batch with oldest timestamp?
-        batch = self._batch_q.get()
+        while True:
+            try:
+                # [todo] - return batch with oldest timestamp?
+                batch = self._batch_q.get(timeout=365 * 24 * 60 * 60)  # workaround: enable Ctrl-C http://bugs.python.org/issue1360
+                break
+            except Empty:
+                continue
+
         assert(batch is not None)
         return batch
 
@@ -218,7 +224,14 @@ class FiniteStream(Base):
             raise StopIteration
 
         # [todo] - return batch with oldest timestamp?
-        batch = self._batch_q.get()
+        while True:
+            try:
+                # [todo] - return batch with oldest timestamp?
+                batch = self._batch_q.get(timeout=365 * 24 * 60 * 60)  # workaround: enable Ctrl-C http://bugs.python.org/issue1360
+                break
+            except Empty:
+                continue
+
         if batch is None:  # means producer thread has sent end signal
             raise StopIteration
         return batch
