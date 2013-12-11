@@ -41,7 +41,9 @@ setup(
 Programming Language :: Python
 Development Status :: 1 - Planning
 License :: OSI Approved :: Apache Software License
+Programming Language :: Python :: 2.6
 Programming Language :: Python :: 2.7
+Programming Language :: Python :: Implementation :: PyPy
 Operating System :: POSIX :: Linux
 '''.strip().splitlines()
 )
