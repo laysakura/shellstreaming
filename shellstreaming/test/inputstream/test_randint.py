@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
-import time
 from shellstreaming.inputstream.randint import RandInt
 
 

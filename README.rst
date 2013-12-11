@@ -1,22 +1,33 @@
 shellstreaming
-~~~~~~~~~~~~~~
+==============
 
 .. image:: https://travis-ci.org/laysakura/shellstreaming.png?branch=master
    :target: https://travis-ci.org/laysakura/shellstreaming
 
 A stream processor working with shell commands
 
-For developers
-==============
+.. contents:: :local:
 
-API documents
--------------
+Installation
+############
+
+.. code-block:: bash
+
+    $ pip install virtualenv shellstreaming
+    $ vim ~/.shellstreaming.cnf
+
+
+For developers
+--------------
+
+API reference
+#############
 
 Sphinx-powered documents are available on http://packages.python.org/shellstreaming
 
 
 Building and uploading documents
---------------------------------
+################################
 
 .. code-block:: bash
 
@@ -25,7 +36,7 @@ Building and uploading documents
     $ ./setup.py upload_sphinx
 
 Testing
--------
+#######
 
 .. code-block:: bash
 
@@ -33,7 +44,7 @@ Testing
     $ browser htmlcov/index.html  # check coverage
 
 Uploading packages to PyPI
---------------------------
+##########################
 
 .. code-block:: bash
 
@@ -41,6 +52,7 @@ Uploading packages to PyPI
     $ emacs CHANGES.txt
     $ ./setup.py sdist upload
 
+Or use `zest.releaser <https://pypi.python.org/pypi/zest.releaser>`_, a convenient tool for repeated release cycles.
 
 Thanks
 ------
@@ -49,10 +61,10 @@ Thanks
 
 
 TODO
-====
+----
 
 細かい話
---------
+########
 
 - マスタワーカ間の通信はrpycで、ワーカ同士の通信はバッチの受け渡しがあるので生ソケットで
 
@@ -91,7 +103,7 @@ TODO
 
 
 全体の展望
-----------
+##########
 
 - シェルオペレータを他の代数演算子と混ぜて、交換法則などを考える。その際、シェルコマンドに各種の制約を与える。
 
