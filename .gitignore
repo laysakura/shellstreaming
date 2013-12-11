@@ -18,6 +18,7 @@ pyvenv.cfg
 MANIFEST
 *.egg
 .travis.yml*
+**.watsonrc
 
 doc/.buildinfo
 doc/.doctrees/
