@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.comm.config
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    shellstreaming.config
+    ~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides config values read from config file
 """
-from os.path import expanduser, join, abspath, dirname, exists
+from os.path import expanduser, join, exists
 from ConfigParser import SafeConfigParser as ConfigParser
 
 

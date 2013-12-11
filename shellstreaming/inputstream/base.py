@@ -7,16 +7,16 @@
 """
 import threading
 try:
-    from Queue import Queue
+    from Queue import Queue, Empty
 except ImportError:
-    from queue import Queue
+    from queue import Queue, Empty
 from abc import ABCMeta, abstractmethod
-from shellstreaming.batch import Batch
+from shellstreaming.timed_batch import TimedBatch
 from shellstreaming.timespan import Timespan
 
 
 class Base(threading.Thread):
-    """Base class for FiniteStream & InfiniteStream.
+    """Base class for :class:`FiniteStream` & :class:`InfiniteStream`.
 
     .. warning::
         Do not create direct subclasses of `Base <#shellstreaming.inputstream.base.Base>`_ .
@@ -104,7 +104,7 @@ class Base(threading.Thread):
 
         :param record: Give `None` to signal consumer that data-fetching process has end.
         """
-        # FIXME: record.timestamp is asserted as arrival time. User defined timestamp is not supported.
+        # [fixme] - record.timestamp is asserted as arrival time. User defined timestamp is not supported.
         # To support it, this function may wait longer to collect records and then make multiple batchs
         # each of which has different timestamp range.
 
@@ -114,14 +114,14 @@ class Base(threading.Thread):
             _no_more_batch()
 
         def _produce_next_batch():
-            batch = Batch(self._next_batch_span, self._next_batch)
+            batch = TimedBatch(self._next_batch_span, tuple(self._next_batch))
             self._batch_q.put(batch)
 
         def _no_more_batch():
             self._batch_q.put(None)
 
         def _create_next_batch():
-            self._next_batch      = Queue()
+            self._next_batch      = []
             self._next_batch_span = Timespan(record.timestamp, self._batch_span_ms)
 
         if record is None:
@@ -138,7 +138,7 @@ class Base(threading.Thread):
             _produce_next_batch()
             _create_next_batch()
 
-        self._next_batch.put(record)
+        self._next_batch.append(record)
 
     def __iter__(self):
         return self
@@ -171,8 +171,14 @@ class InfiniteStream(Base):
         if self.interrupted():
             raise StopIteration
 
-        # TODO: return batch with oldest timestamp?
-        batch = self._batch_q.get()
+        while True:
+            try:
+                # [todo] - return batch with oldest timestamp?
+                batch = self._batch_q.get(timeout=365 * 24 * 60 * 60)  # workaround: enable Ctrl-C http://bugs.python.org/issue1360
+                break
+            except Empty:
+                continue
+
         assert(batch is not None)
         return batch
 
@@ -217,8 +223,15 @@ class FiniteStream(Base):
         if self.interrupted():
             raise StopIteration
 
-        # TODO: return batch with oldest timestamp?
-        batch = self._batch_q.get()
+        # [todo] - return batch with oldest timestamp?
+        while True:
+            try:
+                # [todo] - return batch with oldest timestamp?
+                batch = self._batch_q.get(timeout=365 * 24 * 60 * 60)  # workaround: enable Ctrl-C http://bugs.python.org/issue1360
+                break
+            except Empty:
+                continue
+
         if batch is None:  # means producer thread has sent end signal
             raise StopIteration
         return batch

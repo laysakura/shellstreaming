@@ -1,0 +1,208 @@
+/*
+ * laysakura.css
+ * ~~~~~~~~~~~~~
+ *
+ * Sphinx stylesheet -- theme by @laysakura.
+ *
+ * :copyright: Copyright 2013 Sho Nakatani, a.k.a. @laysakura
+ * :license: BSD, see LICENSE for details.
+ *
+ */
+
+@import url("default.css");
+
+/***************************************
+** layouts
+***************************************/
+body {
+    margin: 0 auto;
+    width: 85%;
+}
+div.documentwrapper {
+    margin-bottom: 30px;
+}
+
+/***************************************
+** background image
+***************************************/
+body {
+    background-image: url('cloth-bg.jpg');
+}
+div.body, div.document, div.related,
+div.body h1, div.body h2, div.body h3, div.body h4, div.body h5, div.body h6
+{
+    background-color: transparent;
+}
+
+/***************************************
+** global styles
+***************************************/
+::selection {
+    background-color: rgba(255, 0, 0, 0.3);
+}
+::-moz-selection {
+    background-color: rgba(255, 0, 0, 0.3);
+}
+
+/***************************************
+** div.body styles
+***************************************/
+div.body h1 {
+    color: #d7523d;
+    border-bottom: 2px dotted #888888;
+}
+div.body h2 {
+    color: #000;
+    border-bottom: none;
+    font-weight: bold;
+}
+div.body .viewcode-link {
+    font-size: 70%;
+}
+div.body a, div.body .viewcode-link {
+    color               : #d7523d;
+    text-decoration     : none;
+    border-bottom       : 1px solid #f8b4a8;
+    transition-property : all;
+    transition          : 0.2s linear;
+}
+div.body a:visited {
+    color: #c10020;
+}
+div.body a:hover, div.body .viewcode-link:hover {
+    background-color : #d7523d;
+    color            : #ffffff;
+    border-bottom    : none;
+}
+div.body a:hover:visited {
+    background-color: #c10020;
+}
+div.body dt {
+    font-size: 130%;
+}
+div.body dt:target {
+    background-color: rgba(255, 220, 0, 0.5);
+}
+div.body table {
+    border-top: 1px solid #ccc !important;
+    border-left: 1px solid #ccc !important;
+    border-right: 1px solid #ccc !important;
+}
+div.body th {
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.25);
+    padding: 0.2em;
+    font-weight: normal;
+    vertical-align: middle;
+    border-bottom: 1px solid #ccc !important;
+}
+div.body td {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid #ccc !important;
+}
+div.body .highlight {
+    padding: 0.5em;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px dotted #000;
+}
+div.body .highlight pre {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    font-family: Courier, monospace, sans-serif;
+    font-size: 90%;
+}
+div.body div.seealso {
+    background-color: #ffc;
+    border: 1px solid #ff6;
+}
+div.body em.property, div.body .class em {
+    font-size: 75%;
+}
+div.body tt {
+    padding: 0;
+    background: transparent;
+    font-size: 100%;
+}
+div.body tt.xref, div.body a tt {
+    font-weight: inherit;
+}
+div.body .admonition-title {
+    display: block;
+    margin: 0 -0.5em;
+    padding: 0.1em 0 0.1em 0.5em;
+    background-color: #d7523d;
+    opacity: 0.7;
+    color: #fff;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.5);
+}
+div.body .admonition {
+    padding: 0 0.5em;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+/***************************************
+** div.sphinxsidebar styles
+***************************************/
+div.sphinxsidebar h3, div.sphinxsidebar h4, div.sphinxsidebar p {
+    color: #000;
+}
+div.sphinxsidebar h3 a, div.sphinxsidebar h3 a:visited {
+    color: #000;
+    background-color: transparent;
+    border-bottom: none;
+}
+div.sphinxsidebar h3 a:hover, div.sphinxsidebar h3 a:hover:visited {
+    color: #000;
+    background-color: transparent;
+    border-bottom: 1px solid #000;
+}
+div.sphinxsidebar a {
+    color               : #d7523d;
+    text-decoration     : none;
+    border-bottom       : 1px solid #f8b4a8;
+    transition-property : all;
+    transition          : 0.2s linear;
+}
+div.sphinxsidebar a:visited {
+    color: #c10020;
+}
+div.sphinxsidebar a:hover {
+    background-color : #d7523d;
+    color            : #ffffff;
+    border-bottom    : none;
+}
+div.sphinxsidebar a:hover:visited {
+    background-color: #c10020;
+}
+div.sphinxsidebar ul {
+    color: #ffbdbd;
+}
+div.sphinxsidebar input {
+    border: 1px solid #ffbdbd;
+}
+div.sphinxsidebarwrapper {
+    word-wrap: break-word;
+}
+div.sphinxsidebar #searchbox input[type="submit"] {
+    width: inherit;
+}
+
+/***************************************
+** div.related styles
+***************************************/
+div.related {
+    color: #000;
+    margin-bottom: 30px;
+}
+div.related a {
+    color: #000;
+}
+
+/***************************************
+** div.footer styles
+***************************************/
+div.footer {
+    color: #000;
+}

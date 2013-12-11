@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
-try:
-    from Queue import Queue
-except ImportError:
-    from queue import Queue
 from datetime import datetime
-from shellstreaming.batch import Batch
-from shellstreaming.recorddef import RecordDef
-from shellstreaming.record import Record
+from shellstreaming.timed_batch import TimedBatch
+from relshell.recorddef import RecordDef
+from shellstreaming.timed_record import TimedRecord
 from shellstreaming.timespan import Timespan
 from shellstreaming.timestamp import Timestamp
 from shellstreaming.error import OperatorInitError
@@ -19,12 +15,14 @@ def _create_test_batch():
         {'name': 'col0', 'type': 'INT'},
         {'name': 'col1', 'type': 'STRING'},
     ])
-    q = Queue()
-    q.put(Record(rdef, 123, 'aaa'))
-    q.put(Record(rdef, 777, 'aaa'))
-    q.put(Record(rdef, 333, 'bbb'))
-    q.put(Record(rdef, 777, 'bbb'))
-    return Batch(Timespan(Timestamp(datetime.now()), 10), q)
+    return TimedBatch(
+        Timespan(Timestamp(datetime.now()), 10),
+        (
+            TimedRecord(rdef, 123, 'aaa'),
+            TimedRecord(rdef, 777, 'aaa'),
+            TimedRecord(rdef, 333, 'bbb'),
+            TimedRecord(rdef, 777, 'bbb'),
+        ))
 
 
 def test_selection_usage():

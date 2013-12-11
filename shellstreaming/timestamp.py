@@ -22,7 +22,7 @@ class Timestamp(object):
         # year=2013, month=10, day=29, hour=01, minute=04, second=12, microsecond=123456
         # => 20131029010412123  (microsecond is cut to millisecond)
         t = timestamp
-        # TODO: compress encoded timestamp (might be better to use `datetime.datetime` as-is)
+        # [todo] - compress encoded timestamp (might be better to use `datetime.datetime` as-is)
         self._ts = (long(t.microsecond * 1e-3) +
                     long(t.second * 1e3) + long(t.minute * 1e5) + long(t.hour * 1e7) +
                     long(t.day * 1e9)    + long(t.month * 1e11) + long(t.year * 1e13))

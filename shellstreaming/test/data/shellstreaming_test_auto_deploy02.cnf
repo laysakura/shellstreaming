@@ -1,0 +1,4 @@
+[worker]
+ssh_config_path = /home/nakatani/.ssh/config
+hosts = hosei000,hosei001
+parallel_deploy = yes

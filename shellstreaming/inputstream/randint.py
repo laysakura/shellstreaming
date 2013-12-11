@@ -10,8 +10,8 @@
 import random
 import time
 from shellstreaming.inputstream.base import InfiniteStream
-from shellstreaming.record import Record
-from shellstreaming.recorddef import RecordDef
+from shellstreaming.timed_record import TimedRecord
+from relshell.recorddef import RecordDef
 
 
 class RandInt(InfiniteStream):
@@ -33,4 +33,4 @@ class RandInt(InfiniteStream):
             time.sleep(0.001)
             if self.interrupted():
                 break
-            self.add(Record(rdef, random.randint(self._min, self._max)))
+            self.add(TimedRecord(rdef, random.randint(self._min, self._max)))

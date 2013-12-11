@@ -5,11 +5,7 @@
 
     :synopsis: Provides filtering operators
 """
-try:
-    from Queue import Queue
-except ImportError:
-    from queue import Queue
-from shellstreaming.batch import Batch
+from shellstreaming.timed_batch import TimedBatch
 from shellstreaming.error import OperatorInitError
 from shellstreaming.operator.base import Base
 
@@ -60,11 +56,11 @@ class Selection(Base):
         :param batch: batch to filter
         :returns:     batch w/ filtered records
         """
-        q = Queue()
+        out_records = []
         for rec in batch:
             if Selection._cmp(rec[self._col], self._op1, self._val1, self._op2, self._val2):
-                q.put(rec)
-        return Batch(batch.timespan, q)  # TODO: is it OK to always use timestamp from inputstream?
+                out_records.append(rec)
+        return TimedBatch(batch.timespan, tuple(out_records))  # [todo] - is it OK to always use timestamp from inputstream?
 
     # private functions
     @staticmethod

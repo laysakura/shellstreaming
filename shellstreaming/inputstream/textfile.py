@@ -8,8 +8,8 @@
     A line is used as record with single column.
 """
 from shellstreaming.inputstream.base import FiniteStream
-from shellstreaming.record import Record
-from shellstreaming.recorddef import RecordDef
+from shellstreaming.timed_record import TimedRecord
+from relshell.recorddef import RecordDef
 
 
 class TextFile(FiniteStream):
@@ -28,5 +28,5 @@ class TextFile(FiniteStream):
         with open(self._path) as f:
             rdef = RecordDef([{'name': 'line', 'type': 'STRING'}])
             for line in f:
-                self.add(Record(rdef, line))
+                self.add(TimedRecord(rdef, line))
         self.add(None)  # producer has end data-fetching

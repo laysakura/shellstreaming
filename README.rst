@@ -1,22 +1,33 @@
 shellstreaming
-~~~~~~~~~~~~~~
+==============
 
 .. image:: https://travis-ci.org/laysakura/shellstreaming.png?branch=master
    :target: https://travis-ci.org/laysakura/shellstreaming
 
 A stream processor working with shell commands
 
-For developers
-==============
+.. contents:: :local:
 
-API documents
--------------
+Installation
+############
+
+.. code-block:: bash
+
+    $ pip install virtualenv shellstreaming
+    $ vim ~/.shellstreaming.cnf
+
+
+For developers
+--------------
+
+API reference
+#############
 
 Sphinx-powered documents are available on http://packages.python.org/shellstreaming
 
 
 Building and uploading documents
---------------------------------
+################################
 
 .. code-block:: bash
 
@@ -25,15 +36,20 @@ Building and uploading documents
     $ ./setup.py upload_sphinx
 
 Testing
--------
+#######
 
 .. code-block:: bash
 
     $ ./setup.py nosetests
     $ browser htmlcov/index.html  # check coverage
 
+Some tests depend too much on personal configuration;
+one needs Twitter OAuth info and another needs access to remote machine via `ssh`.
+To enable all of these tests, comment out the line starts with `ignore-files` in `setup.cfg`
+and run `nosetests` again.
+
 Uploading packages to PyPI
---------------------------
+##########################
 
 .. code-block:: bash
 
@@ -41,6 +57,7 @@ Uploading packages to PyPI
     $ emacs CHANGES.txt
     $ ./setup.py sdist upload
 
+Or use `zest.releaser <https://pypi.python.org/pypi/zest.releaser>`_, a convenient tool for repeated release cycles.
 
 Thanks
 ------
@@ -49,24 +66,12 @@ Thanks
 
 
 TODO
-====
-
-高優先度
---------
-
-- configに書いたノードだけをワーカとして使うようにする(worker1=localhost, ...)
+----
 
 細かい話
---------
+########
 
-- masterがconfigを見てworkerを起こす構成にしたい(わざわざworkerノードにログインしてデーモン起動のためのゴニョゴニョをしたくはない)
-
-  - master -> worker の起動手続きはssh?
-
-  - Zero-Deploy RPyC を使って，「マスタからコードを全部引っ張りだす機能を持ったクラス」を送り付ければ良さそう
-
-- マスタワーカ間の通信はjsonrpcで、ワーカ同士の通信はバッチの受け渡しがあるので生ソケットで
-
+- マスタワーカ間の通信はrpycで、ワーカ同士の通信はバッチの受け渡しがあるので生ソケットで
 
 - group by で集約関数適用しない時はどんな結果が期待されているのだろう?
 
@@ -91,8 +96,19 @@ TODO
 
 - data-fetcher とかいうのを producer に置き換える
 
+- masterがconfigを見てworkerを起こす構成にしたい(わざわざworkerノードにログインしてデーモン起動のためのゴニョゴニョをしたくはない)
+
+  - master -> worker の起動手続きはssh?
+
+  - Zero-Deploy RPyC を使って，「マスタからコードを全部引っ張りだす機能を持ったクラス」を送り付ければ良さそう
+
+    - Zero-Deploy RPyC は，PyPIにリリースされていないRPyC-3.3.0以上でしか動かない．しかもgithubから取ってきたのを無理やり試してもロクに動かなかった．後回し
+
+- データソースからデータを取ってきてるワーカが死んだら・・・レプリ作る暇もなくデータロスが起こるね・・・
+
+
 全体の展望
-----------
+##########
 
 - シェルオペレータを他の代数演算子と混ぜて、交換法則などを考える。その際、シェルコマンドに各種の制約を与える。
 

@@ -18,13 +18,14 @@ pyvenv.cfg
 MANIFEST
 *.egg
 .travis.yml*
+**.watsonrc
 
 doc/.buildinfo
 doc/.doctrees/
 doc/doctrees/
-doc/html/.buildinfo
-doc/html/_sources/
-doc/html/objects.inv
+doc/html/
 doc/coverage/
 
 htmlcov/
+
+shellstreaming/test/data/shellstreaming_test_tweet.cnf

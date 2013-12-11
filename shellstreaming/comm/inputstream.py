@@ -13,7 +13,7 @@ from shellstreaming.config import Config
 class InputStreamExecutorService(rpyc.Service):  # pragma: no cover
                                                  # Because this class is executed by separated process,
                                                  # it's difficult to trace execution of statements inside it.
-                                                 # TODO: must be tested
+                                                 # [todo] - must be tested
     """Provides `InputStreamExecutor <shellstreaming.comm.InputStreamExecutorService.exposed_InputStreamExecutor>`_ for worker.
 
     .. note::
@@ -65,7 +65,7 @@ class InputStreamExecutorService(rpyc.Service):  # pragma: no cover
         """Store batch into worker's memory"""
         pass
         # print('[worker] new batch is stored: %s' % (batch))
-        # TODO: put batch into worker's memory
+        # [todo] - put batch into worker's memory
 
 
 class InputStreamDispatcher(object):
@@ -121,4 +121,4 @@ def _reg_new_batch(conn, batch_id):
     """Register newly created batch (called by master)"""
     (worker, connection, conn_thread) = conn
     print('[%s] new batch: %s' % (worker, batch_id))
-    # TODO: implement
+    # [todo] - implement

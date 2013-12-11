@@ -76,5 +76,5 @@ def test_inputstream_dispatcher():
     # do everything master needs to do
 
     stream.join()
-    # TODO: need another way to close dispatched stream?
+    # [todo] - need another way to close dispatched stream?
     # (maybe by adding callback to InputStreamDispatcher.__init__)
