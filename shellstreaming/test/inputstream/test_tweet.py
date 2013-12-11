@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# This test is supposed to be ignored in `setup.cfg`
+
 from nose.tools import *
 from os.path import abspath, dirname, join, exists
 from shellstreaming.config import Config

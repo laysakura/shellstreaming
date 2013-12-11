@@ -16,6 +16,7 @@ setup(
     install_requires = [
         'relshell',
         'rpyc',
+        'fabric',
         'requests',
         'requests_oauthlib',
     ],
@@ -28,6 +29,7 @@ setup(
         'shellstreaming',
         'shellstreaming.inputstream',
         'shellstreaming.operator',
+        'shellstreaming.comm',
         'shellstreaming.test'
     ],
     scripts          = [
