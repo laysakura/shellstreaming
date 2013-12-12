@@ -52,7 +52,7 @@ def setup():
             conn = rpyc.connect(config.get('worker_list', 'worker0'), int(config.get('worker', 'port')))
             conn.close()
             break
-        except (socket.gaierror, socket.error) as e:  # connection refused
+        except (socket.gaierror, socket.error):  # connection refused
             time.sleep(0.1)
             continue
         except:
