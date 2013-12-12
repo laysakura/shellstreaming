@@ -1,11 +1,10 @@
-0.0.10 (unreleased)
--------------------
-
-- Nothing changed yet.
-
-
 Changelog for shellstreaming
 ============================
+
+0.0.10 (2013-12-12)
+-------------------
+
+- bugfix on packaging
 
 0.0.9
 -----

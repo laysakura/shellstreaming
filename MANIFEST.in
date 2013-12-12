@@ -1,2 +1,4 @@
 include LICENSE.txt
 include CHANGES.rst
+
+include shellstreaming/bin/shellstreaming_worker  # trick for auto-deploy
