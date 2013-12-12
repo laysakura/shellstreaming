@@ -3,6 +3,7 @@
 # This test is supposed to be ignored in `setup.cfg`
 
 from nose.tools import *
+import os
 from os.path import abspath, dirname, join
 import shlex
 from subprocess import Popen
@@ -16,10 +17,12 @@ def test_usage():
     # To fully pass this test, edit 'shellstreaming/test/data/shellstreaming_test_auto_deploy02.cnf'
     # as ssh login succeeds
     global basedir, scriptpath
-    confpath   = join(basedir, 'test', 'data', 'shellstreaming_test_auto_deploy02.cnf')
+    confpath = join(basedir, 'test', 'data', 'shellstreaming_test_auto_deploy02.cnf')
 
-    p = Popen(shlex.split('/home/nakatani/.pyenv/shims/fab -f %s remote_clean pack deploy' % (scriptpath)),
-              env={'SHELLSTREAMING_CNF': confpath})
+    _env = os.environ
+    _env['SHELLSTREAMING_CNF'] = confpath
+    p = Popen(shlex.split('fab -f %s remote_clean pack deploy' % (scriptpath)),
+              env=_env)
     exitcode = p.wait()
     eq_(exitcode, 0)
 
@@ -28,9 +31,11 @@ def test_no_ssh_config_usage():
     # To fully pass this test, edit 'shellstreaming/test/data/shellstreaming_test_auto_deploy01.cnf'
     # as ssh login succeeds
     global basedir, scriptpath
-    confpath   = join(basedir, 'test', 'data', 'shellstreaming_test_auto_deploy01.cnf')
+    confpath = join(basedir, 'test', 'data', 'shellstreaming_test_auto_deploy01.cnf')
 
-    p = Popen(shlex.split('/home/nakatani/.pyenv/shims/fab -f %s remote_clean pack deploy' % (scriptpath)),
-              env={'SHELLSTREAMING_CNF': confpath})
+    _env = os.environ
+    _env['SHELLSTREAMING_CNF'] = confpath
+    p = Popen(shlex.split('fab -f %s remote_clean pack deploy' % (scriptpath)),
+              env=_env)
     exitcode = p.wait()
     eq_(exitcode, 0)
