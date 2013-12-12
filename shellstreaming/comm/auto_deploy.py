@@ -74,7 +74,10 @@ def pack():
 
     global basedir
     chdir(basedir)
+    dist = local('python setup.py --fullname', capture=True).strip()
+    local('rm -rf %s' % (dist))
     local('python setup.py sdist --formats=gztar', capture=False)
+
     already_packed = True
 
 
