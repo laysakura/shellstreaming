@@ -2,7 +2,6 @@
 *.pyc
 core
 
-bin/
 dist/
 lib/
 man/
