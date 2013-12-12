@@ -1,42 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from sys import version_info
 from setuptools import setup
+import shellstreaming
 
 
 setup(
-    name             = 'shellstreaming',
+    name             = shellstreaming.__name__,
     description      = '[under development] A stream processor working with shell commands',
     long_description = open('README.rst').read(),
     url              = 'https://github.com/laysakura/shellstreaming',
     license          = 'LICENSE.txt',
-    version          = '0.0.6',
+    version          = shellstreaming.__version__,
     author           = 'Sho Nakatani',
     author_email     = 'lay.sakura@gmail.com',
     test_suite       = 'nose.collector',
-    install_requires = [
-        'relshell',
-        'importlib' if version_info < (2, 7, 0) else '',
-        'rpyc',
-        'fabric',
-        'requests',
-        'requests_oauthlib',
-    ],
+    install_requires = shellstreaming.install_requires,
     tests_require    = [
         'nose',
         'coverage',
         'nose-cov',
     ],
-    packages         = [
-        'shellstreaming',
-        'shellstreaming.inputstream',
-        'shellstreaming.operator',
-        'shellstreaming.comm',
-        'shellstreaming.test'
-    ],
+    packages         = shellstreaming.packages,
     scripts          = [
-        'bin/shellstreaming_master',
-        'bin/shellstreaming_worker',
+        'bin/shellstreaming',
     ],
     classifiers      = '''
 Programming Language :: Python
