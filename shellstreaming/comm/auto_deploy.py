@@ -13,8 +13,8 @@
 """
 from fabric.api import *
 from fabric.decorators import serial
-from os import chdir, environ
-from os.path import abspath, dirname, join
+from os import environ
+from os.path import abspath, dirname, join, basename
 import ConfigParser
 import tempfile
 from shellstreaming.logger import Logger
@@ -51,15 +51,12 @@ except ConfigParser.NoOptionError as e:
     logger.info(e)
 
 
-# important directories
-basedir    = join(abspath(dirname(__file__)), '..', '..')
-deploy_dir = join(tempfile.gettempdir(), 'shellstreaming-deploy')
-
-
-def remote_clean():
-    global deploy_dir
-    # [todo] - kill worker processes here
-    run('rm -rf %s' % (deploy_dir))
+# important directories & files
+# basedir    = join(abspath(dirname(__file__)), '..', '..')
+scriptdir  = abspath(dirname(__file__))
+pkg_name  = None
+pkg_targz = None
+remote_deploy_dir = join(tempfile.gettempdir(), 'shellstreaming-deploy')
 
 
 already_packed = False
@@ -72,29 +69,71 @@ def pack():
     if already_packed:
         return
 
-    global basedir
-    chdir(basedir)
-    dist = local('python setup.py --fullname', capture=True).strip()
-    local('rm -rf %s' % (dist))
-    local('python setup.py sdist --formats=gztar', capture=False)
+    global pkg_name, pkg_targz
+    pkg_dir   = _mk_latest_pkg()
+    (pkg_name, pkg_targz) = _mk_targz(pkg_dir)
 
     already_packed = True
 
 
 def deploy():
-    # figure out the release name and version
-    global basedir, deploy_dir
-    chdir(basedir)
-    dist = local('python setup.py --fullname', capture=True).strip()
-    # create deploy directory on remote host
-    run('mkdir %s' % (deploy_dir))
-    # upload the source tarball to deploy directory on remote host
-    put(join('dist', '%s.tar.gz' % (dist)), deploy_dir)
+    global already_packed, pkg_name, pkg_targz, remote_deploy_dir
+    assert(already_packed)
 
-    (dist_tar, dist_dir) = (join(deploy_dir, '%s.tar.gz' % (dist)), join(deploy_dir, dist))
-    with cd(deploy_dir):
-        run('tar xzf %s' % (dist_tar))
-        run('rm -f %s' % (dist_tar))
+    # create deploy directory on remote host
+    run('rm -rf %s' % (remote_deploy_dir))
+    run('mkdir %s'  % (remote_deploy_dir))
+
+    # upload the source tarball to deploy directory on remote host
+    put(pkg_targz, remote_deploy_dir)
+
+    # (dist_tar, dist_dir) = (join(remote_deploy_dir, '%s.tar.gz' % (dist)), join(remote_deploy_dir, dist))
+    with cd(remote_deploy_dir):
+        remote_pkg_targz = basename(pkg_targz)
+        run('tar xzf %s' % (remote_pkg_targz))
+        run('rm -f %s'   % (remote_pkg_targz))
         run('virtualenv .')
-    with prefix('source %s' % join(deploy_dir, 'bin', 'activate')), cd('%s' % (dist_dir)):
+    with prefix('source %s' % join(remote_deploy_dir, 'bin', 'activate')), cd(join(remote_deploy_dir, pkg_name)):
         run('python setup.py install')  # installing into virtualenv's environment
+
+
+def _mk_latest_pkg():
+    global scriptdir
+    src_pkg_dir  = join(scriptdir, '..', '..', 'shellstreaming')  # [fix] - package name `shellstreaming` should not be hardcoded
+    dest_pkg_dir = join(tempfile.gettempdir(), 'shellstreaming-latest-pkg')
+    logger.info('Current package is <%s>. This is being deployed to worker nodes.' % (src_pkg_dir))
+
+    local('rm -rf %s'   % (dest_pkg_dir))
+    local('mkdir -p %s' % (dest_pkg_dir))
+    local('cp -rf %s %s' % (src_pkg_dir, dest_pkg_dir))
+
+    setup_py = join(dest_pkg_dir, 'setup.py')
+    with open(setup_py, 'w') as f_setup_py:
+        f_setup_py.write(
+'''# -*- coding: utf-8 -*-
+from setuptools import setup
+import shellstreaming
+
+
+setup(
+    name             = shellstreaming.__name__,
+    version          = shellstreaming.__version__,
+    install_requires = shellstreaming.install_requires,
+    packages         = shellstreaming.packages,
+    scripts          = shellstreaming.scripts,
+)
+'''
+        )
+        logger.debug('Written %s' % (setup_py))
+
+    return dest_pkg_dir
+
+
+def _mk_targz(pkg_dir):
+    print(pkg_dir)
+    with lcd(pkg_dir):
+        pkg_name  = local('python setup.py --fullname', capture=True).strip()
+        pkg_targz = join(pkg_dir, 'dist', pkg_name + '.tar.gz')
+        local('rm -rf %s %s' % (pkg_name, pkg_targz))
+        local('python setup.py sdist --formats=gztar', capture=False)
+    return (pkg_name, pkg_targz)

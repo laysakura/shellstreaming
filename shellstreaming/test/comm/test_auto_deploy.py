@@ -21,7 +21,7 @@ def test_usage():
 
     _env = os.environ
     _env['SHELLSTREAMING_CNF'] = confpath
-    p = Popen(shlex.split('fab -f %s remote_clean pack deploy' % (scriptpath)),
+    p = Popen(shlex.split('fab -f %s pack deploy' % (scriptpath)),
               env=_env)
     exitcode = p.wait()
     eq_(exitcode, 0)
@@ -35,7 +35,7 @@ def test_no_ssh_config_usage():
 
     _env = os.environ
     _env['SHELLSTREAMING_CNF'] = confpath
-    p = Popen(shlex.split('fab -f %s remote_clean pack deploy' % (scriptpath)),
+    p = Popen(shlex.split('fab -f %s pack deploy' % (scriptpath)),
               env=_env)
     exitcode = p.wait()
     eq_(exitcode, 0)
