@@ -22,7 +22,7 @@ setup(
     ],
     packages         = shellstreaming.packages,
     scripts          = [
-        'shellstreaming/bin/shellstreaming',
+        'bin/shellstreaming',
     ],
     classifiers      = '''
 Programming Language :: Python

@@ -8,7 +8,7 @@ from sys import version_info
 
 
 __name__    = 'shellstreaming'
-__version__ = '0.0.11'
+__version__ = '0.0.12'
 
 install_requires = [
     'relshell',
