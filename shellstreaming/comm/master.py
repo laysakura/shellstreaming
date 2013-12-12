@@ -3,9 +3,13 @@
     shellstreaming.comm.master
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :synopsis: Master process
+    :synopsis: Provides master process's entry point
 """
 
 
 def main():
+    """Master process's entry point.
+
+    :returns: exit status of master process
+    """
     print('hello from master')
