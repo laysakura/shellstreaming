@@ -8,7 +8,8 @@ from os import kill
 from os.path import abspath, dirname, join
 import socket
 from shellstreaming.config import Config
-from shellstreaming.comm.inputstream import InputStreamDispatcher, WorkerServerService
+from shellstreaming.comm.worker_server import WorkerServerService
+from shellstreaming.comm.inputstream import InputStreamDispatcher
 
 
 TEST_CONFIG   = join(abspath(dirname(__file__)), '..', 'data', 'shellstreaming.cnf')

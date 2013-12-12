@@ -10,7 +10,7 @@ from importlib import import_module
 from shellstreaming.config import Config
 
 
-class exposed_InputStreamExecutor(object):
+class InputStreamExecutor(object):
     """Asynchronous executor of inputstreams"""
     def __init__(self, conn, inputstream_name, inputstream_args, on_new_batch):
         """Creates asynchronous executor of inputstreams
@@ -32,37 +32,18 @@ class exposed_InputStreamExecutor(object):
 
         This function is supposed to be wrapped by `rpyc.async`
         """
-        stream = WorkerServerService._create_stream(self._inputstream_name, self._inputstream_args)
+        stream = InputStreamExecutor._create_stream(self._inputstream_name, self._inputstream_args)
         for batch in stream:
-            WorkerServerService._store_new_batch(batch)
+            InputStreamExecutor._store_new_batch(batch)
             self._on_new_batch(self._conn, batch)
-
-
-class WorkerServerService(rpyc.Service):  # pragma: no cover
-                                                 # Because this class is executed by separated process,
-                                                 # it's difficult to trace execution of statements inside it.
-                                                 # [todo] - must be tested
-    """Provides `InputStreamExecutor <shellstreaming.comm.InputStreamExecutorService.exposed_InputStreamExecutor>`_ for worker.
-
-    .. note::
-        Any class & functions in `InputStreamExecutorService` are executed by worker process.
-    """
-
-    exposed_InputStreamExecutor = exposed_InputStreamExecutor
 
     @staticmethod
     def _create_stream(inputstream_name, inputstream_args):
         """Create stream object"""
-        module       = import_module(WorkerServerService._get_module_name(inputstream_name))
+        module       = import_module(InputStreamExecutor._get_module_name(inputstream_name))
         stream_class = getattr(module, inputstream_name)
         stream       = stream_class(*inputstream_args)
         return stream
-
-    @staticmethod
-    def _get_module_name(inputstream_name):
-        """Return full module path of `inputstream_name`"""
-        module = 'shellstreaming.inputstream.%s' % (inputstream_name.lower())
-        return module
 
     @staticmethod
     def _store_new_batch(batch):
@@ -70,6 +51,12 @@ class WorkerServerService(rpyc.Service):  # pragma: no cover
         pass
         # print('[worker] new batch is stored: %s' % (batch))
         # [todo] - put batch into worker's memory
+
+    @staticmethod
+    def _get_module_name(inputstream_name):
+        """Return full module path of `inputstream_name`"""
+        module = 'shellstreaming.inputstream.%s' % (inputstream_name.lower())
+        return module
 
 
 class InputStreamDispatcher(object):
