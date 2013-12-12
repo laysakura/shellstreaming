@@ -35,7 +35,8 @@ setup(
         'shellstreaming.test'
     ],
     scripts          = [
-        # 'bin/foo.py'
+        'bin/shellstreaming_master',
+        'bin/shellstreaming_worker',
     ],
     classifiers      = '''
 Programming Language :: Python

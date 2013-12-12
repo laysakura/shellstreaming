@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from nose.tools import *
 import rpyc
 from multiprocessing import Process
