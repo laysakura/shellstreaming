@@ -52,10 +52,9 @@ except ConfigParser.NoOptionError as e:
 
 
 # important directories & files
-# basedir    = join(abspath(dirname(__file__)), '..', '..')
-scriptdir  = abspath(dirname(__file__))
-pkg_name  = None
-pkg_targz = None
+scriptdir         = abspath(dirname(__file__))
+pkg_name          = None
+pkg_targz         = None
 remote_deploy_dir = join(tempfile.gettempdir(), 'shellstreaming-deploy')
 
 
@@ -87,7 +86,6 @@ def deploy():
     # upload the source tarball to deploy directory on remote host
     put(pkg_targz, remote_deploy_dir)
 
-    # (dist_tar, dist_dir) = (join(remote_deploy_dir, '%s.tar.gz' % (dist)), join(remote_deploy_dir, dist))
     with cd(remote_deploy_dir):
         remote_pkg_targz = basename(pkg_targz)
         run('tar xzf %s' % (remote_pkg_targz))
@@ -95,6 +93,12 @@ def deploy():
         run('virtualenv .')
     with prefix('source %s' % join(remote_deploy_dir, 'bin', 'activate')), cd(join(remote_deploy_dir, pkg_name)):
         run('python setup.py install')  # installing into virtualenv's environment
+
+
+def start_worker():
+    global remote_deploy_dir, pkg_name
+    with prefix('source %s' % join(remote_deploy_dir, 'bin', 'activate')), cd(join(remote_deploy_dir, pkg_name)):
+        run('python %s async_start_server' % (join('shellstreaming', 'comm', 'worker.py')))
 
 
 def _mk_latest_pkg():
