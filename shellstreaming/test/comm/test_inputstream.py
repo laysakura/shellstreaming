@@ -8,7 +8,7 @@ from os import kill
 from os.path import abspath, dirname, join
 import socket
 from shellstreaming.config import Config
-from shellstreaming.comm.inputstream import InputStreamDispatcher, InputStreamExecutorService
+from shellstreaming.comm.inputstream import InputStreamDispatcher, WorkerServerService
 
 
 TEST_CONFIG   = join(abspath(dirname(__file__)), '..', 'data', 'shellstreaming.cnf')
@@ -36,7 +36,7 @@ def _start_worker_process():
     from rpyc.utils.server import ThreadedServer as Server
     config = Config.instance()
     config.set_config_file(TEST_CONFIG)
-    server = Server(InputStreamExecutorService, port=int(config.get('worker', 'port')))
+    server = Server(WorkerServerService, port=int(config.get('worker', 'port')))
     server.start()
 
 
