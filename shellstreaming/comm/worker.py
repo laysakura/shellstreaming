@@ -13,3 +13,4 @@ def main():
     :returns: exit status of worker process
     """
     print('hello from worker')
+    return 0

@@ -13,3 +13,4 @@ def main():
     :returns: exit status of master process
     """
     print('hello from master')
+    return 0
