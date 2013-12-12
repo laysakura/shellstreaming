@@ -6,7 +6,7 @@
     :synopsis: Provides worker process's server
 """
 import rpyc
-from shellstreaming.comm.inputstream import InputStreamExecutor
+from shellstreaming.comm.inputstream_executor import InputStreamExecutor
 
 
 class WorkerServerService(rpyc.Service):  # pragma: no cover
