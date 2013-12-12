@@ -8,7 +8,7 @@ from sys import version_info
 
 
 __name__    = 'shellstreaming'
-__version__ = '0.0.10'
+__version__ = '0.0.11'
 
 install_requires = [
     'relshell',
@@ -23,8 +23,4 @@ packages = [
     'shellstreaming.inputstream',
     'shellstreaming.operator',
     'shellstreaming.comm',
-]
-scripts = [
-    'shellstreaming/bin/shellstreaming_master',
-    'shellstreaming/bin/shellstreaming_worker',
 ]

@@ -21,7 +21,9 @@ setup(
         'nose-cov',
     ],
     packages         = shellstreaming.packages,
-    scripts          = shellstreaming.scripts,
+    scripts          = [
+        'shellstreaming/bin/shellstreaming',
+    ],
     classifiers      = '''
 Programming Language :: Python
 Development Status :: 1 - Planning

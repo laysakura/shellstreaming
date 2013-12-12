@@ -120,7 +120,6 @@ setup(
     version          = shellstreaming.__version__,
     install_requires = shellstreaming.install_requires,
     packages         = shellstreaming.packages,
-    scripts          = shellstreaming.scripts,
 )
 '''
         )
