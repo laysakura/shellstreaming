@@ -9,9 +9,9 @@ from importlib import import_module
 
 
 class InputStreamExecutor(object):
-    """Asynchronous executor of inputstreams"""
+    """Executor of inputstreams for worker processes"""
     def __init__(self, conn, inputstream_name, inputstream_args, on_new_batch):
-        """Creates asynchronous executor of inputstreams
+        """Creates executor of inputstreams
 
         :param conn:             connection info
         :type conn:              `(worker name, result of rpyc.connection(), connection thread)`
@@ -28,7 +28,7 @@ class InputStreamExecutor(object):
     def exposed_execute(self):
         """Start inputsream.
 
-        This function is supposed to be wrapped by `rpyc.async`
+        This function is supposed to be called by master process.
         """
         stream = InputStreamExecutor._create_stream(self._inputstream_name, self._inputstream_args)
         for batch in stream:

@@ -18,8 +18,8 @@ class InputStreamDispatcher(object):
         :param inputstream_name: class name of inputstreams
         :param inputstream_args: arguments for specified inputstream
         """
-        self._conn = _connect(worker)
-        self._async_res = _async_execute(self._conn, inputstream_name, inputstream_args)
+        self._conn = InputStreamDispatcher._connect(worker)
+        self._async_res = InputStreamDispatcher._async_execute(self._conn, inputstream_name, inputstream_args)
 
     def join(self):
         """Wait for inputstream to finish.
@@ -36,30 +36,30 @@ class InputStreamDispatcher(object):
         conn_thread.stop()
         connection.close()
 
+    @staticmethod
+    def _connect(worker):
+        """Connect to worker"""
+        connection  = rpyc.connect(worker, int(Config.instance().get('worker', 'port')))
+        conn_thread = rpyc.BgServingThread(connection)
+        return (worker, connection, conn_thread)
 
-def _connect(worker):
-    """Connect to worker"""
-    connection  = rpyc.connect(worker, int(Config.instance().get('worker', 'port')))
-    conn_thread = rpyc.BgServingThread(connection)
-    return (worker, connection, conn_thread)
+    @staticmethod
+    def _async_execute(conn, inputstream_name, inputstream_args):
+        """Asynchronously execute inputstream on worker process"""
+        (worker, connection, conn_thread) = conn
+        executor = connection.root.InputStreamExecutor(
+            conn,
+            inputstream_name, inputstream_args,
+            on_new_batch=InputStreamDispatcher._reg_new_batch
+        )
 
+        # asynchronously call `InputStreamExecutor.exposed_execute`, in which callbacks are called
+        aexecute = rpyc.async(executor.execute)
+        return aexecute()
 
-def _async_execute(conn, inputstream_name, inputstream_args):
-    """Asynchronously execute inputstream on worker process"""
-    (worker, connection, conn_thread) = conn
-    executor = connection.root.InputStreamExecutor(
-        conn,
-        inputstream_name, inputstream_args,
-        on_new_batch=_reg_new_batch
-    )
-
-    # asynchronously call `InputStreamExecutor.exposed_execute`, in which callbacks are called
-    aexecute = rpyc.async(executor.execute)
-    return aexecute()
-
-
-def _reg_new_batch(conn, batch_id):
-    """Register newly created batch (called by master)"""
-    (worker, connection, conn_thread) = conn
-    print('[%s] new batch: %s' % (worker, batch_id))
-    # [todo] - implement
+    @staticmethod
+    def _reg_new_batch(conn, batch_id):
+        """Register newly created batch (called by master)"""
+        (worker, connection, conn_thread) = conn
+        print('[%s] new batch: %s' % (worker, batch_id))
+        # [todo] - implement
