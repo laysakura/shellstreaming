@@ -7,7 +7,6 @@
 """
 import rpyc
 from shellstreaming.config import Config
-from shellstreaming.comm.inputstream_executor import InputStreamExecutor
 
 
 class InputStreamDispatcher(object):
