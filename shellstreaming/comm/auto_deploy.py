@@ -5,17 +5,13 @@
 
     :synopsis: Provides `auto-deploy` feature.
 
-    Call this script from `fabric`:
-
-    .. code-block:: bash
-        $ SHELLSTREAMING_CNF=/path/to/shellstreaming.cnf fab -f auto_deploy.py remote_clean pack deploy
-
+    Call this script from `fabric`.
+    Refer to `test_auto_deploy.py` to see how to call this.
 """
 from fabric.api import *
 from fabric.decorators import serial
-from os import environ
 from os.path import abspath, dirname, join, basename
-from ConfigParser import NoOptionError
+import logging
 import tempfile
 import sys
 
@@ -24,44 +20,16 @@ import sys
 basedir = join(abspath(dirname(__file__)), '..', '..')
 sys.path = [basedir] + sys.path
 from shellstreaming.logger import TerminalLogger as Logger
-from shellstreaming.config import Config
-
-
-# prepare config
-cnfpath = environ.get('SHELLSTREAMING_CNF')
-assert(cnfpath)
-config  = Config(cnfpath)
 
 
 # prepare logger
-import logging
-logger = Logger(eval('logging.' + config.get('worker', 'log_level')))
-
-
-# set user/host
-env.hosts = config.get('worker', 'hosts').split(',')
-try:
-    env.user = config.get('worker', 'user')
-except NoOptionError as e:
-    logger.info(e)
-try:
-    ssh_config_path     = config.get('worker', 'ssh_config_path')
-    env.ssh_config_path = ssh_config_path
-    env.use_ssh_config  = True
-except NoOptionError as e:
-    logger.info(e)
-    logger.warn('Use of `ssh_config` is strongly recommended for deploying worker scripts from master')
-try:
-    env.parallel = config.get('worker', 'parallel_deploy')
-except NoOptionError as e:
-    logger.info(e)
+logger = Logger(logging.DEBUG)
 
 
 # important directories & files
 scriptdir         = abspath(dirname(__file__))
 pkg_name          = None
 pkg_targz         = None
-remote_deploy_dir = join(tempfile.gettempdir(), 'shellstreaming-deploy')
 
 
 already_packed = False
@@ -75,19 +43,28 @@ def pack():
         return
 
     global pkg_name, pkg_targz
-    pkg_dir   = _mk_latest_pkg()
+    pkg_dir = _mk_latest_pkg()
     (pkg_name, pkg_targz) = _mk_targz(pkg_dir)
 
     already_packed = True
 
 
-def deploy():
-    global already_packed, pkg_name, pkg_targz, remote_deploy_dir
+def deploy(cnfpath, deploy_dir):
+    """
+    :param cnfpath:    config file deployed to :param:`deploy_dir`
+    :param deploy_dir: Relative path to deploy directory. It is put onto temporary direcory.
+    """
+    global already_packed, pkg_name, pkg_targz
     assert(already_packed)
 
+    remote_deploy_dir = join(tempfile.gettempdir(), deploy_dir)
+
     # create deploy directory on remote host
-    run('rm -rf %s' % (remote_deploy_dir))
+    run('rm -rf %s' % (remote_deploy_dir))  # [fix] - not always remove
     run('mkdir %s'  % (remote_deploy_dir))
+
+    # upload the config file
+    put(cnfpath, remote_deploy_dir)
 
     # upload the source tarball to deploy directory on remote host
     put(pkg_targz, remote_deploy_dir)
