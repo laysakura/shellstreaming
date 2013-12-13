@@ -6,19 +6,19 @@
     :synopsis: Dispatcher of inputstreams for master
 """
 import rpyc
-from shellstreaming.config import Config
 
 
 class InputStreamDispatcher(object):
     """Asynchronous inputstream dispatcher"""
-    def __init__(self, worker, inputstream_name, inputstream_args):
+    def __init__(self, worker, worker_port, inputstream_name, inputstream_args):
         """Create inputstream dispatcher
 
         :param worker:           worker's reachable hostname or IP address
+        :param worker_port:      worker's `rpyc` port
         :param inputstream_name: class name of inputstreams
         :param inputstream_args: arguments for specified inputstream
         """
-        self._conn = InputStreamDispatcher._connect(worker)
+        self._conn = InputStreamDispatcher._connect(worker, worker_port)
         self._async_res = InputStreamDispatcher._async_execute(self._conn, inputstream_name, inputstream_args)
 
     def join(self):
@@ -37,9 +37,9 @@ class InputStreamDispatcher(object):
         connection.close()
 
     @staticmethod
-    def _connect(worker):
+    def _connect(worker, worker_port):
         """Connect to worker"""
-        connection  = rpyc.connect(worker, int(Config.instance().get('worker', 'port')))
+        connection  = rpyc.connect(worker, worker_port)
         conn_thread = rpyc.BgServingThread(connection)
         return (worker, connection, conn_thread)
 

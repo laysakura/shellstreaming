@@ -8,6 +8,7 @@ from os import kill
 from os.path import abspath, dirname, join
 import socket
 from shellstreaming.config import Config
+from shellstreaming.logger import Logger
 from shellstreaming.comm.worker_server import WorkerServerService
 from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
 
@@ -18,6 +19,7 @@ TEST_TEXTFILE = join(abspath(dirname(__file__)), '..', 'data', 'comm_inputstream
 
 process = None  # used by master process
 server  = None  # used by worker process
+config  = None  # used by master process
 
 
 def _sigusr1_handler(signum, stack):
@@ -35,23 +37,26 @@ def _start_worker_process():
     # start worker server
     global server
     from rpyc.utils.server import ThreadedServer as Server
-    config = Config.instance()
-    config.set_config_file(TEST_CONFIG)
+    config = Config(TEST_CONFIG)
     server = Server(WorkerServerService, port=int(config.get('worker', 'port')))
     server.start()
 
 
 def setup():
+    global process, config
+    config = Config(TEST_CONFIG)
+    logger = Logger.instance()
+
     # setting up worker
-    global process
     process = Process(target=_start_worker_process)
     process.start()
+
     # wait for worker process to really start
-    config = Config.instance()
-    config.set_config_file(TEST_CONFIG)
+    worker = config.get('worker', 'hosts').split(',')[0]
     while True:
         try:
-            conn = rpyc.connect(config.get('worker_list', 'worker0'), int(config.get('worker', 'port')))
+            logger.debug('trying to connect %s ...' % (worker))
+            conn = rpyc.connect(worker, int(config.get('worker', 'port')))
             conn.close()
             break
         except (socket.gaierror, socket.error):  # connection refused
@@ -59,7 +64,7 @@ def setup():
             continue
         except:
             raise
-    print('worker server has been started')
+    logger.debug('%s\'s server has been started' % (worker))
 
 
 def teardown():
@@ -69,8 +74,10 @@ def teardown():
 
 def test_inputstream_dispatcher():
     # master's code
+    global config
     stream = InputStreamDispatcher(
-        Config.instance().get('worker_list', 'worker0'),
+        config.get('worker', 'hosts').split(',')[0],
+        int(config.get('worker', 'port')),
         'TextFile',
         (TEST_TEXTFILE, 20),
     )

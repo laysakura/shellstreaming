@@ -1,5 +1,7 @@
 [worker]
-port = 18871
+# user = unix_user
 
-[worker_list]
-worker0 = localhost
+# ','-separated host names
+hosts = localhost
+
+port = 18871
