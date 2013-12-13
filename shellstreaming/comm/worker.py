@@ -59,6 +59,7 @@ def _run_server():
 
     WorkerServerService.server = Server(WorkerServerService, port=18871, logger=WorkerServerService.logger)
     t = Thread(target=WorkerServerService.server.start)
+    t.daemon = True
     t.start()
 
     while WorkerServerService.server:

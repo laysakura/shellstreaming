@@ -11,6 +11,7 @@ from shellstreaming.config import Config
 from shellstreaming.logger import TerminalLogger as Logger
 from shellstreaming.comm.worker_server import WorkerServerService
 from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
+from shellstreaming.comm.util import kill_worker_server
 
 
 TEST_CONFIG   = join(abspath(dirname(__file__)), '..', 'data', 'shellstreaming.cnf')
@@ -48,6 +49,9 @@ def setup():
     config = Config(TEST_CONFIG)
     import logging
     logger = Logger(logging.DEBUG)
+
+    # kill worker server if exists
+    kill_worker_server('localhost', 18871)  # [fix] - hardcoding
 
     # setting up worker
     process = Process(target=_start_worker_process)
