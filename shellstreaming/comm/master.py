@@ -14,6 +14,7 @@ import rpyc
 from subprocess import Popen
 from shellstreaming.config import Config
 from shellstreaming.logger import TerminalLogger
+from shellstreaming.comm.util import kill_worker_server
 
 
 # global objects referenced from master's code: `shellstreaming.comm.master.logger`
@@ -84,13 +85,7 @@ def _launch_workers(confpath):
     time.sleep(5)
 
     # worker process も殺す
-    new_conn = rpyc.connect('gueze.logos.ic.i.u-tokyo.ac.jp', port=18871)
-    try:
-        new_conn.root.kill()
-    except EOFError:
-        # Since server is closed by `WorkerServerService.exposed_kill()`,
-        # "connection closed by peer" error is raised
-        logger.debug('master has closed connection to gueze')  # [todo] - hardcoding
+    kill_worker_server('gueze.logos.ic.i.u-tokyo.ac.jp', 18871)
 
     import sys
     sys.exit(0)

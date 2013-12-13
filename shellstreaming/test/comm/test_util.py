@@ -16,4 +16,6 @@ def test_kill_worker_server():
 
     kill_worker_server('localhost', port)
 
-    t.join()
+
+def test_kill_worker_server_when_no_server():
+    kill_worker_server('localhost', 19999)
