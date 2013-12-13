@@ -11,4 +11,8 @@ from shellstreaming.comm.master import main
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(
+        main(
+            confpath='/home/nakatani/git/shellstreaming/shellstreaming/test/data/shellstreaming.cnf',
+        )
+    )                           # [fix] - parse args

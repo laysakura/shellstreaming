@@ -12,30 +12,51 @@ import time
 import socket
 import rpyc
 from subprocess import Popen
+from shellstreaming.config import Config
 from shellstreaming.logger import TerminalLogger
 
 
-import logging
-logger = TerminalLogger(logging.DEBUG)  # [todo] - use config
+# global objects referenced from master's code: `shellstreaming.comm.master.logger`
+config = None
+"""The config"""
+
+logger = None
+"""The logger"""
 
 
-def main():
+def main(confpath):
     """Master process's entry point.
 
+    :param confpath: path to config file
     :returns: exit status of master process
     """
+    _init(confpath)
+
     print('hello from master')
 
     # [todo] - もしここで18871番にconnectできたら，そのプロセスは終了しとく
 
-    _launch_workers('/home/nakatani/git/shellstreaming/shellstreaming/test/data/shellstreaming.cnf')
+    _launch_workers(confpath)
     return 0
+
+
+def _init(confpath):
+    """Every initialization master process has to do"""
+    global logger, config
+
+    # setup config object
+    config = Config(confpath)
+
+    # setup logger
+    logger = TerminalLogger(config.get('master', 'log_level'))
 
 
 def _launch_workers(confpath):
     """
     :param confpath: path to config file
     """
+    global logger, config
+
     # deploy & start workers' server
     scriptpath = join(abspath(dirname(__file__)), 'auto_deploy.py')
     _env = os.environ
@@ -44,8 +65,6 @@ def _launch_workers(confpath):
               env=_env)
     exitcode = p.wait()
     assert(exitcode == 0)
-
-    global logger
 
     # wait for all workers' server to start
     while True:
