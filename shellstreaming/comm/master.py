@@ -21,6 +21,9 @@ def main():
     :returns: exit status of master process
     """
     print('hello from master')
+
+    # [todo] - もしここで18871番にconnectできたら，そのプロセスは終了しとく
+
     _launch_workers('/home/nakatani/git/shellstreaming/shellstreaming/test/data/shellstreaming_test_auto_deploy01.cnf')
     return 0
 
@@ -36,6 +39,9 @@ def _launch_workers(confpath):
     p = Popen(shlex.split('fab -f %s pack deploy start_worker' % (scriptpath)),
               env=_env)
     exitcode = p.wait()
+    assert(exitcode == 0)
+
+    logger = Logger.instance()
 
     # wait for all workers' server to start
     while True:
@@ -44,16 +50,28 @@ def _launch_workers(confpath):
             conn.close()
             break
         except (socket.gaierror, socket.error):  # connection refused
-            time.sleep(10.0)  # [todo] - 0.1?
-            Logger.instance().debug('waiting gueze worker server ...')
+            time.sleep(0.1)
+            logger.debug('waiting gueze worker server ...')
             continue
         except:
             raise
 
-    Logger.instance().debug('connected to gueze!!')
+    logger.debug('connected to gueze!!')
+
+    import time
+    time.sleep(5)
+
+    # worker process も殺す
+    new_conn = rpyc.connect('gueze.logos.ic.i.u-tokyo.ac.jp', port=18871)
+    try:
+        new_conn.root.kill()
+    except EOFError:
+        # Since server is closed by `WorkerServerService.exposed_kill()`,
+        # "connection closed by peer" error is raised
+        logger.debug('master has closed connection to gueze')  # [todo] - hardcoding
 
     import sys
-    sys.exit(exitcode)
+    sys.exit(0)
 
     # fabでworkerのrpycサーバ立てに行く
     # 各workerについて，connectionを試みるループを回す(もちろんmasterで複数スレッドでやりたい)
