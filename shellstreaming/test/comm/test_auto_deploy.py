@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
-from nose_parameterized import parameterized
 import os
 from os.path import abspath, dirname, join
 import tempfile
@@ -12,17 +11,14 @@ basedir    = join(abspath(dirname(__file__)), '..', '..')
 scriptpath = join(basedir, 'comm', 'auto_deploy.py')
 
 
-@parameterized([
-    'pack deploy:cnfpath=%s,deploy_dir=%s' % (cnfpath, 'shellstreaming-deploy'),
-])
-def test_auto_deploy_tasks(tasks):
-    global basedir, scriptpath
+def test_deploy():
+    global scriptpath
     (fd, cnfpath) = tempfile.mkstemp(prefix='shellstreaming-', suffix='.cnf')
 
     cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s' % {
         'script': scriptpath,
         'hosts': 'localhost',
-        'tasks': tasks,
+        'tasks': 'pack deploy:cnfpath=%s' % (cnfpath),
     }
 
     p = Popen(shlex.split(cmd), env=os.environ)
@@ -33,4 +29,14 @@ def test_auto_deploy_tasks(tasks):
 
 
 def test_start_worker():
-    
+    global scriptpath
+
+    cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s' % {
+        'script': scriptpath,
+        'hosts': 'localhost',
+        'tasks': 'start_worker',
+    }
+
+    p = Popen(shlex.split(cmd), env=os.environ)
+    exitcode = p.wait()
+    eq_(exitcode, 0)
