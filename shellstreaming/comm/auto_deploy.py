@@ -81,8 +81,9 @@ def deploy(cnfpath):
         run('mv %s %s'   % (_get_pkg_name(), REMOTE_PKG_ROOT))
         run('rm -f %s'   % (remote_pkg_targz))
         run('virtualenv .')
-    with prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE), cd(REMOTE_PKG_ROOT):
-        run('python setup.py install')  # installing into virtualenv's environment
+    with cd(REMOTE_PKG_ROOT):
+        with prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE):
+            run('python setup.py install')  # installing into virtualenv's environment
 
 
 def start_worker():
@@ -90,8 +91,9 @@ def start_worker():
 
     When this task is called w/o preceeding :func:`deploy`, already-deployed codes are used.
     """
-    with prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE), cd(REMOTE_PKG_ROOT):
-        run('python %s async_start_server' % (REMOTE_WORKER_PY))
+    with cd(REMOTE_PKG_ROOT):
+        with prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE):
+            run('python %s async_start_server' % (REMOTE_WORKER_PY))
 
 
 def _mk_latest_pkg():
