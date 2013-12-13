@@ -17,7 +17,7 @@ from subprocess import Popen, STDOUT
 from threading import Thread
 from rpyc.utils.server import ThreadedServer as Server
 from shellstreaming.config import Config
-from shellstreaming.logger import Logger
+from shellstreaming.logger import FileLogger as Logger
 from shellstreaming.comm.worker_server import WorkerServerService
 
 
@@ -43,17 +43,17 @@ def main():
 
 
 def _async_start_server():
-    global config, logfile
+    global config
     this_script = abspath(__file__)
     deploy_dir  = join(dirname(this_script), '..', '..', '..')
     virtualenv_activator = join(deploy_dir, 'bin', 'activate')
-
     cmd = 'nohup sh -c ". %s ; python %s run_server" &' % (virtualenv_activator, this_script)
-    logfile = open(config.get('worker', 'logfile'), 'a')
-    Popen(shlex.split(cmd), env=os.environ,
-          stderr=STDOUT, stdout=logfile)
 
-    Logger.instance().debug('[%s async_start_server] Start new process: "%s"'  % (sys.argv[0], cmd))
+    logger = Logger.instance()
+    Popen(shlex.split(cmd), env=os.environ,
+          stderr=STDOUT, stdout=logger.logfile)
+
+    logger.debug('[%s async_start_server] Start new process: "%s"'  % (sys.argv[0], cmd))
 
 
 def _run_server():

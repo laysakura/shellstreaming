@@ -12,7 +12,7 @@ import time
 import socket
 import rpyc
 from subprocess import Popen
-from shellstreaming.logger import Logger
+from shellstreaming.logger import TerminalLogger as Logger
 
 
 def main():

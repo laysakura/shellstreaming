@@ -15,9 +15,15 @@ from fabric.api import *
 from fabric.decorators import serial
 from os import environ
 from os.path import abspath, dirname, join, basename
-import ConfigParser
+from ConfigParser import NoOptionError
 import tempfile
-from shellstreaming.logger import Logger
+import sys
+
+# use `../../shellstreaming` as package if it exists
+# (to reflect changes on `../../shellstreaming/**.py` quickly if using `<github-repo>/shellstreaming/comm/auto_deploy.py`)
+basedir = join(abspath(dirname(__file__)), '..', '..')
+sys.path = [basedir] + sys.path
+from shellstreaming.logger import TerminalLogger as Logger
 from shellstreaming.config import Config
 
 
@@ -36,18 +42,18 @@ config.set_config_file(cnfpath)
 env.hosts = config.get('worker', 'hosts').split(',')
 try:
     env.user = config.get('worker', 'user')
-except ConfigParser.NoOptionError as e:
+except NoOptionError as e:
     logger.info(e)
 try:
     ssh_config_path     = config.get('worker', 'ssh_config_path')
     env.ssh_config_path = ssh_config_path
     env.use_ssh_config  = True
-except ConfigParser.NoOptionError as e:
+except NoOptionError as e:
     logger.info(e)
     logger.warn('Use of `ssh_config` is strongly recommended for deploying worker scripts from master')
 try:
     env.parallel = config.get('worker', 'parallel_deploy')
-except ConfigParser.NoOptionError as e:
+except NoOptionError as e:
     logger.info(e)
 
 

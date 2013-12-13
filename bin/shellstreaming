@@ -4,7 +4,7 @@ from os.path import abspath, dirname, join
 import sys
 
 # use `../shellstreaming` as package if it exists
-# (to reflect changes on `../shellstreaming/**.py` quickly if using github repo)
+# (to reflect changes on `../shellstreaming/**.py` quickly if using `<github-repo>/bin/shellstreaming`)
 basedir = join(abspath(dirname(__file__)), '..')
 sys.path = [basedir] + sys.path
 from shellstreaming.comm.master import main
