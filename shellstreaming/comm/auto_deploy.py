@@ -37,6 +37,11 @@ already_packed = False
 
 @serial
 def pack():
+    """Pack seemingly-latest codes to tarball.
+
+    :param cnfpath:    config file deployed to :param:`deploy_dir`
+    :param deploy_dir: Relative path to deploy directory. It is put onto temporary direcory.
+    """
     # create a new source distribution as tarball (only once even if multiple remote hosts)
     global already_packed
     if already_packed:
@@ -50,7 +55,8 @@ def pack():
 
 
 def deploy(cnfpath, deploy_dir):
-    """
+    """Deploy :func:`pack`ed codes to remote hosts.
+
     :param cnfpath:    config file deployed to :param:`deploy_dir`
     :param deploy_dir: Relative path to deploy directory. It is put onto temporary direcory.
     """
@@ -79,6 +85,10 @@ def deploy(cnfpath, deploy_dir):
 
 
 def start_worker():
+    """Start worker server via :func:`deploy`ed codes.
+
+    When this task is called w/o preceeding :func:`deploy`, already-deployed codes are used.
+    """
     global remote_deploy_dir, pkg_name
     with prefix('source %s' % join(remote_deploy_dir, 'bin', 'activate')), cd(join(remote_deploy_dir, pkg_name)):
         run('python %s async_start_server' % (join('shellstreaming', 'comm', 'worker.py')))
