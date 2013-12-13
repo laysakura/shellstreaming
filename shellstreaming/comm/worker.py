@@ -48,7 +48,8 @@ def _async_start_server():
     cmd = 'nohup sh -c ". %s ; python %s run_server" &' % (virtualenv_activator, this_script)
 
     Popen(shlex.split(cmd), env=os.environ,
-          stderr=STDOUT, stdout=WorkerServerService.logger.logfile)
+          # stderr=STDOUT, stdout=WorkerServerService.logger  # [todo] - redirect to logger
+    )
 
     WorkerServerService.logger.debug('[%s async_start_server] Start new process: "%s"'  % (sys.argv[0], cmd))
 

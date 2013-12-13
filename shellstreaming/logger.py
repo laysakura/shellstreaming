@@ -8,6 +8,7 @@
 import sys
 import logging
 from rainbow_logging_handler import RainbowLoggingHandler
+from logging.handlers import RotatingFileHandler
 
 
 class TerminalLogger(logging.Logger):
@@ -26,18 +27,13 @@ class TerminalLogger(logging.Logger):
 class FileLogger(logging.Logger):
     """Provides logger which outputs to config-specified file"""
 
-    # [todo] - logrotate
-
-    logfile = None
-    """Log file stream"""
-
-    def __init__(self, log_level, log_path):
+    def __init__(self, log_level, log_path, max_log_bytes):
         """Constructor
 
         :param log_level: e.g. `logging.DEBUG`, ...
         :param log_path:  path to log file
+        :prram max_log_bytes: max log file size to make rotete files
         """
         logging.Logger.__init__(self, 'shellstreaming_FileLogger', log_level)
-        FileLogger.logfile = open(log_path, 'a')
-        handler = RainbowLoggingHandler(FileLogger.logfile)
+        handler = RotatingFileHandler(log_path)
         self.addHandler(handler)

@@ -18,7 +18,7 @@ class WorkerServerService(rpyc.Service):
     server = None
 
     # the logger
-    logger = FileLogger(logging.DEBUG, '/tmp/shellstreaming.log')  # [fix] - use config
+    logger = FileLogger(logging.DEBUG, '/tmp/shellstreaming.log', 1000000)  # [fix] - use config
 
     # API to clients
     exposed_InputStreamExecutor = InputStreamExecutor

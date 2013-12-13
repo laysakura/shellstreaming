@@ -54,11 +54,10 @@ def setup():
     process.start()
 
     # wait for worker process to really start
-    worker = config.get('worker', 'hosts').split(',')[0]
     while True:
         try:
-            logger.debug('trying to connect %s ...' % (worker))
-            conn = rpyc.connect(worker, int(config.get('worker', 'port')))
+            logger.debug('trying to connect localhost ...')
+            conn = rpyc.connect('localhost', int(config.get('worker', 'port')))
             conn.close()
             break
         except (socket.gaierror, socket.error):  # connection refused
@@ -66,7 +65,7 @@ def setup():
             continue
         except:
             raise
-    logger.debug('%s\'s server has been started' % (worker))
+    logger.debug('localhost\'s server has been started')
 
 
 def teardown():
@@ -78,7 +77,7 @@ def test_inputstream_dispatcher():
     # master's code
     global config
     stream = InputStreamDispatcher(
-        config.get('worker', 'hosts').split(',')[0],
+        'localhost',
         int(config.get('worker', 'port')),
         'TextFile',
         (TEST_TEXTFILE, 20),

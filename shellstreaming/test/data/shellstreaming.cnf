@@ -8,3 +8,6 @@ port = 18871
 
 # One of DEBUG, INFO, WARN, ERROR, CRITICAL, FATAL.
 log_level = DEBUG
+
+# Max log file size to make rotate files
+max_log_bytes = 1000000
