@@ -27,15 +27,15 @@ from shellstreaming.logger import TerminalLogger as Logger
 from shellstreaming.config import Config
 
 
-# prepare logger
-logger = Logger.instance()
-
-
 # prepare config
 cnfpath = environ.get('SHELLSTREAMING_CNF')
 assert(cnfpath)
-config  = Config.instance()
-config.set_config_file(cnfpath)
+config  = Config(cnfpath)
+
+
+# prepare logger
+import logging
+logger = Logger(eval('logging.' + config.get('worker', 'log_level')))
 
 
 # set user/host

@@ -17,12 +17,10 @@ from subprocess import Popen, STDOUT
 from threading import Thread
 from rpyc.utils.server import ThreadedServer as Server
 from shellstreaming.config import Config
-from shellstreaming.logger import FileLogger as Logger
 from shellstreaming.comm.worker_server import WorkerServerService
 
 
-config = Config.instance()
-config.set_config_file('/tmp/a.cnf')
+config = Config('/home/nakatani/git/shellstreaming/shellstreaming/test/data/shellstreaming.cnf')
 
 
 def main():
@@ -49,18 +47,16 @@ def _async_start_server():
     virtualenv_activator = join(deploy_dir, 'bin', 'activate')
     cmd = 'nohup sh -c ". %s ; python %s run_server" &' % (virtualenv_activator, this_script)
 
-    logger = Logger.instance()
     Popen(shlex.split(cmd), env=os.environ,
-          stderr=STDOUT, stdout=logger.logfile)
+          stderr=STDOUT, stdout=WorkerServerService.logger.logfile)
 
-    logger.debug('[%s async_start_server] Start new process: "%s"'  % (sys.argv[0], cmd))
+    WorkerServerService.logger.debug('[%s async_start_server] Start new process: "%s"'  % (sys.argv[0], cmd))
 
 
 def _run_server():
-    logger = Logger.instance()
-    logger.debug('[%s run_server] Launching `WorkerServerService` ...' % (sys.argv[0]))
+    WorkerServerService.logger.debug('[%s run_server] Launching `WorkerServerService` ...' % (sys.argv[0]))
 
-    WorkerServerService.server = Server(WorkerServerService, port=18871, logger=logger)
+    WorkerServerService.server = Server(WorkerServerService, port=18871, logger=WorkerServerService.logger)
     t = Thread(target=WorkerServerService.server.start)
     t.start()
 
@@ -68,7 +64,7 @@ def _run_server():
         # wait for `server` to be `close()`ed by master the client.
         time.sleep(1.0)
 
-    logger.debug('`WorkerServerService` has been closed.')
+    WorkerServerService.logger.debug('`WorkerServerService` has been closed.')
     t.join()
 
 if __name__ == '__main__':

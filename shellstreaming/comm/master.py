@@ -12,7 +12,11 @@ import time
 import socket
 import rpyc
 from subprocess import Popen
-from shellstreaming.logger import TerminalLogger as Logger
+from shellstreaming.logger import TerminalLogger
+
+
+import logging
+logger = TerminalLogger(logging.DEBUG)  # [todo] - use config
 
 
 def main():
@@ -24,7 +28,7 @@ def main():
 
     # [todo] - もしここで18871番にconnectできたら，そのプロセスは終了しとく
 
-    _launch_workers('/home/nakatani/git/shellstreaming/shellstreaming/test/data/shellstreaming_test_auto_deploy01.cnf')
+    _launch_workers('/home/nakatani/git/shellstreaming/shellstreaming/test/data/shellstreaming.cnf')
     return 0
 
 
@@ -41,7 +45,7 @@ def _launch_workers(confpath):
     exitcode = p.wait()
     assert(exitcode == 0)
 
-    logger = Logger.instance()
+    global logger
 
     # wait for all workers' server to start
     while True:
@@ -58,7 +62,6 @@ def _launch_workers(confpath):
 
     logger.debug('connected to gueze!!')
 
-    import time
     time.sleep(5)
 
     # worker process も殺す

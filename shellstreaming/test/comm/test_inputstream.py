@@ -8,7 +8,7 @@ from os import kill
 from os.path import abspath, dirname, join
 import socket
 from shellstreaming.config import Config
-from shellstreaming.logger import Logger
+from shellstreaming.logger import TerminalLogger as Logger
 from shellstreaming.comm.worker_server import WorkerServerService
 from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
 
@@ -31,6 +31,7 @@ def _sigusr1_handler(signum, stack):
 
 def _start_worker_process():
     # register SIGUSR1 handler
+    # [fix] - really needs SIGUSR1? SIGHUP might be used
     import signal
     signal.signal(signal.SIGUSR1, _sigusr1_handler)
 
@@ -45,7 +46,8 @@ def _start_worker_process():
 def setup():
     global process, config
     config = Config(TEST_CONFIG)
-    logger = Logger.instance()
+    import logging
+    logger = Logger(logging.DEBUG)
 
     # setting up worker
     process = Process(target=_start_worker_process)
