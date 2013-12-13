@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# to pass this test, "$ ssh localhost" has to be succeed w/o any confirmation (e.g. password, y/n)
+
 from nose.tools import *
 import os
 from os.path import abspath, dirname, join
