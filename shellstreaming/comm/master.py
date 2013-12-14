@@ -9,12 +9,10 @@ import os
 from os.path import abspath, dirname, join
 import shlex
 import time
-import socket
-import rpyc
 from subprocess import Popen
 from shellstreaming.config import Config
 from shellstreaming.logger import TerminalLogger
-from shellstreaming.comm.util import kill_worker_server
+from shellstreaming.comm.util import kill_worker_server, wait_worker_server
 
 
 # global objects referenced from master's code: `shellstreaming.comm.master.logger`
@@ -52,33 +50,27 @@ def _init(confpath):
     logger = TerminalLogger(config.get('master', 'log_level'))
 
 
-def _launch_workers(confpath):
+def _launch_workers(cnfpath):
     """
-    :param confpath: path to config file
+    :param cnfpath: path to config file
     """
     global logger, config
 
     # deploy & start workers' server
     scriptpath = join(abspath(dirname(__file__)), 'auto_deploy.py')
-    _env = os.environ
-    _env['SHELLSTREAMING_CNF'] = confpath
-    p = Popen(shlex.split('fab -f %s pack deploy start_worker' % (scriptpath)),
-              env=_env)
+
+    cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s' % {
+        'script': scriptpath,
+        'hosts': 'gueze.logos.ic.i.u-tokyo.ac.jp',
+        'tasks': 'pack deploy:cnfpath=%s start_worker' % (cnfpath),
+    }
+
+    p = Popen(shlex.split(cmd), env=os.environ)
     exitcode = p.wait()
     assert(exitcode == 0)
 
     # wait for all workers' server to start
-    while True:
-        try:
-            conn = rpyc.connect('gueze.logos.ic.i.u-tokyo.ac.jp', port=18871)
-            conn.close()
-            break
-        except (socket.gaierror, socket.error):  # connection refused
-            time.sleep(0.1)
-            logger.debug('waiting gueze worker server ...')
-            continue
-        except:
-            raise
+    wait_worker_server('gueze.logos.ic.i.u-tokyo.ac.jp', 18871)
 
     logger.debug('connected to gueze!!')
 
