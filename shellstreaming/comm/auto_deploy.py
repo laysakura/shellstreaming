@@ -66,7 +66,7 @@ def deploy(cnfpath):
     assert(already_packed)
 
     # create deploy directory on remote host
-    run('rm -rf %s' % (REMOTE_DEPLOY))  # [fix] - not always remove
+    run('rm -rf %s' % (REMOTE_DEPLOY))
     run('mkdir %s'  % (REMOTE_DEPLOY))
 
     # upload the config file
