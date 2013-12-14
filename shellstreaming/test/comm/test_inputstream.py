@@ -51,7 +51,11 @@ def setup():
     logger = Logger(logging.DEBUG)
 
     # kill worker server if exists
-    kill_worker_server('localhost', 18871)  # [fix] - hardcoding
+    try:
+        kill_worker_server('localhost', 18871)  # [fix] - hardcoding
+        logger.debug('Killed already-exist worker process: %s:%s' % ('localhost', 18871))
+    except IOError:
+        pass
 
     # setting up worker
     process = Process(target=_start_worker_process)

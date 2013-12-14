@@ -6,9 +6,9 @@ from shellstreaming.comm.worker_server import WorkerServerService
 from shellstreaming.comm.util import kill_worker_server, wait_worker_server
 
 
-def test_wait_worker_server():
-    # timeoutを投げる例?
-    pass
+@IOError
+def test_wait_worker_server_timeout():
+    wait_worker_server('localhost', 17777, timeout_sec=1.0)  # IOError after timeout when no server is established
 
 
 def test_kill_worker_server():
