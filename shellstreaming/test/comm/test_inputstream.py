@@ -7,20 +7,19 @@ import signal
 from os import kill
 from os.path import abspath, dirname, join
 import socket
-from shellstreaming.config import Config
 from shellstreaming.logger import TerminalLogger as Logger
 from shellstreaming.comm.worker_server import WorkerServerService
 from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
 from shellstreaming.comm.util import kill_worker_server
 
 
-TEST_CONFIG   = join(abspath(dirname(__file__)), '..', 'data', 'shellstreaming.cnf')
+WORKER_HOST   = 'localhost'
+WORKER_PORT   = 18889
 TEST_TEXTFILE = join(abspath(dirname(__file__)), '..', 'data', 'comm_inputstream_input01.txt')
 
 
 process = None  # used by master process
 server  = None  # used by worker process
-config  = None  # used by master process
 
 
 def _sigusr1_handler(signum, stack):
@@ -39,21 +38,19 @@ def _start_worker_process():
     # start worker server
     global server
     from rpyc.utils.server import ThreadedServer as Server
-    config = Config(TEST_CONFIG)
-    server = Server(WorkerServerService, port=int(config.get('worker', 'port')))
+    server = Server(WorkerServerService, port=WORKER_PORT)
     server.start()
 
 
 def setup():
-    global process, config
-    config = Config(TEST_CONFIG)
+    global process
     import logging
     logger = Logger(logging.DEBUG)
 
     # kill worker server if exists
     try:
-        kill_worker_server('localhost', 18871)  # [fix] - hardcoding
-        logger.debug('Killed already-exist worker process: %s:%s' % ('localhost', 18871))
+        kill_worker_server(WORKER_HOST, WORKER_PORT)
+        logger.debug('Killed already-exist worker process: %s:%s' % (WORKER_HOST, WORKER_PORT))
     except IOError:
         pass
 
@@ -64,8 +61,8 @@ def setup():
     # wait for worker process to really start
     while True:
         try:
-            logger.debug('trying to connect localhost ...')
-            conn = rpyc.connect('localhost', int(config.get('worker', 'port')))
+            logger.debug('trying to connect %s:%s ...' % (WORKER_HOST, WORKER_PORT))
+            conn = rpyc.connect(WORKER_HOST, WORKER_PORT)
             conn.close()
             break
         except (socket.gaierror, socket.error):  # connection refused
@@ -73,7 +70,7 @@ def setup():
             continue
         except:
             raise
-    logger.debug('localhost\'s server has been started')
+    logger.debug('%s:%s\'s worker server has been started' % (WORKER_HOST, WORKER_PORT))
 
 
 def teardown():
@@ -83,10 +80,8 @@ def teardown():
 
 def test_inputstream_dispatcher():
     # master's code
-    global config
     stream = InputStreamDispatcher(
-        'localhost',
-        int(config.get('worker', 'port')),
+        WORKER_HOST, WORKER_PORT,
         'TextFile',
         (TEST_TEXTFILE, 20),
     )
