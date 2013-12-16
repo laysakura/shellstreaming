@@ -16,11 +16,12 @@ from os.path import abspath, dirname, join
 from subprocess import Popen, STDOUT
 from threading import Thread
 from rpyc.utils.server import ThreadedServer as Server
-from shellstreaming.config import Config
+from ConfigParser import SafeConfigParser as Config
 from shellstreaming.comm.worker_server import WorkerServerService
 
 
-config = Config('/home/nakatani/git/shellstreaming/shellstreaming/test/data/shellstreaming.cnf')
+config = Config()
+config.read('/home/nakatani/git/shellstreaming/shellstreaming/test/data/shellstreaming.cnf')
 
 
 def main(port):

@@ -5,26 +5,45 @@
 
     :synopsis: Provides master process's entry point
 """
+import argparse
 import os
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, join, expanduser
 import shlex
 import logging
 from subprocess import Popen
-from shellstreaming.config import Config
+from ConfigParser import SafeConfigParser as Config
+import shellstreaming
 from shellstreaming.logger import TerminalLogger
 from shellstreaming.comm.util import wait_worker_server
+
+
+DEFAULT_CONFIGS = (expanduser(join('~', '.shellstreaming.cnf')), )
+"""Path from which default config file is searched (from left)"""
+
+# default arguments to _launch_workers
+CNF_SENT_TO_WORKER = None
+PARALLEL_DEPLOY    = False
+SSH_PRIVATE_KEY    = None
 
 
 logger = TerminalLogger(logging.DEBUG)
 
 
-def main(confpath):
+def main():
     """Master process's entry point.
 
     :param confpath: path to config file
     :returns: exit status of master process
     """
-    config = Config(confpath)
+    # parse args
+    args = _parse_args()
+
+    # setup config
+    cnfpath = args.config if args.config else _get_existing_cnf(DEFAULT_CONFIGS)
+    if cnfpath is None:
+        raise IOError('Config file not found: Specify via `--config` option or put one of %s.' % (DEFAULT_CONFIGS))
+    config = Config()
+    config.read(cnfpath)
 
     # setup logger
     global logger
@@ -33,15 +52,41 @@ def main(confpath):
 
     # launch worker servers (auto-deploy)
     _launch_workers(
-        config.get('worker', 'hosts'), config.get('worker', 'port'),
-        cnf_sent_to_worker=confpath,
+        config.get('worker', 'hosts').split(','), config.getint('worker', 'port'),
+        cnf_sent_to_worker=cnfpath,
+        parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy') if config.has_option('auto_deploy', 'parallel_deploy') else PARALLEL_DEPLOY,
+        ssh_private_key=config.get('auto_deploy', 'ssh_private_key') if config.has_option('auto_deploy', 'ssh_private_key') else SSH_PRIVATE_KEY,
     )
+
     return 0
 
 
+def _parse_args():
+    parser = argparse.ArgumentParser(description=shellstreaming.__description__)
+
+    parser.add_argument(
+        '--config', '-c',
+        default=None,
+        help='''Configuration file. If not specified, %(default_configs)s are searched (from left) and one found is used.''' % {
+            'default_configs': ', '.join(DEFAULT_CONFIGS),
+        })
+
+    args = parser.parse_args()
+    return args
+
+
+def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIGS):
+    global logger
+    for cnfpath in cnf_candidates:
+        if os.path.exists(cnfpath):
+            return cnfpath
+    return None
+
+
 def _launch_workers(worker_hosts, worker_port,
-                    cnf_sent_to_worker=None,
-                    parallel_deploy=False, ssh_priv_key=None):
+                    cnf_sent_to_worker=CNF_SENT_TO_WORKER,
+                    parallel_deploy=PARALLEL_DEPLOY,
+                    ssh_private_key=SSH_PRIVATE_KEY):
     """Launch every worker server and return.
 
     :param worker_hosts: worker hosts to launch worker servers
@@ -52,7 +97,7 @@ def _launch_workers(worker_hosts, worker_port,
         many :param:`worker_hosts`.
         However, if you have to input anything (pass for secret key, login password, ...),
         :param:`parallel_deploy` has to be `False`.
-    :param ssh_priv_key: if not `None`, specified private key is used for ssh-login to every worker host
+    :param ssh_private_key: if not `None`, specified private key is used for ssh-login to every worker host
     """
     # [todo] - make use of ssh_config (`fabric.api.env.ssh_config_path` must be True (via cmd opt?))
     global logger
@@ -68,8 +113,9 @@ def _launch_workers(worker_hosts, worker_port,
             worker_port,
         ),
         'parallel_deploy' : '-P' if parallel_deploy else '',
-        'ssh_priv_key'    : '-i ' + ssh_priv_key if ssh_priv_key else '',
+        'ssh_priv_key'    : '-i ' + ssh_private_key if ssh_private_key else '',
     }
+    logger.debug('Auto-deploy starts with this command:%s%s' % (os.linesep, cmd))
 
     p        = Popen(shlex.split(cmd), env=os.environ)
     exitcode = p.wait()
