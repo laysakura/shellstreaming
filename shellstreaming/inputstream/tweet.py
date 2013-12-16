@@ -48,7 +48,7 @@ class Tweet(InfiniteStream):
             {'name': 'text'        , 'type': 'STRING'},
             {'name': 'lang'        , 'type': 'STRING'},
             {'name': 'created_at'  , 'type': 'STRING'},  # [fix] - use timestamp type?
-            {'name': 'screen_name' , 'type': 'STRING'},  # [fix] - invalid column name creates a non-killable thread (e.g. 'name': 'user.screen_name')
+            {'name': 'screen_name' , 'type': 'STRING'},
         ])
         for line in self._twitter_response.iter_lines():
             if self.interrupted():

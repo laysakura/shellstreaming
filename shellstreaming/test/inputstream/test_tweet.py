@@ -26,7 +26,6 @@ def test_tweet_usage():
 
     n_batches = 5
     stream = Tweet(
-        # [todo] - use config for not showing my keys & secrets
         consumer_key=config.get('inputstream.tweet', 'consumer_key'),
         consumer_secret=config.get('inputstream.tweet', 'consumer_secret'),
         access_token=config.get('inputstream.tweet', 'access_token'),

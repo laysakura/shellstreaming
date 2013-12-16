@@ -23,29 +23,34 @@ from shellstreaming.comm.worker_server import WorkerServerService
 config = Config('/home/nakatani/git/shellstreaming/shellstreaming/test/data/shellstreaming.cnf')
 
 
-def main():
+def main(port):
     """Worker process's entry point.
 
+    :param port: TCP port number to launch worker server
     :returns: exit status of worker process
     """
     if sys.argv[1] == 'async_start_server':
         # fork this script (on background) and call `start_server()`
-        _async_start_server()
+        _async_start_server(port)
     elif sys.argv[1] == 'run_server':
         # (forked process) run server
-        _run_server()
+        _run_server(port)
     else:  # pragma: no cover
         assert(False)
 
     return 0
 
 
-def _async_start_server():
+def _async_start_server(port):
     global config
     this_script = abspath(__file__)
     deploy_dir  = join(dirname(this_script), '..', '..', '..')
     virtualenv_activator = join(deploy_dir, 'bin', 'activate')
-    cmd = 'nohup sh -c ". %s ; python %s run_server" &' % (virtualenv_activator, this_script)
+    cmd = 'nohup sh -c ". %(virtualenv)s ; python %(script)s run_server %(port)d" &' % {
+        'virtualenv' : virtualenv_activator,
+        'script'     : this_script,
+        'port'       : port,
+    }
 
     Popen(shlex.split(cmd), env=os.environ,
           # stderr=STDOUT, stdout=WorkerServerService.logger  # [todo] - redirect to logger
@@ -54,10 +59,10 @@ def _async_start_server():
     WorkerServerService.logger.debug('[%s async_start_server] Start new process: "%s"'  % (sys.argv[0], cmd))
 
 
-def _run_server():
-    WorkerServerService.logger.debug('[%s run_server] Launching `WorkerServerService` ...' % (sys.argv[0]))
+def _run_server(port):
+    WorkerServerService.logger.debug('[%s run_server] Launching `WorkerServerService` on port %d ...' % (sys.argv[0], port))
 
-    WorkerServerService.server = Server(WorkerServerService, port=18871, logger=WorkerServerService.logger)
+    WorkerServerService.server = Server(WorkerServerService, port=port, logger=WorkerServerService.logger)
     t = Thread(target=WorkerServerService.server.start)
     t.daemon = True
     t.start()
@@ -70,6 +75,6 @@ def _run_server():
     t.join()
 
 if __name__ == '__main__':
-    assert(len(sys.argv) == 2)
+    assert(len(sys.argv) == 3)  # [fix] parse args more efficiently
     assert(sys.argv[1] in ('async_start_server', 'run_server'))
-    sys.exit(main())
+    sys.exit(main(port=int(sys.argv[2])))

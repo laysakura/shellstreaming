@@ -4,6 +4,7 @@ import rpyc
 from multiprocessing import Process
 import time
 import signal
+import logging
 from os import kill
 from os.path import abspath, dirname, join
 import socket
@@ -20,6 +21,7 @@ TEST_TEXTFILE = join(abspath(dirname(__file__)), '..', 'data', 'comm_inputstream
 
 process = None  # used by master process
 server  = None  # used by worker process
+logger  = Logger(logging.DEBUG)
 
 
 def _sigusr1_handler(signum, stack):
@@ -31,8 +33,6 @@ def _sigusr1_handler(signum, stack):
 
 def _start_worker_process():
     # register SIGUSR1 handler
-    # [fix] - really needs SIGUSR1? SIGHUP might be used
-    import signal
     signal.signal(signal.SIGUSR1, _sigusr1_handler)
 
     # start worker server
@@ -43,9 +43,7 @@ def _start_worker_process():
 
 
 def setup():
-    global process
-    import logging
-    logger = Logger(logging.DEBUG)
+    global process, logger
 
     # kill worker server if exists
     try:
@@ -74,7 +72,8 @@ def setup():
 
 
 def teardown():
-    print('worker process is being killed')
+    global logger
+    logger.debug('worker process is being killed')
     kill(process.pid, signal.SIGUSR1)
 
 
