@@ -24,6 +24,7 @@ DEFAULT_CONFIGS = (expanduser(join('~', '.shellstreaming.cnf')), )
 CNF_SENT_TO_WORKER = None
 PARALLEL_DEPLOY    = False
 SSH_PRIVATE_KEY    = None
+SEND_LATEST_CODES_ON_START = True
 
 
 logger = TerminalLogger(logging.DEBUG)
@@ -56,6 +57,7 @@ def main():
         cnf_sent_to_worker=cnfpath,
         parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy') if config.has_option('auto_deploy', 'parallel_deploy') else PARALLEL_DEPLOY,
         ssh_private_key=config.get('auto_deploy', 'ssh_private_key') if config.has_option('auto_deploy', 'ssh_private_key') else SSH_PRIVATE_KEY,
+        send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start') if config.has_option('auto_deploy', 'send_latest_codes_on_start') else SEND_LATEST_CODES_ON_START,
     )
 
     return 0
@@ -86,7 +88,9 @@ def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIGS):
 def _launch_workers(worker_hosts, worker_port,
                     cnf_sent_to_worker=CNF_SENT_TO_WORKER,
                     parallel_deploy=PARALLEL_DEPLOY,
-                    ssh_private_key=SSH_PRIVATE_KEY):
+                    ssh_private_key=SSH_PRIVATE_KEY,
+                    send_latest_codes_on_start=SEND_LATEST_CODES_ON_START,
+    ):
     """Launch every worker server and return.
 
     :param worker_hosts: worker hosts to launch worker servers
@@ -105,13 +109,16 @@ def _launch_workers(worker_hosts, worker_port,
     # deploy & start workers' server
     scriptpath = join(abspath(dirname(__file__)), 'auto_deploy.py')
 
+    fab_tasks = []
+    if send_latest_codes_on_start:
+        fab_tasks.append('pack')
+        fab_tasks.append('deploy:cnfpath=%s' % (cnf_sent_to_worker))
+    fab_tasks.append('start_worker:worker_server_port=%d' % (worker_port))
+
     cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s %(parallel_deploy)s %(ssh_priv_key)s' % {
         'script'          : scriptpath,
         'hosts'           : ','.join(worker_hosts),
-        'tasks'           : 'pack deploy:cnfpath=%s start_worker:worker_server_port=%d' % (
-            cnf_sent_to_worker if cnf_sent_to_worker else '',
-            worker_port,
-        ),
+        'tasks'           : ' '.join(fab_tasks),
         'parallel_deploy' : '-P' if parallel_deploy else '',
         'ssh_priv_key'    : '-i ' + ssh_private_key if ssh_private_key else '',
     }
