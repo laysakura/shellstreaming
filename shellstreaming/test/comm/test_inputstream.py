@@ -33,7 +33,6 @@ def _sigusr1_handler(signum, stack):
 
 def _start_worker_process():
     # register SIGUSR1 handler
-    # [fix] - really needs SIGUSR1? SIGHUP might be used
     signal.signal(signal.SIGUSR1, _sigusr1_handler)
 
     # start worker server
