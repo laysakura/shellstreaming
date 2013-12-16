@@ -29,12 +29,12 @@ def main(port, cnfpath):
     :param cnfpath: path to config file
     :returns: exit status of worker process
     """
-    _async_start_server(port, cnfpath)
+    _run_worker_server(port, cnfpath)
 
     return 0
 
 
-def _async_start_server(port, cnfpath):
+def _run_worker_server(port, cnfpath):
     global config
     script     = join(dirname(abspath(__file__)), 'run_worker_server.py')
     deploy_dir = join(dirname(abspath(__file__)), '..', '..', '..')
@@ -49,7 +49,6 @@ def _async_start_server(port, cnfpath):
     Popen(shlex.split(cmd), env=os.environ,
           # stderr=STDOUT, stdout=WorkerServerService.logger  # [todo] - redirect to logger
     )
-
     WorkerServerService.logger.debug('Start new process: "%s"'  % (cmd))
 
 
