@@ -14,3 +14,9 @@ def test_config_usage():
 
     config2 = Config(TEST_CONFIG2)
     eq_('test_val2', config2.get('test_section', 'test_var'))
+
+
+def test_get_not_defined_config():
+    config = Config(TEST_CONFIG1)
+    ok_(config.get('test_section', 'not_defined_var')        is None)
+    ok_(config.get('not_defined_section', 'not_defined_var') is None)

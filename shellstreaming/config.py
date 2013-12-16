@@ -5,8 +5,7 @@
 
     :synopsis: Provides config values read from config file
 """
-from os.path import expanduser, join, exists
-from ConfigParser import SafeConfigParser as ConfigParser
+from ConfigParser import SafeConfigParser as ConfigParser, NoSectionError, NoOptionError
 
 
 class Config(object):
@@ -18,5 +17,11 @@ class Config(object):
         self._parser.read(config_file)
 
     def get(self, section, option):
-        """Get config values"""
-        return self._parser.get(section, option)
+        """Get config values
+
+        :returns: `None` if config is undefined
+        """
+        try:
+            return self._parser.get(section, option)
+        except (NoSectionError, NoOptionError):
+            return None
