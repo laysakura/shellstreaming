@@ -18,24 +18,20 @@ from ConfigParser import SafeConfigParser as Config
 from shellstreaming.comm.worker_server import WorkerServerService
 
 
-config = Config()
-config.read('/home/nakatani/git/shellstreaming/shellstreaming/test/data/shellstreaming.cnf')
-
-
-def main(port, cnfpath):
+def main(cnfpath):
     """Worker process's entry point.
 
     :param port: TCP port number to launch worker server
     :param cnfpath: path to config file
     :returns: exit status of worker process
     """
-    _run_worker_server(port, cnfpath)
-
+    config = Config()
+    config.read(cnfpath)
+    _run_worker_server(config.getint('worker', 'port'), cnfpath)
     return 0
 
 
 def _run_worker_server(port, cnfpath):
-    global config
     script     = join(dirname(abspath(__file__)), 'run_worker_server.py')
     deploy_dir = join(dirname(abspath(__file__)), '..', '..', '..')
     virtualenv_activator = join(deploy_dir, 'bin', 'activate')
@@ -71,4 +67,4 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    sys.exit(main(port=args.port, cnfpath=args.config))
+    sys.exit(main(args.config))
