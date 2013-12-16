@@ -8,19 +8,14 @@
 import os
 from os.path import abspath, dirname, join
 import shlex
-import time
+import logging
 from subprocess import Popen
 from shellstreaming.config import Config
 from shellstreaming.logger import TerminalLogger
-from shellstreaming.comm.util import kill_worker_server, wait_worker_server
+from shellstreaming.comm.util import wait_worker_server
 
 
-# global objects referenced from master's code: `shellstreaming.comm.master.logger`
-config = None
-"""The config"""
-
-logger = None
-"""The logger"""
+logger = TerminalLogger(logging.DEBUG)
 
 
 def main(confpath):
@@ -29,63 +24,59 @@ def main(confpath):
     :param confpath: path to config file
     :returns: exit status of master process
     """
-    _init(confpath)
-
-    print('hello from master')
-
-    # [todo] - もしここで18871番にconnectできたら，そのプロセスは終了しとく
-
-    _launch_workers(confpath)
-    return 0
-
-
-def _init(confpath):
-    """Every initialization master process has to do"""
-    global logger, config
-
-    # setup config object
     config = Config(confpath)
 
     # setup logger
+    global logger
     logger = TerminalLogger(config.get('master', 'log_level'))
+    logger.debug('hello from master')
+
+    # launch worker servers (auto-deploy)
+    _launch_workers(
+        config.get('worker', 'hosts'), config.get('worker', 'port'),
+        cnf_sent_to_worker=confpath,
+    )
+    return 0
 
 
-def _launch_workers(cnfpath):
+def _launch_workers(worker_hosts, worker_port,
+                    cnf_sent_to_worker=None,
+                    parallel_deploy=False, ssh_priv_key=None):
+    """Launch every worker server and return.
+
+    :param worker_hosts: worker hosts to launch worker servers
+    :type worker_hosts:  list of hostname string
+    :param worker_port:  worker servers' TCP port number
+    :param cnf_sent_to_worker: if not `None`, specified config file is sent to worker hosts and used by them
+    :param parallel_deploy: If `True`, auto-deploy is done in parallel. Especially useful when you have
+        many :param:`worker_hosts`.
+        However, if you have to input anything (pass for secret key, login password, ...),
+        :param:`parallel_deploy` has to be `False`.
+    :param ssh_priv_key: if not `None`, specified private key is used for ssh-login to every worker host
     """
-    :param cnfpath: path to config file
-    """
-    global logger, config
+    # [todo] - make use of ssh_config (`fabric.api.env.ssh_config_path` must be True (via cmd opt?))
+    global logger
 
     # deploy & start workers' server
     scriptpath = join(abspath(dirname(__file__)), 'auto_deploy.py')
 
-    cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s' % {
-        'script': scriptpath,
-        'hosts': 'gueze.logos.ic.i.u-tokyo.ac.jp',
-        'tasks': 'pack deploy:cnfpath=%s start_worker' % (cnfpath),
+    cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s %(parallel_deploy)s %(ssh_priv_key)s' % {
+        'script'          : scriptpath,
+        'hosts'           : ','.join(worker_hosts),
+        'tasks'           : 'pack deploy:cnfpath=%s start_worker:worker_server_port=%d' % (
+            cnf_sent_to_worker if cnf_sent_to_worker else '',
+            worker_port,
+        ),
+        'parallel_deploy' : '-P' if parallel_deploy else '',
+        'ssh_priv_key'    : '-i ' + ssh_priv_key if ssh_priv_key else '',
     }
 
-    p = Popen(shlex.split(cmd), env=os.environ)
+    p        = Popen(shlex.split(cmd), env=os.environ)
     exitcode = p.wait()
     assert(exitcode == 0)
 
     # wait for all workers' server to start
-    wait_worker_server('gueze.logos.ic.i.u-tokyo.ac.jp', 18871)
-
-    logger.debug('connected to gueze!!')
-
-    time.sleep(5)
-
-    # worker process も殺す
-    kill_worker_server('gueze.logos.ic.i.u-tokyo.ac.jp', 18871)
-
-    import sys
-    sys.exit(0)
-
-    # fabでworkerのrpycサーバ立てに行く
-    # 各workerについて，connectionを試みるループを回す(もちろんmasterで複数スレッドでやりたい)
-    from rpyc.utils.server import ThreadedServer as Server
-    server = Server(InputStreamExecutorService,
-                    # port=int(config.get('master', 'port'))
-    )
-    server.start()
+    # [todo] - parallel wait
+    for host in worker_hosts:
+        wait_worker_server(host, worker_port)
+        logger.debug('connected to %s:%s' % (host, worker_port))
