@@ -60,6 +60,10 @@ def main():
         send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start') if config.has_option('auto_deploy', 'send_latest_codes_on_start') else SEND_LATEST_CODES_ON_START,
     )
 
+    # necessary to remove error message:
+    #     Exception TypeError: "'NoneType' object is not callable" in <function _removeHandlerRef at 0x7fb2b038ee60> ignored
+    logger = None
+
     return 0
 
 
