@@ -6,7 +6,7 @@ import shellstreaming
 
 setup(
     name             = shellstreaming.__name__,
-    description      = '[under development] A stream processor working with shell commands',
+    description      = shellstreaming.__description__,
     long_description = open('README.rst').read(),
     url              = 'https://github.com/laysakura/shellstreaming',
     license          = 'LICENSE.txt',

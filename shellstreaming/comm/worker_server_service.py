@@ -6,8 +6,6 @@
     :synopsis: Provides worker process's server
 """
 import rpyc
-import logging
-from shellstreaming.logger import FileLogger
 from shellstreaming.comm.inputstream_executor import InputStreamExecutor
 
 
@@ -18,7 +16,7 @@ class WorkerServerService(rpyc.Service):
     server = None
 
     # the logger
-    logger = FileLogger(logging.DEBUG, '/tmp/shellstreaming.log', 1000000)  # [fix] - use config
+    logger = None
 
     # API to clients
     exposed_InputStreamExecutor = InputStreamExecutor

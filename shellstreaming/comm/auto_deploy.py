@@ -87,18 +87,19 @@ def deploy(cnfpath=''):
             run('python setup.py install')  # installing into virtualenv's environment
 
 
-def start_worker(worker_server_port):
+def start_worker(cnfpath):
     """Start worker server via :func:`deploy`ed codes.
 
     When this task is called w/o preceeding :func:`deploy`, already-deployed codes are used.
 
     :param worker_server_port: TCP port number to launch rpyc server on worker
+    :param cnfpath: path to config file
     """
     with cd(REMOTE_PKG_ROOT):
         with prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE):
-            run('python %(remote_worker_py)s async_start_server %(port)d' % {
+            run('python %(remote_worker_py)s --config=%(cnfpath)s' % {
                 'remote_worker_py' : REMOTE_WORKER_PY,
-                'port'             : int(worker_server_port),
+                'cnfpath'          : cnfpath,
             })
 
 
