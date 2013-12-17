@@ -117,7 +117,7 @@ def _launch_workers(worker_hosts, worker_port,
     if send_latest_codes_on_start:
         fab_tasks.append('pack')
         fab_tasks.append('deploy:cnfpath=%s' % (cnf_sent_to_worker))
-    fab_tasks.append('start_worker:worker_server_port=%d,cnfpath=%s' % (worker_port, cnf_sent_to_worker))
+    fab_tasks.append('start_worker:cnfpath=%s' % (cnf_sent_to_worker))
 
     cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s %(parallel_deploy)s %(ssh_priv_key)s' % {
         'script'          : scriptpath,
