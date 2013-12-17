@@ -10,13 +10,17 @@
 
 """
 import time
+import sys
 from threading import Thread
 from rpyc.utils.server import ThreadedServer as Server
+import logging
+from shellstreaming.logger import FileLogger
 from shellstreaming.comm.worker import parse_args
 from shellstreaming.comm.worker_server import WorkerServerService
 
 
 def main(port, cnfpath):
+    WorkerServerService.logger = FileLogger(logging.DEBUG, '/tmp/shellstreaming.log', 1000000)  # [fix] - use config
     WorkerServerService.logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
 
     WorkerServerService.server = Server(WorkerServerService, port=port, logger=WorkerServerService.logger)
@@ -34,4 +38,4 @@ def main(port, cnfpath):
 
 if __name__ == '__main__':
     args = parse_args()
-    sys.exit(main(port=args.port, cnfpath=args.cnfpath))
+    sys.exit(main(port=args.port, cnfpath=args.config))

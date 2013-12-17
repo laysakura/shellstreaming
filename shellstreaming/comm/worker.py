@@ -13,9 +13,8 @@ import sys
 import shlex
 import os
 from os.path import abspath, dirname, join
-from subprocess import Popen, STDOUT
+from subprocess import Popen
 from ConfigParser import SafeConfigParser as Config
-from shellstreaming.comm.worker_server import WorkerServerService
 
 
 def main(cnfpath):
@@ -42,10 +41,8 @@ def _run_worker_server(port, cnfpath):
         'port'       : port,
     }
 
-    Popen(shlex.split(cmd), env=os.environ,
-          # stderr=STDOUT, stdout=WorkerServerService.logger  # [todo] - redirect to logger
-    )
-    WorkerServerService.logger.debug('Start new process: "%s"'  % (cmd))
+    Popen(shlex.split(cmd), env=os.environ)
+    print('Start new process: "%s"'  % (cmd))  # logger is only available in child process above
 
 
 def parse_args():
