@@ -9,7 +9,7 @@ from os import kill
 from os.path import abspath, dirname, join
 import socket
 from shellstreaming.logger import TerminalLogger as Logger
-from shellstreaming.comm.worker_server import WorkerServerService
+from shellstreaming.comm.worker_server_service import WorkerServerService
 from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
 from shellstreaming.comm.util import kill_worker_server
 
