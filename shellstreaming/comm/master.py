@@ -13,8 +13,10 @@ import logging
 from subprocess import Popen
 from ConfigParser import SafeConfigParser as Config
 import shellstreaming
+from shellstreaming.util import import_from_file
 from shellstreaming.logger import TerminalLogger
 from shellstreaming.comm.util import wait_worker_server
+from shellstreaming.api import *
 
 
 DEFAULT_CONFIGS = (expanduser(join('~', '.shellstreaming.cnf')), )
@@ -27,13 +29,12 @@ SSH_PRIVATE_KEY    = None
 SEND_LATEST_CODES_ON_START = True
 
 
-logger = TerminalLogger(logging.DEBUG)
+logger = None
 
 
 def main():
     """Master process's entry point.
 
-    :param confpath: path to config file
     :returns: exit status of master process
     """
     # parse args
@@ -49,7 +50,7 @@ def main():
     # setup logger
     global logger
     logger = TerminalLogger(config.get('master', 'log_level'))
-    logger.debug('hello from master')
+    logger.info('Used config file: %s' % (cnfpath))
 
     # launch worker servers (auto-deploy)
     _launch_workers(
@@ -59,6 +60,9 @@ def main():
         ssh_private_key=config.get('auto_deploy', 'ssh_private_key') if config.has_option('auto_deploy', 'ssh_private_key') else SSH_PRIVATE_KEY,
         send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start') if config.has_option('auto_deploy', 'send_latest_codes_on_start') else SEND_LATEST_CODES_ON_START,
     )
+
+    # start main stream processing
+    _start_main(args.stream_py)
 
     # necessary to remove error message:
     #     Exception TypeError: "'NoneType' object is not callable" in <function _removeHandlerRef at 0x7fb2b038ee60> ignored
@@ -76,6 +80,10 @@ def _parse_args():
         help='''Configuration file. If not specified, %(default_configs)s are searched (from left) and one found is used.''' % {
             'default_configs': ', '.join(DEFAULT_CONFIGS),
         })
+    parser.add_argument(
+        'stream_py',
+        help='''Python script describing stream processings. Must have `.py` as suffix''',
+    )
 
     args = parser.parse_args()
     return args
@@ -137,3 +145,13 @@ def _launch_workers(worker_hosts, worker_port,
     for host in worker_hosts:
         wait_worker_server(host, worker_port)
         logger.debug('connected to %s:%s' % (host, worker_port))
+
+
+def _start_main(stream_py):
+    """Parse and execute stream processings.
+
+    :param stream_py: python script in which stream processings are described by users
+    """
+    module    = import_from_file(stream_py)
+    main_func = getattr(module, 'main')
+    main_func()
