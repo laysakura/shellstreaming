@@ -16,7 +16,12 @@ def import_from_file(path):
     :param path: path to python module file, which ends with `.py`
     :raises:     :class:`ImportError` when import failed
     """
-    if not path.endswith('.py'):
-        raise ImportError('File name must ends with `.py`: %s' % (path))
+    module_name = basename(path)
+    if path.endswith('.py'):
+        module_name = module_name[:-len('.py')]
+    elif path.endswith('.pyc'):
+        module_name = module_name[:-len('.pyc')]
+    else:
+        raise ImportError('File name must ends with `.py` or `.pyc`: %s' % (path))
     sys.path.append(dirname(abspath(path)))
-    return import_module(basename(path)[:-3])
+    return import_module(module_name)
