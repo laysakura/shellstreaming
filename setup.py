@@ -14,7 +14,13 @@ setup(
     author           = 'Sho Nakatani',
     author_email     = 'lay.sakura@gmail.com',
     test_suite       = 'nose.collector',
-    install_requires = shellstreaming.install_requires,
+    install_requires = (
+        shellstreaming.install_requires +  # master & workers requirements
+        [
+            'fabric',
+            'matplotlib',
+        ]  # master requirements
+    ),
     tests_require    = [
         'nose',
         'coverage',

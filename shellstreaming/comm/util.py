@@ -9,7 +9,6 @@ import rpyc
 import socket
 import time
 import logging
-from shellstreaming.logger import TerminalLogger
 
 
 def kill_worker_server(worker_host, worker_port):
@@ -17,7 +16,7 @@ def kill_worker_server(worker_host, worker_port):
 
     :raises: :class:`IOError` if unable to connect worker server.
     """
-    logger = TerminalLogger(logging.DEBUG)
+    logger = logging.getLogger('TerminalLogger')
 
     try:
         conn = rpyc.connect(worker_host, worker_port)
@@ -38,7 +37,7 @@ def wait_worker_server(worker_host, worker_port, timeout_sec=None):
     :param timeout_sec: if not `None`, raise :class:`IOError` when no connection is established after :timeout_sec:.
     :raises: :class:`IOError`
     """
-    logger = TerminalLogger(logging.DEBUG)
+    logger = logging.getLogger('TerminalLogger')
 
     t_start = time.time()
     while True:

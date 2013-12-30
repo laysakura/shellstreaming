@@ -19,11 +19,11 @@ import sys
 # (to reflect changes on `../../shellstreaming/**.py` quickly if using `<github-repo>/shellstreaming/comm/auto_deploy.py`)
 basedir = join(abspath(dirname(__file__)), '..', '..')
 sys.path = [basedir] + sys.path
-from shellstreaming.logger import TerminalLogger as Logger
+from shellstreaming.logger import setup_TerminalLogger
 
 
 # prepare logger
-logger = Logger(logging.DEBUG)
+setup_TerminalLogger(logging.DEBUG)
 
 
 # important path
@@ -104,6 +104,7 @@ def start_worker(cnfpath):
 
 
 def _mk_latest_pkg():
+    logger = logging.getLogger('TerminalLogger')
     logger.info('Current package is <%s>. This is being deployed to worker nodes.' % (LOCAL_SRC_PKG))
 
     local('rm -rf %s'   % (LOCAL_LATEST_PKG))

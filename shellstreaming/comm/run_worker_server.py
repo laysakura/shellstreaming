@@ -18,7 +18,7 @@ from ConfigParser import SafeConfigParser as Config
 from threading import Thread
 from rpyc.utils.server import ThreadedServer as Server
 import logging
-from shellstreaming.logger import FileLogger, TerminalLogger
+from shellstreaming.logger import FileLogger, setup_TerminalLogger
 from shellstreaming.comm.worker_server_service import WorkerServerService
 
 
@@ -37,7 +37,9 @@ def main(cnfpath):
     # setup logger
     (loglevel, logpath) = (eval('logging.' + config.get('worker', 'log_level')), config.get('worker', 'log_path'))
     WorkerServerService.logger = FileLogger(loglevel, logpath, 100 * 1e6)
-    TerminalLogger(loglevel).debug('Log is written in <%s> in `%s` level' % (logpath, loglevel))
+    setup_TerminalLogger(loglevel)
+    logger = logging.getLogger('TerminalLogger')
+    logger.debug('Log is written in <%s> in `%s` level' % (logpath, loglevel))
 
     # start `WorkerServerService`
     port = config.getint('worker', 'port')

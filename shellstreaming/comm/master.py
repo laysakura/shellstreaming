@@ -11,25 +11,20 @@ from os.path import abspath, dirname, join, expanduser
 import shlex
 import logging
 from subprocess import Popen
-from ConfigParser import SafeConfigParser as Config
+import networkx as nx
+import matplotlib.pyplot as plt
 import shellstreaming
+from shellstreaming.logger import setup_TerminalLogger
+from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
-from shellstreaming.logger import TerminalLogger
-from shellstreaming.comm.util import wait_worker_server
+from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
+from shellstreaming.comm.util import wait_worker_server, kill_worker_server
+from shellstreaming.jobgraph import JobGraph
 from shellstreaming.api import *
 
 
 DEFAULT_CONFIGS = (expanduser(join('~', '.shellstreaming.cnf')), )
 """Path from which default config file is searched (from left)"""
-
-# default arguments to _launch_workers
-CNF_SENT_TO_WORKER = None
-PARALLEL_DEPLOY    = False
-SSH_PRIVATE_KEY    = None
-SEND_LATEST_CODES_ON_START = True
-
-
-logger = None
 
 
 def main():
@@ -42,31 +37,35 @@ def main():
 
     # setup config
     cnfpath = args.config if args.config else _get_existing_cnf(DEFAULT_CONFIGS)
-    if cnfpath is None:
-        raise IOError('Config file not found: Specify via `--config` option or put one of %s.' % (DEFAULT_CONFIGS))
-    config = Config()
-    config.read(cnfpath)
+    config  = _setup_config(cnfpath)
 
     # setup logger
-    global logger
-    logger = TerminalLogger(config.get('master', 'log_level'))
+    setup_TerminalLogger(config.get('master', 'log_level'))
+    logger = logging.getLogger('TerminalLogger')
     logger.info('Used config file: %s' % (cnfpath))
 
     # launch worker servers (auto-deploy)
+    (worker_hosts, worker_port) = (config.get('worker', 'hosts').split(','), config.getint('worker', 'port'))
     _launch_workers(
-        config.get('worker', 'hosts').split(','), config.getint('worker', 'port'),
+        worker_hosts, worker_port,
         cnf_sent_to_worker=cnfpath,
-        parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy') if config.has_option('auto_deploy', 'parallel_deploy') else PARALLEL_DEPLOY,
-        ssh_private_key=config.get('auto_deploy', 'ssh_private_key') if config.has_option('auto_deploy', 'ssh_private_key') else SSH_PRIVATE_KEY,
-        send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start') if config.has_option('auto_deploy', 'send_latest_codes_on_start') else SEND_LATEST_CODES_ON_START,
+        parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy'),
+        ssh_private_key=config.get('auto_deploy', 'ssh_private_key'),
+        send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start'),
     )
 
-    # start main stream processing
-    _start_main(args.stream_py)
-
-    # necessary to remove error message:
-    #     Exception TypeError: "'NoneType' object is not callable" in <function _removeHandlerRef at 0x7fb2b038ee60> ignored
-    logger = None
+    try:
+        # make job graph from user's stream app description
+        job_graph = _parse_stream_py(args.stream_py)
+        if config.get('master', 'job_graph_path') != '':
+            _draw_job_graph(job_graph, config.get('master', 'job_graph_path'))
+        # start master's main loop
+        _do_stream_processing(job_graph, worker_hosts, worker_port)
+    except KeyboardInterrupt as e:
+        logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
+        for host in worker_hosts:
+            kill_worker_server(host, worker_port)
+        logger.exception(e)
 
     return 0
 
@@ -89,8 +88,15 @@ def _parse_args():
     return args
 
 
+def _setup_config(cnfpath):
+    if cnfpath is None:
+        raise IOError('Config file not found: Specify via `--config` option or put one of %s.' % (DEFAULT_CONFIGS))
+    config = get_default_conf()
+    config.read(cnfpath)
+    return config
+
+
 def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIGS):
-    global logger
     for cnfpath in cnf_candidates:
         if os.path.exists(cnfpath):
             return cnfpath
@@ -98,10 +104,10 @@ def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIGS):
 
 
 def _launch_workers(worker_hosts, worker_port,
-                    cnf_sent_to_worker=CNF_SENT_TO_WORKER,
-                    parallel_deploy=PARALLEL_DEPLOY,
-                    ssh_private_key=SSH_PRIVATE_KEY,
-                    send_latest_codes_on_start=SEND_LATEST_CODES_ON_START,
+                    cnf_sent_to_worker,
+                    parallel_deploy,
+                    ssh_private_key,
+                    send_latest_codes_on_start,
     ):
     """Launch every worker server and return.
 
@@ -116,7 +122,7 @@ def _launch_workers(worker_hosts, worker_port,
     :param ssh_private_key: if not `None`, specified private key is used for ssh-login to every worker host
     """
     # [todo] - make use of ssh_config (`fabric.api.env.ssh_config_path` must be True (via cmd opt?))
-    global logger
+    logger = logging.getLogger('TerminalLogger')
 
     # deploy & start workers' server
     scriptpath = join(abspath(dirname(__file__)), 'auto_deploy.py')
@@ -147,11 +153,36 @@ def _launch_workers(worker_hosts, worker_port,
         logger.debug('connected to %s:%s' % (host, worker_port))
 
 
-def _start_main(stream_py):
-    """Parse and execute stream processings.
+def _parse_stream_py(stream_py):
+    """Parse stream processing description and return job graph.
 
     :param stream_py: python script in which stream processings are described by users
+    :returns: job graph
+    :rtype:   :class:`JobGraph()`
     """
     module    = import_from_file(stream_py)
     main_func = getattr(module, 'main')
-    main_func()
+    job_graph = JobGraph()
+    main_func(job_graph)
+    return job_graph
+
+
+def _draw_job_graph(job_graph, path):
+    """
+    """
+    nx.draw(job_graph)
+    plt.savefig(path)
+    logger = logging.getLogger('TerminalLogger')
+    logger.info('Job graph figure is generated on: %s' % (path))
+
+
+def _do_stream_processing(job_graph, worker_hosts, worker_port):
+    # dispatch inputstreams
+    for n in job_graph.begin_nodes():
+        istream = job_graph.node[n]
+        print(istream)
+        stream = InputStreamDispatcher(worker_hosts[0], worker_port, istream['name'], istream['args'])
+    #     # dispatch(job, worker_hosts[0]])  # どうやってdispatchしたopをmigrateしよう?
+    #     #                                  # これが実際に何をやってるかによって，実行プロファイルを得たり，それからまたdispatchを変えたりってコードが変わってくる
+    stream.join()
+    pass

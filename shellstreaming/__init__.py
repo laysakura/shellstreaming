@@ -16,7 +16,7 @@ install_requires = [
     'importlib' if version_info < (2, 7, 0) else '',
     'argparse'  if version_info < (2, 7, 0) else '',
     'rpyc',
-    'fabric',
+    'networkx',
     'requests',
     'requests_oauthlib',
 ]
