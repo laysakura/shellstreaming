@@ -58,7 +58,7 @@ def main():
     _launch_workers(
         config.get('worker', 'hosts').split(','), config.getint('worker', 'port'),
         cnf_sent_to_worker=cnfpath,
-        parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy') if config.has_option('auto_deploy', 'parallel_deploy') else PARALLEL_DEPLOY,
+        parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy', PARALLEL_DEPLOY),
         ssh_private_key=config.get('auto_deploy', 'ssh_private_key') if config.has_option('auto_deploy', 'ssh_private_key') else SSH_PRIVATE_KEY,
         send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start') if config.has_option('auto_deploy', 'send_latest_codes_on_start') else SEND_LATEST_CODES_ON_START,
     )
