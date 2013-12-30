@@ -7,21 +7,24 @@
 """
 import sys
 import logging
-from rainbow_logging_handler import RainbowLoggingHandler
 from logging.handlers import RotatingFileHandler
+from rainbow_logging_handler import RainbowLoggingHandler
 
 
-class TerminalLogger(logging.Logger):
-    """Provides colorful logger which outputs to stderr"""
+def setup_TerminalLogger(loglevel, logger_name='TerminalLogger'):
+    """Setup colorful logger
 
-    def __init__(self, log_level):
-        """Constructor
+    *Usage*
 
-        :param log_level: e.g. `logging.DEBUG`, ...
-        """
-        logging.Logger.__init__(self, 'shellstreaming_TerminalLogger', log_level)
-        handler = RainbowLoggingHandler(sys.stderr)
-        self.addHandler(handler)
+    .. code-block:: python
+        setup_TerminalLogger(logging.DEBUG)
+        logger = logging.getLogger('TerminalLogger')
+        logger.debug('hello')
+    """
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(loglevel)
+    handler = RainbowLoggingHandler(sys.stderr)
+    logger.addHandler(handler)
 
 
 class FileLogger(logging.Logger):

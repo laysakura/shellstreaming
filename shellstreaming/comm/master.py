@@ -14,17 +14,15 @@ from subprocess import Popen
 import networkx as nx
 import matplotlib.pyplot as plt
 import shellstreaming
+from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
-from shellstreaming.logger import TerminalLogger
 from shellstreaming.comm.util import wait_worker_server
 from shellstreaming.api import *
 
 
 DEFAULT_CONFIGS = (expanduser(join('~', '.shellstreaming.cnf')), )
 """Path from which default config file is searched (from left)"""
-
-logger = None
 
 
 def main():
@@ -40,8 +38,8 @@ def main():
     config  = _setup_config(cnfpath)
 
     # setup logger
-    global logger
-    logger = TerminalLogger(config.get('master', 'log_level'))
+    setup_TerminalLogger(config.get('master', 'log_level'))
+    logger = logging.getLogger('TerminalLogger')
     logger.info('Used config file: %s' % (cnfpath))
 
     # launch worker servers (auto-deploy)
@@ -96,7 +94,6 @@ def _setup_config(cnfpath):
 
 
 def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIGS):
-    global logger
     for cnfpath in cnf_candidates:
         if os.path.exists(cnfpath):
             return cnfpath
@@ -122,7 +119,7 @@ def _launch_workers(worker_hosts, worker_port,
     :param ssh_private_key: if not `None`, specified private key is used for ssh-login to every worker host
     """
     # [todo] - make use of ssh_config (`fabric.api.env.ssh_config_path` must be True (via cmd opt?))
-    global logger
+    logger = logging.getLogger('TerminalLogger')
 
     # deploy & start workers' server
     scriptpath = join(abspath(dirname(__file__)), 'auto_deploy.py')

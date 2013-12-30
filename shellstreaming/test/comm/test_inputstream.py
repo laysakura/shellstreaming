@@ -8,7 +8,7 @@ import logging
 from os import kill
 from os.path import abspath, dirname, join
 import socket
-from shellstreaming.logger import TerminalLogger as Logger
+from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.comm.worker_server_service import WorkerServerService
 from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
 from shellstreaming.comm.util import kill_worker_server
@@ -21,7 +21,6 @@ TEST_TEXTFILE = join(abspath(dirname(__file__)), '..', 'data', 'comm_inputstream
 
 process = None  # used by master process
 server  = None  # used by worker process
-logger  = Logger(logging.DEBUG)
 
 
 def _sigusr1_handler(signum, stack):
@@ -43,8 +42,10 @@ def _start_worker_process():
 
 
 def setup():
-    global process, logger
+    setup_TerminalLogger(logging.DEBUG)
+    logger = logging.getLogger('TerminalLogger')
 
+    global process
     # kill worker server if exists
     try:
         kill_worker_server(WORKER_HOST, WORKER_PORT)
@@ -72,7 +73,7 @@ def setup():
 
 
 def teardown():
-    global logger
+    logger = logging.getLogger('TerminalLogger')
     logger.debug('worker process is being killed')
     kill(process.pid, signal.SIGUSR1)
 
