@@ -16,4 +16,5 @@ def get_default_conf():
         'ssh_private_key'            : 'None',
         'send_latest_codes_on_start' : 'True',
         'job_graph_path'             : '',
+        'single_process_debug'       : 'False',
     })

@@ -12,11 +12,11 @@ import shlex
 import logging
 from subprocess import Popen
 import networkx as nx
-import matplotlib.pyplot as plt
 import shellstreaming
 from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
+from shellstreaming.comm.run_worker_server import start_worker_server_thread
 from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
 from shellstreaming.comm.util import wait_worker_server, kill_worker_server
 from shellstreaming.jobgraph import JobGraph
@@ -44,15 +44,21 @@ def main():
     logger = logging.getLogger('TerminalLogger')
     logger.info('Used config file: %s' % (cnfpath))
 
-    # launch worker servers (auto-deploy)
+    # launch worker servers
     (worker_hosts, worker_port) = (config.get('worker', 'hosts').split(','), config.getint('worker', 'port'))
-    _launch_workers(
-        worker_hosts, worker_port,
-        cnf_sent_to_worker=cnfpath,
-        parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy'),
-        ssh_private_key=config.get('auto_deploy', 'ssh_private_key'),
-        send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start'),
-    )
+    if config.getboolean('debug', 'single_process_debug'):
+        # launch a worker server on localhost
+        logger.debug('Entering single_process_debug mode')
+        t = start_worker_server_thread(worker_port, logger)
+    else:
+        # auto-deploy, launch worker server on worker hosts
+        _launch_workers(
+            worker_hosts, worker_port,
+            cnf_sent_to_worker=cnfpath,
+            parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy'),
+            ssh_private_key=config.get('auto_deploy', 'ssh_private_key'),
+            send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start'),
+        )
 
     try:
         # make job graph from user's stream app description
@@ -168,8 +174,7 @@ def _parse_stream_py(stream_py):
 
 
 def _draw_job_graph(job_graph, path):
-    """
-    """
+    import matplotlib.pyplot as plt
     nx.draw(job_graph)
     plt.savefig(path)
     logger = logging.getLogger('TerminalLogger')
