@@ -18,6 +18,7 @@ from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
 from shellstreaming.comm.util import wait_worker_server
+from shellstreaming.jobgraph import JobGraph
 from shellstreaming.api import *
 
 
@@ -58,7 +59,7 @@ def main():
         _draw_job_graph(job_graph, config.get('master', 'job_graph_path'))
 
     # start master's main loop
-    _do_stream_processing(job_graph)
+    _do_stream_processing(job_graph, config.get('worker', 'hosts').split(','), config.getint('worker', 'port'))
 
     return 0
 
@@ -151,11 +152,11 @@ def _parse_stream_py(stream_py):
 
     :param stream_py: python script in which stream processings are described by users
     :returns: job graph
-    :rtype:   :class:`networkx.DiGraph()`
+    :rtype:   :class:`JobGraph()`
     """
     module    = import_from_file(stream_py)
     main_func = getattr(module, 'main')
-    job_graph = nx.DiGraph()
+    job_graph = JobGraph()
     main_func(job_graph)
     return job_graph
 
@@ -169,5 +170,9 @@ def _draw_job_graph(job_graph, path):
     logger.info('Job graph figure is generated on: %s' % (path))
 
 
-def _do_stream_processing(job_graph):
+def _do_stream_processing(job_graph, worker_hosts, worker_port):
+    # for job in job_graph:
+    #     InputStreamDispatcher(worker_hosts[0], worker_port, job, job_args)
+    #     # dispatch(job, worker_hosts[0]])  # どうやってdispatchしたopをmigrateしよう?
+    #     #                                  # これが実際に何をやってるかによって，実行プロファイルを得たり，それからまたdispatchを変えたりってコードが変わってくる
     pass
