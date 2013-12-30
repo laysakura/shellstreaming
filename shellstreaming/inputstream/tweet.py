@@ -10,7 +10,6 @@ import requests
 from requests_oauthlib import OAuth1
 from relshell.recorddef import RecordDef
 from shellstreaming.inputstream.base import InfiniteStream
-from shellstreaming.config import Config
 from shellstreaming.timed_record import TimedRecord
 
 
@@ -24,6 +23,7 @@ class Tweet(InfiniteStream):
     """
     def __init__(
         self,
+        public_tweets_url,
         consumer_key, consumer_secret,
         access_token, access_token_secret,
 
@@ -31,6 +31,7 @@ class Tweet(InfiniteStream):
     ):
         """Constructor
 
+        :param public_tweets_url:   Public tweet streaming API's URL
         :param consumer_key:        Twitter app consumer key (got from twitter)
         :param consumer_secret:     Twitter app consumer secret (got from twitter)
         :param access_token:        Twitter app access token (got from twitter)
@@ -38,6 +39,7 @@ class Tweet(InfiniteStream):
         :raises: :class:`requests.HTTPError` if twitter API returns error response status
         """
         self._twitter_response = Tweet._get_twitter_streaming_response(
+            public_tweets_url,
             consumer_key, consumer_secret, access_token, access_token_secret)
         InfiniteStream.__init__(self, batch_span_ms)
 
@@ -67,6 +69,7 @@ class Tweet(InfiniteStream):
 
     @staticmethod
     def _get_twitter_streaming_response(
+            public_tweets_url,
             consumer_key, consumer_secret,
             access_token, access_token_secret
     ):
@@ -74,7 +77,7 @@ class Tweet(InfiniteStream):
                       access_token, access_token_secret,
                       signature_type='query')
         res  = requests.get(
-            Config.instance().get('inputstream.tweet', 'public_tweets_url'),
+            public_tweets_url,
             auth=auth, stream=True)
         res.raise_for_status()
         return res
