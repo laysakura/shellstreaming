@@ -182,6 +182,8 @@ def _draw_job_graph(job_graph, path):
 
 
 def _do_stream_processing(job_graph, worker_hosts, worker_port):
+    # [todo] - separate from master.py as scheduler codes
+
     # dispatch inputstreams
     for n in job_graph.begin_nodes():
         istream = job_graph.node[n]
