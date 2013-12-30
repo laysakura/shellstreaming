@@ -44,10 +44,7 @@ def main(cnfpath):
     # start `WorkerServerService`
     port = config.getint('worker', 'port')
     WorkerServerService.logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
-    WorkerServerService.server = Server(WorkerServerService, port=port, logger=WorkerServerService.logger)
-    t = Thread(target=WorkerServerService.server.start)
-    t.daemon = True
-    t.start()
+    t = start_worker_server_thread(port, WorkerServerService.logger)
 
     while WorkerServerService.server:
         # wait for `server` to be `close()`ed by master the client.
@@ -55,6 +52,14 @@ def main(cnfpath):
 
     WorkerServerService.logger.debug('`WorkerServerService` has been closed.')
     t.join()
+
+
+def start_worker_server_thread(port, logger):
+    WorkerServerService.server = Server(WorkerServerService, port=port, logger=logger)
+    t = Thread(target=WorkerServerService.server.start)
+    t.daemon = True
+    t.start()
+    return t
 
 
 def _parse_args():
