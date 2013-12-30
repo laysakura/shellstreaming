@@ -7,19 +7,33 @@
 """
 
 
-def InputStream(job_graph, inputstream):
+def InputStream(job_graph, inputstream, inputstream_args):
+    """Create an inputstream.
+
+    :param inputstream:      reference to an inputsteram class
+    :param inputsteram_args: tuple of args to :param:`inputsteram`.__init__()
+    :returns: stream object (`node_id` internally)
+
+    **Example**
+
+    .. code-block:: python
+        randint_stream = InputStream(RandInt, ())
+        ...
+    """
     print('%s called' % (inputstream.__name__))
-    job_node = inputstream.__name__
-    job_graph.add_node(job_node)
-    return {
-        'job_node': job_node,
-    }
-    # return networkxのノード, その他の情報
+    node_id = inputstream.__name__   # [fix] - unique id
+    job_graph.add_node(node_id, attr_dict={
+        'name': inputstream.__name__,
+        'args': inputstream_args,
+    })
+    return node_id
 
 
 def OutputStream(job_graph, outputstream, outputstream_args, prev_stream, dest):
     print prev_stream
     print('%s called' % (outputstream.__name__))
-    job_node = outputstream.__name__
-    job_graph.add_node(job_node)
-    job_graph.add_edge(prev_stream['job_node'], job_node)
+    node_id = outputstream.__name__  # [fix] - unique id
+    job_graph.add_node(node_id, attr_dict={
+        'name': outputstream.__name__,
+    })
+    job_graph.add_edge(prev_stream, node_id)

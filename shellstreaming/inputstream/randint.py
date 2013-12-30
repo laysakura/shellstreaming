@@ -16,7 +16,7 @@ from relshell.recorddef import RecordDef
 
 class RandInt(InfiniteStream):
     """Infinite input stream which generates random integer sequence"""
-    def __init__(self, min_int, max_int, batch_span_ms=1000):
+    def __init__(self, min_int=0, max_int=1000, batch_span_ms=1000):
         """Constructor
 
         :param min_int:       minimum integer to generate
