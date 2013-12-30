@@ -176,7 +176,8 @@ def _do_stream_processing(job_graph, worker_hosts, worker_port):
     for n in job_graph.begin_nodes():
         istream = job_graph.node[n]
         print(istream)
-        InputStreamDispatcher(worker_hosts[0], worker_port, istream['name'], istream['args'])
+        stream = InputStreamDispatcher(worker_hosts[0], worker_port, istream['name'], istream['args'])
     #     # dispatch(job, worker_hosts[0]])  # どうやってdispatchしたopをmigrateしよう?
     #     #                                  # これが実際に何をやってるかによって，実行プロファイルを得たり，それからまたdispatchを変えたりってコードが変わってくる
+    stream.join()
     pass
