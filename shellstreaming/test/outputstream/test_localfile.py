@@ -13,8 +13,7 @@ TEST_FILE = join(gettempdir(), 'shellstreaming_test_localfile.txt')
 
 
 def teardown():
-    pass
-    # os.remove(TEST_FILE)
+     os.remove(TEST_FILE)
 
 
 def test_localfile_usage():
