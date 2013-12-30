@@ -60,10 +60,6 @@ def main():
     # start master's main loop
     _do_stream_processing(job_graph)
 
-    # necessary to remove error message:
-    #     Exception TypeError: "'NoneType' object is not callable" in <function _removeHandlerRef at 0x7fb2b038ee60> ignored
-    # logger = None
-
     return 0
 
 
@@ -161,14 +157,16 @@ def _parse_stream_py(stream_py):
     main_func = getattr(module, 'main')
     job_graph = nx.DiGraph()
     main_func(job_graph)
-    nx.draw(job_graph)
-    plt.savefig("digraph.png") # save as png
+    return job_graph
 
 
 def _draw_job_graph(job_graph, path):
     """
     """
-    pass
+    nx.draw(job_graph)
+    plt.savefig(path)
+    logger = logging.getLogger('TerminalLogger')
+    logger.info('Job graph figure is generated on: %s' % (path))
 
 
 def _do_stream_processing(job_graph):
