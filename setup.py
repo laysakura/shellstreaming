@@ -18,7 +18,6 @@ setup(
         shellstreaming.install_requires +  # master & workers requirements
         [
             'fabric',
-            'matplotlib',
         ]  # master requirements
     ),
     tests_require    = [

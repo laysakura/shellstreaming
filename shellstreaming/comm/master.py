@@ -12,7 +12,6 @@ import shlex
 import logging
 from subprocess import Popen
 import networkx as nx
-import matplotlib.pyplot as plt
 import shellstreaming
 from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
@@ -168,8 +167,7 @@ def _parse_stream_py(stream_py):
 
 
 def _draw_job_graph(job_graph, path):
-    """
-    """
+    import matplotlib.pyplot as plt
     nx.draw(job_graph)
     plt.savefig(path)
     logger = logging.getLogger('TerminalLogger')
