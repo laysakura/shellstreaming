@@ -9,8 +9,9 @@ from os import kill
 from os.path import abspath, dirname, join
 import socket
 from shellstreaming.logger import setup_TerminalLogger
+from shellstreaming.inputstream.textfile import TextFile
 from shellstreaming.comm.worker_server_service import WorkerServerService
-from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
+from shellstreaming.comm.job_dispatcher import JobDispatcher
 from shellstreaming.comm.util import kill_worker_server
 
 
@@ -80,9 +81,9 @@ def teardown():
 
 def test_inputstream_dispatcher():
     # master's code
-    stream = InputStreamDispatcher(
+    stream = JobDispatcher(
         WORKER_HOST, WORKER_PORT,
-        'TextFile',
+        TextFile,
         (TEST_TEXTFILE, 20),
     )
 
@@ -90,4 +91,4 @@ def test_inputstream_dispatcher():
 
     stream.join()
     # [todo] - need another way to close dispatched stream?
-    # (maybe by adding callback to InputStreamDispatcher.__init__)
+    # (maybe by adding callback to JobDispatcher.__init__)

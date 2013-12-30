@@ -17,7 +17,7 @@ from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
 from shellstreaming.comm.run_worker_server import start_worker_server_thread
-from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
+from shellstreaming.comm.job_dispatcher import JobDispatcher
 from shellstreaming.comm.util import wait_worker_server, kill_worker_server
 from shellstreaming.jobgraph import JobGraph
 from shellstreaming.api import *
@@ -188,7 +188,7 @@ def _do_stream_processing(job_graph, worker_hosts, worker_port):
     for n in job_graph.begin_nodes():
         istream = job_graph.node[n]
         print(istream)
-        stream = InputStreamDispatcher(worker_hosts[0], worker_port, istream['name'], istream['args'])
+        stream = JobDispatcher(worker_hosts[0], worker_port, istream['name'], istream['args'])
     #     # dispatch(job, worker_hosts[0]])  # どうやってdispatchしたopをmigrateしよう?
     #     #                                  # これが実際に何をやってるかによって，実行プロファイルを得たり，それからまたdispatchを変えたりってコードが変わってくる
     stream.join()
