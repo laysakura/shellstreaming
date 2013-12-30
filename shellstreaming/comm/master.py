@@ -18,7 +18,7 @@ from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
 from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
-from shellstreaming.comm.util import wait_worker_server
+from shellstreaming.comm.util import wait_worker_server, kill_worker_server
 from shellstreaming.jobgraph import JobGraph
 from shellstreaming.api import *
 
@@ -45,22 +45,27 @@ def main():
     logger.info('Used config file: %s' % (cnfpath))
 
     # launch worker servers (auto-deploy)
+    (worker_hosts, worker_port) = (config.get('worker', 'hosts').split(','), config.getint('worker', 'port'))
     _launch_workers(
-        config.get('worker', 'hosts').split(','),
-        config.getint('worker', 'port'),
+        worker_hosts, worker_port,
         cnf_sent_to_worker=cnfpath,
         parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy'),
         ssh_private_key=config.get('auto_deploy', 'ssh_private_key'),
         send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start'),
     )
 
-    # make job graph from user's stream app description
-    job_graph = _parse_stream_py(args.stream_py)
-    if config.get('master', 'job_graph_path') != '':
-        _draw_job_graph(job_graph, config.get('master', 'job_graph_path'))
-
-    # start master's main loop
-    _do_stream_processing(job_graph, config.get('worker', 'hosts').split(','), config.getint('worker', 'port'))
+    try:
+        # make job graph from user's stream app description
+        job_graph = _parse_stream_py(args.stream_py)
+        if config.get('master', 'job_graph_path') != '':
+            _draw_job_graph(job_graph, config.get('master', 'job_graph_path'))
+        # start master's main loop
+        _do_stream_processing(job_graph, worker_hosts, worker_port)
+    except KeyboardInterrupt as e:
+        logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
+        for host in worker_hosts:
+            kill_worker_server(host, worker_port)
+        logger.exception(e)
 
     return 0
 
