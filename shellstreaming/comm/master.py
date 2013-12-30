@@ -11,10 +11,10 @@ from os.path import abspath, dirname, join, expanduser
 import shlex
 import logging
 from subprocess import Popen
-from ConfigParser import SafeConfigParser as Config
 import networkx as nx
 import matplotlib.pyplot as plt
 import shellstreaming
+from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
 from shellstreaming.logger import TerminalLogger
 from shellstreaming.comm.util import wait_worker_server
@@ -23,13 +23,6 @@ from shellstreaming.api import *
 
 DEFAULT_CONFIGS = (expanduser(join('~', '.shellstreaming.cnf')), )
 """Path from which default config file is searched (from left)"""
-
-# default arguments to _launch_workers
-CNF_SENT_TO_WORKER = None
-PARALLEL_DEPLOY    = False
-SSH_PRIVATE_KEY    = None
-SEND_LATEST_CODES_ON_START = True
-
 
 logger = None
 
@@ -46,7 +39,7 @@ def main():
     cnfpath = args.config if args.config else _get_existing_cnf(DEFAULT_CONFIGS)
     if cnfpath is None:
         raise IOError('Config file not found: Specify via `--config` option or put one of %s.' % (DEFAULT_CONFIGS))
-    config = Config()
+    config = get_default_conf()
     config.read(cnfpath)
 
     # setup logger
@@ -56,11 +49,12 @@ def main():
 
     # launch worker servers (auto-deploy)
     _launch_workers(
-        config.get('worker', 'hosts').split(','), config.getint('worker', 'port'),
+        config.get('worker', 'hosts').split(','),
+        config.getint('worker', 'port'),
         cnf_sent_to_worker=cnfpath,
-        parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy', PARALLEL_DEPLOY),
-        ssh_private_key=config.get('auto_deploy', 'ssh_private_key') if config.has_option('auto_deploy', 'ssh_private_key') else SSH_PRIVATE_KEY,
-        send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start') if config.has_option('auto_deploy', 'send_latest_codes_on_start') else SEND_LATEST_CODES_ON_START,
+        parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy'),
+        ssh_private_key=config.get('auto_deploy', 'ssh_private_key'),
+        send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start'),
     )
 
     # start main stream processing
@@ -100,10 +94,10 @@ def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIGS):
 
 
 def _launch_workers(worker_hosts, worker_port,
-                    cnf_sent_to_worker=CNF_SENT_TO_WORKER,
-                    parallel_deploy=PARALLEL_DEPLOY,
-                    ssh_private_key=SSH_PRIVATE_KEY,
-                    send_latest_codes_on_start=SEND_LATEST_CODES_ON_START,
+                    cnf_sent_to_worker,
+                    parallel_deploy,
+                    ssh_private_key,
+                    send_latest_codes_on_start,
     ):
     """Launch every worker server and return.
 
