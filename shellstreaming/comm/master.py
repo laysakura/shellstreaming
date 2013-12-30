@@ -62,7 +62,7 @@ def main():
 
     # necessary to remove error message:
     #     Exception TypeError: "'NoneType' object is not callable" in <function _removeHandlerRef at 0x7fb2b038ee60> ignored
-    logger = None
+    # logger = None
 
     return 0
 
