@@ -15,4 +15,5 @@ def get_default_conf():
         'parallel_deploy'            : 'False',
         'ssh_private_key'            : 'None',
         'send_latest_codes_on_start' : 'True',
+        'job_graph_path'             : '',
     })

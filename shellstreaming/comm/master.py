@@ -37,10 +37,7 @@ def main():
 
     # setup config
     cnfpath = args.config if args.config else _get_existing_cnf(DEFAULT_CONFIGS)
-    if cnfpath is None:
-        raise IOError('Config file not found: Specify via `--config` option or put one of %s.' % (DEFAULT_CONFIGS))
-    config = get_default_conf()
-    config.read(cnfpath)
+    config  = _setup_config(cnfpath)
 
     # setup logger
     global logger
@@ -57,8 +54,13 @@ def main():
         send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start'),
     )
 
-    # start main stream processing
-    _start_main(args.stream_py)
+    # make job graph from user's stream app description
+    job_graph = _parse_stream_py(args.stream_py)
+    if config.get('master', 'job_graph_path') != '':
+        _draw_job_graph(job_graph, config.get('master', 'job_graph_path'))
+
+    # start master's main loop
+    _do_stream_processing(job_graph)
 
     # necessary to remove error message:
     #     Exception TypeError: "'NoneType' object is not callable" in <function _removeHandlerRef at 0x7fb2b038ee60> ignored
@@ -83,6 +85,14 @@ def _parse_args():
 
     args = parser.parse_args()
     return args
+
+
+def _setup_config(cnfpath):
+    if cnfpath is None:
+        raise IOError('Config file not found: Specify via `--config` option or put one of %s.' % (DEFAULT_CONFIGS))
+    config = get_default_conf()
+    config.read(cnfpath)
+    return config
 
 
 def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIGS):
@@ -143,10 +153,12 @@ def _launch_workers(worker_hosts, worker_port,
         logger.debug('connected to %s:%s' % (host, worker_port))
 
 
-def _start_main(stream_py):
-    """Parse and execute stream processings.
+def _parse_stream_py(stream_py):
+    """Parse stream processing description and return job graph.
 
     :param stream_py: python script in which stream processings are described by users
+    :returns: job graph
+    :rtype:   :class:`networkx.DiGraph()`
     """
     module    = import_from_file(stream_py)
     main_func = getattr(module, 'main')
@@ -154,3 +166,13 @@ def _start_main(stream_py):
     main_func(job_graph)
     nx.draw(job_graph)
     plt.savefig("digraph.png") # save as png
+
+
+def _draw_job_graph(job_graph, path):
+    """
+    """
+    pass
+
+
+def _do_stream_processing(job_graph):
+    pass
