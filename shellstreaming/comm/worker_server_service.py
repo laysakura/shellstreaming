@@ -6,7 +6,8 @@
     :synopsis: Provides worker process's server
 """
 import rpyc
-from shellstreaming.comm.job_executor import JobExecutor
+from shellstreaming.comm.inputstream_executor import InputStreamExecutor
+from shellstreaming.comm.outputstream_executor import OutputStreamExecutor
 
 
 class WorkerServerService(rpyc.Service):
@@ -19,7 +20,8 @@ class WorkerServerService(rpyc.Service):
     logger = None
 
     # API to clients
-    exposed_JobExecutor = JobExecutor
+    exposed_InputStreamExecutor  = InputStreamExecutor
+    exposed_OutputStreamExecutor = OutputStreamExecutor
 
     def exposed_kill(self):
         WorkerServerService.server.close()

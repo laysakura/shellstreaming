@@ -47,11 +47,21 @@ class JobDispatcher(object):
     def _async_execute(conn, job_class, job_args):
         """Asynchronously execute job on worker process"""
         (worker, connection, conn_thread) = conn
-        executor = connection.root.JobExecutor(
-            conn,
-            job_class, job_args,
-        )
+        executor_class = JobDispatcher._get_executor_class(conn, job_class)
+        executor       = executor_class(conn, job_class, job_args)
 
         # asynchronously call `JobExecutor.exposed_execute`, in which callbacks are called
         aexecute = rpyc.async(executor.execute)
         return aexecute()
+
+    @staticmethod
+    def _get_executor_class(conn, job_class):
+        (worker, connection, conn_thread) = conn
+        pkg_path = job_class.__module__.split('.')
+        print(pkg_path)
+        if 'inputstream' in pkg_path:
+            return connection.root.InputStreamExecutor
+        elif 'outputstream' in pkg_path:
+            return connection.root.OutputStreamExecutor
+        else:
+            assert False

@@ -23,8 +23,8 @@ def InputStream(job_graph, inputstream, inputstream_args):
     print('%s called' % (inputstream.__name__))
     node_id = inputstream.__name__   # [fix] - unique id
     job_graph.add_node(node_id, attr_dict={
-        'name': inputstream.__name__,
-        'args': inputstream_args,
+        'class' : inputstream,
+        'args'  : inputstream_args,
     })
     return node_id
 
@@ -34,6 +34,7 @@ def OutputStream(job_graph, outputstream, outputstream_args, prev_stream, dest):
     print('%s called' % (outputstream.__name__))
     node_id = outputstream.__name__  # [fix] - unique id
     job_graph.add_node(node_id, attr_dict={
-        'name': outputstream.__name__,
+        'class' : outputstream,
+        'args'  : outputstream_args,
     })
     job_graph.add_edge(prev_stream, node_id)

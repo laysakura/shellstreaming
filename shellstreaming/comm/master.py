@@ -185,10 +185,11 @@ def _do_stream_processing(job_graph, worker_hosts, worker_port):
     # [todo] - separate from master.py as scheduler codes
 
     # dispatch inputstreams
-    for n in job_graph.begin_nodes():
-        istream = job_graph.node[n]
-        print(istream)
-        stream = JobDispatcher(worker_hosts[0], worker_port, istream['name'], istream['args'])
+    # [todo] - more performance consideration
+    for n in job_graph.nodes():
+        job = job_graph.node[n]
+        print(job)
+        stream = JobDispatcher(worker_hosts[0], worker_port, job['class'], job['args'])
     #     # dispatch(job, worker_hosts[0]])  # どうやってdispatchしたopをmigrateしよう?
     #     #                                  # これが実際に何をやってるかによって，実行プロファイルを得たり，それからまたdispatchを変えたりってコードが変わってくる
     stream.join()
