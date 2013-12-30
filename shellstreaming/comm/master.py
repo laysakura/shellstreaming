@@ -192,5 +192,4 @@ def _do_stream_processing(job_graph, worker_hosts, worker_port):
         stream = JobDispatcher(worker_hosts[0], worker_port, job['class'], job['args'])
     #     # dispatch(job, worker_hosts[0]])  # どうやってdispatchしたopをmigrateしよう?
     #     #                                  # これが実際に何をやってるかによって，実行プロファイルを得たり，それからまたdispatchを変えたりってコードが変わってくる
-    stream.join()
-    pass
+    stream.join()  # [todo] - wait only last job?
