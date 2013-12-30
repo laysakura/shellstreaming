@@ -12,6 +12,8 @@ import shlex
 import logging
 from subprocess import Popen
 from ConfigParser import SafeConfigParser as Config
+import networkx as nx
+import matplotlib.pyplot as plt
 import shellstreaming
 from shellstreaming.util import import_from_file
 from shellstreaming.logger import TerminalLogger
@@ -154,4 +156,7 @@ def _start_main(stream_py):
     """
     module    = import_from_file(stream_py)
     main_func = getattr(module, 'main')
-    main_func()
+    job_graph = nx.DiGraph()
+    main_func(job_graph)
+    nx.draw(job_graph)
+    plt.savefig("digraph.png") # save as png
