@@ -16,13 +16,20 @@ class WorkerServerService(rpyc.Service):
     # `rpyc.utils.server.*Server`'s instance
     server = None
 
-    # the logger
-    logger = None
-
-    # API to clients
+    # APIs for master
     exposed_InputStreamExecutor  = InputStreamExecutor
     exposed_OutputStreamExecutor = OutputStreamExecutor
 
     def exposed_kill(self):
+        """Kill worker server"""
         WorkerServerService.server.close()
         WorkerServerService.server = None
+
+    # APIs for workers
+    def exposed_get_out_batches(num_batches=0):
+        """Pass batches to caller worker from internal batch queue.
+
+        .. note::
+            This function is **blocking** just like :class:`Queue.Queue`
+        """
+        pass

@@ -18,7 +18,7 @@ from ConfigParser import SafeConfigParser as Config
 from threading import Thread
 from rpyc.utils.server import ThreadedServer as Server
 import logging
-from shellstreaming.logger import FileLogger, setup_TerminalLogger
+from shellstreaming.logger import setup_FileLogger, setup_TerminalLogger
 from shellstreaming.comm.worker_server_service import WorkerServerService
 
 
@@ -36,21 +36,21 @@ def main(cnfpath):
 
     # setup logger
     (loglevel, logpath) = (eval('logging.' + config.get('worker', 'log_level')), config.get('worker', 'log_path'))
-    WorkerServerService.logger = FileLogger(loglevel, logpath, 100 * 1e6)
+    setup_FileLogger(loglevel, logpath)
+    logger = logging.getLogger('FileLogger')
     setup_TerminalLogger(loglevel)
-    logger = logging.getLogger('TerminalLogger')
-    logger.debug('Log is written in <%s> in `%s` level' % (logpath, loglevel))
+    logging.getLogger('TerminalLogger').debug('Log is written in <%s> in `%s` level' % (logpath, loglevel))
 
     # start `WorkerServerService`
     port = config.getint('worker', 'port')
     WorkerServerService.logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
-    t = start_worker_server_thread(port, WorkerServerService.logger)
+    t = start_worker_server_thread(port, logger)
 
     while WorkerServerService.server:
         # wait for `server` to be `close()`ed by master the client.
         time.sleep(1.0)
 
-    WorkerServerService.logger.debug('`WorkerServerService` has been closed.')
+    logger.debug('`WorkerServerService` has been closed.')
     t.join()
 
 

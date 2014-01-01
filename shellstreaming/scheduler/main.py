@@ -8,7 +8,10 @@
 from shellstreaming.comm.job_dispatcher import JobDispatcher
 
 
-def main_loop(job_graph, worker_hosts, worker_port):
+def main_loop(job_graph,
+              worker_hosts,  # [todo] - not only worker's hostname but also
+                             # [todo] - worker's resource info is important for scheduling decision.
+              worker_port):
     """Main loop of stream processing
     """
     #あと，「inputstreamならいらないけど，outputstreamなら前のjobの情報が必要」とかなら，JobDispatcherも継承させるのがいいかも
