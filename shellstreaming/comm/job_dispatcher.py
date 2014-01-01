@@ -39,7 +39,7 @@ class JobDispatcher(object):
     @staticmethod
     def _connect(worker, worker_port):
         """Connect to worker"""
-        connection  = rpyc.connect(worker, worker_port)
+        connection  = rpyc.connect(worker, worker_port)  # [todo] - why not keep 1 connection per master-worker?
         conn_thread = rpyc.BgServingThread(connection)
         return (worker, connection, conn_thread)
 

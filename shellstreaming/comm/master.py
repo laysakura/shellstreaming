@@ -17,7 +17,7 @@ from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
 from shellstreaming.comm.run_worker_server import start_worker_server_thread
-from shellstreaming.comm.job_dispatcher import JobDispatcher
+from shellstreaming.scheduler.main import main_loop
 from shellstreaming.comm.util import wait_worker_server, kill_worker_server
 from shellstreaming.jobgraph import JobGraph
 from shellstreaming.api import *
@@ -66,7 +66,7 @@ def main():
         if config.get('master', 'job_graph_path') != '':
             _draw_job_graph(job_graph, config.get('master', 'job_graph_path'))
         # start master's main loop
-        _do_stream_processing(job_graph, worker_hosts, worker_port)
+        main_loop(job_graph, worker_hosts, worker_port)
     except KeyboardInterrupt as e:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
         for host in worker_hosts:
@@ -179,17 +179,3 @@ def _draw_job_graph(job_graph, path):
     plt.savefig(path)
     logger = logging.getLogger('TerminalLogger')
     logger.info('Job graph figure is generated on: %s' % (path))
-
-
-def _do_stream_processing(job_graph, worker_hosts, worker_port):
-    # [todo] - separate from master.py as scheduler codes
-
-    # dispatch inputstreams
-    # [todo] - more performance consideration
-    for n in job_graph.nodes():
-        job = job_graph.node[n]
-        print(job)
-        stream = JobDispatcher(worker_hosts[0], worker_port, job['class'], job['args'])
-    #     # dispatch(job, worker_hosts[0]])  # どうやってdispatchしたopをmigrateしよう?
-    #     #                                  # これが実際に何をやってるかによって，実行プロファイルを得たり，それからまたdispatchを変えたりってコードが変わってくる
-    stream.join()  # [todo] - wait only last job?
