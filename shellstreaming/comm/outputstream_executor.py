@@ -23,4 +23,4 @@ class OutputStreamExecutor(JobExecutor):
         print(ostream)
         ws.job_instance[self._job_id] = ostream
         for batch in self._gen_in_batches():
-            ostream.write2(batch)
+            ostream.write(batch)

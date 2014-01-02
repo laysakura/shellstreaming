@@ -51,7 +51,15 @@ class JobDispatcher(object):
         """Asynchronously execute job on worker process"""
         (worker, connection, conn_thread) = conn
         executor_class = JobDispatcher._get_executor_class(conn, job_class)
-        executor       = executor_class(job_id, job_class, job_args, gen_in_batches)
+
+        # `job_class` is master's class. If passed to worker, worker has to connect to master again
+        # and class instance is created on master.
+        # It require's every-time communication when calling member function of `job_class`.
+        # So only job_class's name is passed to worker, and worker will dynamically import job
+        executor = executor_class(job_id,
+                                  '.'.join([job_class.__module__, job_class.__name__]),
+                                  job_args,
+                                  gen_in_batches)
 
         # asynchronously call `JobExecutor.exposed_execute`, in which callbacks are called
         aexecute = rpyc.async(executor.execute)
