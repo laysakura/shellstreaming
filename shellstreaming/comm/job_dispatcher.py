@@ -51,7 +51,7 @@ class JobDispatcher(object):
         """Asynchronously execute job on worker process"""
         (worker, connection, conn_thread) = conn
         executor_class = JobDispatcher._get_executor_class(conn, job_class)
-        executor       = executor_class(conn, job_id, job_class, job_args, gen_in_batches)
+        executor       = executor_class(job_id, job_class, job_args, gen_in_batches)
 
         # asynchronously call `JobExecutor.exposed_execute`, in which callbacks are called
         aexecute = rpyc.async(executor.execute)

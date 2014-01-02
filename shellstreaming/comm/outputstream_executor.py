@@ -12,9 +12,9 @@ from shellstreaming.comm.job_executor import JobExecutor
 class OutputStreamExecutor(JobExecutor):
     """"""
 
-    def __init__(self, conn, job_id, job_class, job_args, gen_in_batches):
+    def __init__(self, job_id, job_class, job_args, gen_in_batches):
         """"""
-        JobExecutor.__init__(self, conn, job_id, job_class, job_args, gen_in_batches)
+        JobExecutor.__init__(self, job_id, job_class, job_args, gen_in_batches)
 
     def exposed_execute(self):
         """Main loop of each job"""
