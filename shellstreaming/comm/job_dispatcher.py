@@ -10,16 +10,19 @@ import rpyc
 
 class JobDispatcher(object):
     """Asynchronous job dispatcher"""
-    def __init__(self, worker, worker_port, job_class, job_args):
+    def __init__(self, worker, worker_port, job_id, job_class, job_args, gen_in_batches=None):
         """Create job dispatcher
 
         :param worker:      worker's reachable hostname or IP address
         :param worker_port: worker's `rpyc` port
+        :param job_id:    job's id
         :param job_class:   reference to job class (one of :class:`inpustream`, :class:`outpustream`, and :class:`operator`)
         :param job_args:    arguments for :param:`job_class`.__init()__
+        :param gen_in_batches: generator object of input batches. Since inputstream does not have ascendant job,
+                               it can be `None` for :class:`InputStreamExecutor`.
         """
         self._conn      = JobDispatcher._connect(worker, worker_port)
-        self._async_res = JobDispatcher._async_execute(self._conn, job_class, job_args)
+        self._async_res = JobDispatcher._async_execute(self._conn, job_id, job_class, job_args, gen_in_batches)
 
     def join(self):
         """Wait for job to finish.
@@ -44,11 +47,11 @@ class JobDispatcher(object):
         return (worker, connection, conn_thread)
 
     @staticmethod
-    def _async_execute(conn, job_class, job_args):
+    def _async_execute(conn, job_id, job_class, job_args, gen_in_batches):
         """Asynchronously execute job on worker process"""
         (worker, connection, conn_thread) = conn
         executor_class = JobDispatcher._get_executor_class(conn, job_class)
-        executor       = executor_class(conn, job_class, job_args)
+        executor       = executor_class(conn, job_id, job_class, job_args, gen_in_batches)
 
         # asynchronously call `JobExecutor.exposed_execute`, in which callbacks are called
         aexecute = rpyc.async(executor.execute)
@@ -58,7 +61,6 @@ class JobDispatcher(object):
     def _get_executor_class(conn, job_class):
         (worker, connection, conn_thread) = conn
         pkg_path = job_class.__module__.split('.')
-        print(pkg_path)
         if 'inputstream' in pkg_path:
             return connection.root.InputStreamExecutor
         elif 'outputstream' in pkg_path:

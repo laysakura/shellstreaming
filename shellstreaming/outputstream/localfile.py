@@ -20,7 +20,7 @@ class LocalFile(object):
     def __del__(self):
         self._f.close()
 
-    def write(self, batch):
+    def write2(self, batch):
         """Output batch into local file
         """
         # [fix] - how about output format?????
