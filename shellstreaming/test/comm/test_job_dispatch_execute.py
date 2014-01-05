@@ -9,6 +9,7 @@ from os import kill
 from os.path import abspath, dirname, join
 import socket
 from shellstreaming.logger import setup_TerminalLogger
+from shellstreaming.batch_queue import BatchQueue
 from shellstreaming.inputstream.textfile import TextFile
 from shellstreaming.comm.worker_server_service import WorkerServerService
 from shellstreaming.comm.job_dispatcher import JobDispatcher
@@ -81,7 +82,8 @@ def teardown():
 
 def test_inputstream_dispatcher():
     # master's code
-    stream = JobDispatcher(
+    q = BatchQueue()
+    istream = JobDispatcher(
         WORKER_HOST, WORKER_PORT,
         'job_id',  # job_id is in job graph,, irrelavant to this test
         TextFile,
@@ -90,6 +92,6 @@ def test_inputstream_dispatcher():
 
     # do everything master needs to do
 
-    stream.join()
+    istream.join()
     # [todo] - need another way to close dispatched stream?
     # (maybe by adding callback to JobDispatcher.__init__)

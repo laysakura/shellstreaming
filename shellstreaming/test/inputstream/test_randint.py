@@ -12,8 +12,12 @@ def test_randint_usage():
     istream.interrupt()    # kill istream thread
 
     # consume batches
-    while not q.empty() or istream.isAlive():
+    while True:
+        # print('isAlive? => ', istream.isAlive())
         batch = q.pop()
+        if batch is None:  # producer has end data-fetching
+            break
+
         for i_record, record in enumerate(batch):
             ok_(0 <= record[0] <= 10)
         # print('batch has %d records' % (i_record + 1))

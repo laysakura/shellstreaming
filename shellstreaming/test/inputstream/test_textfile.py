@@ -19,7 +19,6 @@ def test_textfile_usage():
     while True:
         batch = q.pop()
         if batch is None:  # producer has end data-fetching
-            print('batch is None')
             break
 
         n_batches += 1

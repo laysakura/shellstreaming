@@ -46,6 +46,7 @@ class Base(threading.Thread):
         """API to safely kill data-fetching thread.
         """
         self._interrupt.set()
+        self._batch_q.push(None)  # producer has end data-fetching
 
     def _interrupted(self):
         """Function for inputstream subclasses to probe interruption"""
