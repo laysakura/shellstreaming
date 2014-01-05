@@ -173,7 +173,11 @@ def _parse_stream_py(stream_py):
 
 def _draw_job_graph(job_graph, path):
     import matplotlib.pyplot as plt
-    nx.draw(job_graph)
+
+    pos = nx.spring_layout(job_graph)
+    nx.draw(job_graph, pos)
+    nx.draw_networkx_edge_labels(job_graph, pos, job_graph.edge_labels)
     plt.savefig(path)
+
     logger = logging.getLogger('TerminalLogger')
     logger.info('Job graph figure is generated on: %s' % (path))

@@ -11,6 +11,9 @@ import networkx as nx
 class JobGraph(nx.DiGraph):
     """Provides utility functions in addition to :class:`networkx.DiGraph`"""
 
+    edge_labels = {}
+    """edges' label to draw"""
+
     def begin_nodes(self):
         """Return nodes who don't have incomming edges.
 
@@ -42,3 +45,11 @@ class JobGraph(nx.DiGraph):
             [2, 3]
         """
         return [n for n in self.nodes() if self.out_edges(n) == []]
+
+
+class StreamEdge(object):
+
+    def __init__(self, id, src_job_id, dest_job_id=None):
+        self.id          = id
+        self.src_job_id  = src_job_id
+        self.dest_job_id = dest_job_id
