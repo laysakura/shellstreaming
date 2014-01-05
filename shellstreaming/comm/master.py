@@ -167,7 +167,7 @@ def _parse_stream_py(stream_py):
     """
     module    = import_from_file(stream_py)
     main_func = getattr(module, 'main')
-    main_func()
+    main_func()    # `api._job_graph` is changed internally
     return api._job_graph
 
 
