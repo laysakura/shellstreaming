@@ -7,7 +7,7 @@
 """
 
 
-def InputStream(job_graph, inputstream, inputstream_args):
+def IStream(job_graph, inputstream, inputstream_args):
     """Create an inputstream.
 
     :param inputstream:      reference to an inputsteram class
