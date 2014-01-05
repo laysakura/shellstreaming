@@ -83,6 +83,7 @@ def test_inputstream_dispatcher():
     # master's code
     stream = JobDispatcher(
         WORKER_HOST, WORKER_PORT,
+        'job_id',  # job_id is in job graph,, irrelavant to this test
         TextFile,
         (TEST_TEXTFILE, 20),
     )
