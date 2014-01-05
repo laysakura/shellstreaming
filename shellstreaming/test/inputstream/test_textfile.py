@@ -2,6 +2,7 @@
 from nose.tools import *
 import time
 from os.path import abspath, dirname, join
+from shellstreaming.batch_queue import BatchQueue
 from shellstreaming.inputstream.textfile import TextFile
 
 
@@ -10,8 +11,17 @@ TEST_FILE = join(abspath(dirname(__file__)), '..', 'data', 'inputstream_textfile
 
 def test_textfile_usage():
     n_batches = n_records = 0
-    stream = TextFile(TEST_FILE, batch_span_ms=20)
-    for batch in stream:
+
+    q       = BatchQueue()
+    istream = TextFile(TEST_FILE, q, batch_span_ms=20)
+
+    # consume batches
+    while True:
+        batch = q.pop()
+        if batch is None:  # producer has end data-fetching
+            print('batch is None')
+            break
+
         n_batches += 1
         for record in batch:
             eq_(len(record), 1)
@@ -19,15 +29,7 @@ def test_textfile_usage():
             eq_('line ', line[0:5])
             ok_(0 <= int(line[5:]) < 100)  # record order in a batch is not always 'oldest-first'
             n_records += 1
+
     print('number of batches (%d) >= 1 ?' % (n_batches))
     ok_(n_batches >= 1)
     eq_(n_records, 100)
-
-
-def test_textfile_interrupt():
-    n_batches = 0
-    stream = TextFile(TEST_FILE, batch_span_ms=20)
-    for batch in stream:
-        n_batches += 1
-        stream.interrupt()
-    eq_(n_batches, 1)

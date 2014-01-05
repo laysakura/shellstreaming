@@ -5,6 +5,7 @@
 from nose.tools import *
 from os.path import abspath, dirname, join, exists
 from ConfigParser import SafeConfigParser
+from shellstreaming.batch_queue import BatchQueue
 from shellstreaming.inputstream.tweet import Tweet
 
 
@@ -22,7 +23,7 @@ def test_tweet_usage():
     config = SafeConfigParser()
     config.read(confpath)
 
-    n_batches = 5
+    q         = BatchQueue()
     stream = Tweet(
         public_tweets_url='https://stream.twitter.com/1.1/statuses/sample.json',
         consumer_key=config.get('inputstream.tweet', 'consumer_key'),
@@ -30,10 +31,15 @@ def test_tweet_usage():
         access_token=config.get('inputstream.tweet', 'access_token'),
         access_token_secret=config.get('inputstream.tweet', 'access_token_secret'),
 
+        output_queue=q,
         batch_span_ms=1000,
     )
-    for i_batch, batch in enumerate(stream):
+
+    n_batches = 5
+    while n_batches > 0:
+        batch = q.pop()
         print(batch)
         n_batches -= 1
-        if n_batches == 0:
-            stream.interrupt()
+
+    stream.interrupt()
+    # q may have batches yet

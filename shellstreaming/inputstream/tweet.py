@@ -9,11 +9,11 @@ import json
 import requests
 from requests_oauthlib import OAuth1
 from relshell.recorddef import RecordDef
-from shellstreaming.inputstream.base import InfiniteStream
+from shellstreaming.inputstream.base import Base
 from shellstreaming.timed_record import TimedRecord
 
 
-class Tweet(InfiniteStream):
+class Tweet(Base):
     """Infinite input stream which generates public tweets sequence.
 
     .. note::
@@ -27,6 +27,7 @@ class Tweet(InfiniteStream):
         consumer_key, consumer_secret,
         access_token, access_token_secret,
 
+        output_queue,
         batch_span_ms=1000,
     ):
         """Constructor
@@ -41,7 +42,7 @@ class Tweet(InfiniteStream):
         self._twitter_response = Tweet._get_twitter_streaming_response(
             public_tweets_url,
             consumer_key, consumer_secret, access_token, access_token_secret)
-        InfiniteStream.__init__(self, batch_span_ms)
+        Base.__init__(self, output_queue, batch_span_ms)
 
     def run(self):
         """Fetches tweets from Twitter public stream"""
@@ -53,8 +54,8 @@ class Tweet(InfiniteStream):
             {'name': 'screen_name' , 'type': 'STRING'},
         ])
         for line in self._twitter_response.iter_lines():
-            if self.interrupted():
-                break
+            if self._interrupted():
+                return
             line_dict = json.loads(line)
             if 'text' in line_dict:  # [fix] - wired condition...
                 (text, lang, created_at, screen_name) = (

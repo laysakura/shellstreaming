@@ -26,3 +26,7 @@ class BatchQueue(object):
     def pop(self):
         """"""
         return self._q.get(timeout=365 * 24 * 60 * 60)  # workaround: enable Ctrl-C http://bugs.python.org/issue1360
+
+    def empty(self):
+        """"""
+        return self._q.qsize() == 0
