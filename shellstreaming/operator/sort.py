@@ -39,3 +39,7 @@ class Sort(Base):
             reverse=self._desc
         )  # [todo] - faster algorithm. E.g. keep sorted order when inserting
         return TimedBatch(batch.timespan, tuple(records))  # [todo] - is it OK to always use timestamp from inputstream?
+
+    @staticmethod
+    def stream_names():
+        return ('sorted', )

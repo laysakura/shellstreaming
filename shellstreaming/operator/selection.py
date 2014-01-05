@@ -98,3 +98,7 @@ class Selection(Base):
             elif op2 == '<=': return val1 <= col_val <= val2
         else:  # pragma: no cover
             assert(False)
+
+    @staticmethod
+    def stream_names():
+        return ('filtered', )
