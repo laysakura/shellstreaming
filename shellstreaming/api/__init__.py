@@ -33,7 +33,7 @@ def IStream(inputstream, inputstream_args):
     return node_id
 
 
-def OutputStream(outputstream, outputstream_args, prev_stream, dest):
+def OStream(outputstream, outputstream_args, prev_stream, dest):
     global _job_graph
     node_id = outputstream.__name__  # [fix] - unique id
     _job_graph.add_node(node_id, attr_dict={
