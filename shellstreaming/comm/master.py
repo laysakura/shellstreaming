@@ -176,6 +176,16 @@ def _draw_job_graph(job_graph, path):
 
     pos = nx.spring_layout(job_graph)
     nx.draw(job_graph, pos)
+    # red color for istream
+    nx.draw_networkx_nodes(job_graph, pos, nodelist=job_graph.begin_nodes(), node_color='r')
+    # blue color for ostream
+    nx.draw_networkx_nodes(job_graph, pos, nodelist=job_graph.end_nodes(), node_color='b')
+    # white color for operator
+    nx.draw_networkx_nodes(
+        job_graph, pos,
+        nodelist=tuple(set(job_graph.nodes()) - set(job_graph.begin_nodes()) - set(job_graph.end_nodes())),
+        node_color='w')
+    # edge label
     nx.draw_networkx_edge_labels(job_graph, pos, job_graph.edge_labels)
     plt.savefig(path)
 
