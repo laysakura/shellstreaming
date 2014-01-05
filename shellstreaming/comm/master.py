@@ -79,8 +79,8 @@ def main():
         # start master's main loop
         main_loop(
             job_graph, worker_hosts, worker_port,
-            config.get('scheduler', 'scheduler_module'),
-            config.getint('scheduler', 'reschedule_interval_sec'),
+            config.get('master', 'master_scheduler_module'),
+            config.getint('master', 'reschedule_interval_sec'),
         )
     except KeyboardInterrupt as e:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')

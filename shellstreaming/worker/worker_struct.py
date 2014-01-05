@@ -13,6 +13,16 @@ JOB_GRAPH = None
 registered_jobs = []
 """Jobs to execute"""
 
+job_instances = {}
+"""Jobs' instances
+
+.. code-block:: python
+    {
+        '<job id>': <job instance>,
+        ...
+    }
+"""
+
 output_queues = {}
 """Queue to put output batches
 

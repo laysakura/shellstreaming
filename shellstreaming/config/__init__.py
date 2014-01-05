@@ -17,6 +17,6 @@ def get_default_conf():
         'send_latest_codes_on_start' : 'True',
         'job_graph_path'             : '',
         'single_process_debug'       : 'False',
-        'scheduler_module'           : 'shellstreaming.scheduler.sched_localhost',
+        'master_scheduler_module'    : 'shellstreaming.scheduler.master_sched_localhost',
         'reschedule_interval_sec'    : '10',
     })
