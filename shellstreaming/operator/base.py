@@ -6,6 +6,7 @@
     :synopsis: Provides abstract class for operators
 """
 from abc import ABCMeta, abstractmethod
+from shellstreaming.util import abstractstatic
 
 
 class Base(object):
@@ -22,5 +23,16 @@ class Base(object):
 
         :param batch: input
         :returns:     output batch
+        """
+        pass
+
+    @abstractstatic
+    def stream_names(*args):
+        """Return names of output streams
+
+        Each output stream must have different name.
+
+        :param *args: same as parameters of :func:`self.__init__()`
+        :returns: tuple of output stream names
         """
         pass

@@ -30,6 +30,11 @@ def IStream(istream, istream_args):
     return stream
 
 
+def Operator(operator, operator_args, in_stream):
+    streams = _reg_job(operator, operator_args, 'operator', in_stream)
+    return streams
+
+
 def OStream(ostream, ostream_args, in_stream, dest):    # [fix] - `dest` のワーカにostream instanceを立てるようにする
     _reg_job(ostream, ostream_args, 'ostream', in_stream)
 
@@ -58,9 +63,16 @@ def _reg_job(job_class, job_class_args, job_type, in_stream):
         return
 
     # prepare edge from this job
-    # opの時は，edge_id の元になる文字列(エッジが複数なので複数)を，op_classに聞く
-    stream_id = "%d: %s" % (_num_stream_edge, '')
-    _num_stream_edge += 1
-    stream = StreamEdge(stream_id, src_job_id=job_id)
-
-    return stream
+    if job_type == 'istream':
+        stream_id = "%d: %s" % (_num_stream_edge, '')
+        _num_stream_edge += 1
+        return StreamEdge(stream_id, src_job_id=job_id)
+    else:
+        # some operator has multiple output streams
+        assert(job_type == 'operator')
+        streams = []
+        for s in job_class.stream_names(job_class_args):
+            stream_id = "%d: %s" % (_num_stream_edge, s)
+            _num_stream_edge += 1
+            streams.append(StreamEdge(stream_id, src_job_id=job_id))
+        return tuple(streams)

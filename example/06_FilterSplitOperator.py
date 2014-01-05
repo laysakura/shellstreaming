@@ -15,8 +15,5 @@ def main():
         ),
         randint_stream,
     )
-    # lo_stream => {'根本': 'FilterSplitOperator_3', '先': None, 'edge_id': '1: num < 50'}
     api.OStream(LocalFileOStream, ('lo_stream.txt'), lo_stream, 'localhost')
     api.OStream(LocalFileOStream, ('hi_stream.txt'), hi_stream, 'localhost')
-
-    # [todo] - api.* の返り値を生ストリームIDでなくて何かのclass objectにする
