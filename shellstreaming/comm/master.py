@@ -19,8 +19,7 @@ from shellstreaming.util import import_from_file
 from shellstreaming.comm.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.main import main_loop
 from shellstreaming.comm.util import wait_worker_server, kill_worker_server
-from shellstreaming.jobgraph import JobGraph
-from shellstreaming.api import *
+from shellstreaming import api
 
 
 DEFAULT_CONFIGS = (expanduser(join('~', '.shellstreaming.cnf')), )
@@ -168,9 +167,8 @@ def _parse_stream_py(stream_py):
     """
     module    = import_from_file(stream_py)
     main_func = getattr(module, 'main')
-    job_graph = JobGraph()
-    main_func(job_graph)    # [fix] - ユーザにとって意味のわからない `job_graph` を与えるな
-    return job_graph
+    main_func()    # [fix] - ユーザにとって意味のわからない `job_graph` を与えるな
+    return api._job_graph
 
 
 def _draw_job_graph(job_graph, path):

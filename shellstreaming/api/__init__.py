@@ -5,9 +5,13 @@
 
     :synopsis: Provides APIs users call for describing stream processings
 """
+from shellstreaming.jobgraph import JobGraph
 
 
-def IStream(job_graph, inputstream, inputstream_args):
+_job_graph = JobGraph()  # api.* functions modify this graph structure
+
+
+def IStream(inputstream, inputstream_args):
     """Create an inputstream.
 
     :param inputstream:      reference to an inputsteram class
@@ -20,21 +24,20 @@ def IStream(job_graph, inputstream, inputstream_args):
         randint_stream = InputStream(RandInt, ())
         ...
     """
-    print('%s called' % (inputstream.__name__))
+    global _job_graph
     node_id = inputstream.__name__   # [fix] - unique id
-    job_graph.add_node(node_id, attr_dict={
+    _job_graph.add_node(node_id, attr_dict={
         'class' : inputstream,
         'args'  : inputstream_args,
     })
     return node_id
 
 
-def OutputStream(job_graph, outputstream, outputstream_args, prev_stream, dest):
-    print prev_stream
-    print('%s called' % (outputstream.__name__))
+def OutputStream(outputstream, outputstream_args, prev_stream, dest):
+    global _job_graph
     node_id = outputstream.__name__  # [fix] - unique id
-    job_graph.add_node(node_id, attr_dict={
+    _job_graph.add_node(node_id, attr_dict={
         'class' : outputstream,
         'args'  : outputstream_args,
     })
-    job_graph.add_edge(prev_stream, node_id)
+    _job_graph.add_edge(prev_stream, node_id)
