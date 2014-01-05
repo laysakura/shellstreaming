@@ -8,7 +8,8 @@
 from shellstreaming.jobgraph import JobGraph
 
 
-_job_graph = JobGraph()  # api.* functions modify this graph structure
+_job_graph    = JobGraph()  # api.* functions modify this graph structure
+_num_job_node = 0           # used for unique job node id
 
 
 def IStream(inputstream, inputstream_args):
@@ -21,23 +22,30 @@ def IStream(inputstream, inputstream_args):
     **Example**
 
     .. code-block:: python
-        randint_stream = InputStream(RandInt, ())
+        randint_stream = InputStream(RandInt, (0, 100))
         ...
     """
-    global _job_graph
-    node_id = inputstream.__name__   # [fix] - unique id
-    _job_graph.add_node(node_id, attr_dict={
-        'class' : inputstream,
-        'args'  : inputstream_args,
-    })
-    return node_id
+    return _reg_job(inputstream, inputstream_args, None)
 
 
-def OStream(outputstream, outputstream_args, prev_stream, dest):
-    global _job_graph
-    node_id = outputstream.__name__  # [fix] - unique id
-    _job_graph.add_node(node_id, attr_dict={
-        'class' : outputstream,
-        'args'  : outputstream_args,
+def OStream(outputstream, outputstream_args, pred_stream, dest):    # [fix] - `dest` のワーカにostream instanceを立てるようにする
+    return _reg_job(outputstream, outputstream_args, pred_stream)
+
+
+def _reg_job(job_class, job_class_args, pred_job_id):
+    """Update :data:`_job_graph`
+
+    :returns: job_id of registered one
+    """
+    global _job_graph, _num_job_node
+    job_id = "%s_%d" % (job_class.__name__, _num_job_node)
+    _num_job_node += 1
+
+    _job_graph.add_node(job_id, attr_dict={
+        'class' : job_class,
+        'args'  : job_class_args,
     })
-    _job_graph.add_edge(prev_stream, node_id)
+    if pred_job_id:
+        _job_graph.add_edge(pred_job_id, job_id)
+
+    return job_id

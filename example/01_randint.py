@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 from shellstreaming import api
 from shellstreaming.inputstream import RandIntIStream
-from shellstreaming.outputstream import LocalFileOStream
+from shellstreaming.outputstream import StdoutOStream
 
 
 def main():
     randint_stream = api.IStream(RandIntIStream, (0, 100))
-    api.OStream(LocalFileOStream, ('/tmp/result.txt', ), randint_stream, 'localhost')  # => localhost:/tmp/result.txt
-    # [todo] - outputの場所は「誰にoutputstreamを立てて欲しいか(worker server単位)」でなく
-    # [todo] - 「誰のnodeにoutputが置かれて欲しいか(worker node単位)」になってるけど，これは妥当か
+    api.OStream(StdoutOStream, (), randint_stream, 'localhost')  # => output is written to stdout by localhost's worker server

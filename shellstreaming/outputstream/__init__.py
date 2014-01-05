@@ -5,7 +5,8 @@
 
     :synopsis: Export pre-defined OStreams
 """
-from shellstreaming.outputstream import localfile
+from shellstreaming.outputstream import localfile, stdout
 
 
 LocalFileOStream = localfile.LocalFile
+StdoutOStream    = stdout.Stdout
