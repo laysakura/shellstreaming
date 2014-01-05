@@ -12,26 +12,17 @@
 import argparse
 import time
 import sys
-from os.path import join
-from tempfile import gettempdir
-from ConfigParser import SafeConfigParser as Config
 from threading import Thread
 from rpyc.utils.server import ThreadedServer as Server
 import logging
+from shellstreaming.config import get_default_conf
 from shellstreaming.logger import setup_FileLogger, setup_TerminalLogger
 from shellstreaming.comm.worker_server_service import WorkerServerService
 
 
-DEFAULT_CONFIG_VALUE = {
-    'log_path'  : join(gettempdir(), 'shellstreaming-worker.log'),
-    'log_level' : 'DEBUG',
-}
-"""Default key-values of config file. Keys not included in this dict is required config."""
-
-
 def main(cnfpath):
     # setup config
-    config = Config(DEFAULT_CONFIG_VALUE)
+    config = get_default_conf()
     config.read(cnfpath)
 
     # setup logger

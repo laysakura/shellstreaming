@@ -8,7 +8,4 @@
 
 
 def update_instances(registered_jobs, job_instances):  # [todo] - finer grained methods?
-    next_jobs_placement = {}
-    for job_id in prev_jobs_placement.iterkeys():
-        next_jobs_placement[job_id] = ['localhost']
-    return next_jobs_placement
+    pass
