@@ -8,10 +8,10 @@
 
 
 JOB_GRAPH = None
-"""Job graph to refer. Only :func:`exposd_reg_job_graph` modify this"""
+"""Job graph to refer. Only :func:`exposd_reg_job_graph` modifies this"""
 
-registered_jobs = []
-"""Jobs to execute"""
+REGISTERED_JOBS = []
+"""Jobs to execute. Only :func:`exposd_register` and :func:`exposd_unregister` modify this"""
 
 job_instances = {}
 """Jobs' instances

@@ -37,8 +37,7 @@ def main(cnfpath):
     WorkerServerService.logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
     t = start_worker_server_thread(port, logger)
 
-    while WorkerServerService.server:
-        # wait for `server` to be `close()`ed by master the client.
+    while WorkerServerService.server:    # wait for `server` to be `close()`ed by master client.
         time.sleep(1.0)
 
     logger.debug('`WorkerServerService` has been closed.')

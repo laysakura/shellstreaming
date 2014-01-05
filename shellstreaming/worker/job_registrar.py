@@ -14,10 +14,10 @@ class JobRegistrar(object):
 
     def exposed_register(self, job_id):
         """Register :param:`job_id` to execute"""
-        assert(job_id not in ws.registered_jobs)
-        ws.registered_jobs.append(job_id)
+        assert(job_id not in ws.REGISTERED_JOBS)
+        ws.REGISTERED_JOBS.append(job_id)
 
     def exposed_unregister(self, job_id):
         """Unregister :param:`job_id` from job list to execute"""
-        assert(job_id in ws.registered_jobs)
-        del ws.registered_jobs[job_id]
+        assert(job_id in ws.REGISTERED_JOBS)
+        del ws.REGISTERED_JOBS[job_id]
