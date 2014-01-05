@@ -7,8 +7,7 @@
 """
 import rpyc
 from shellstreaming.worker import worker_struct as ws
-from shellstreaming.comm.inputstream_executor import InputStreamExecutor
-from shellstreaming.comm.outputstream_executor import OutputStreamExecutor
+from shellstreaming.worker.job_registrar import JobRegistrar
 
 
 class WorkerServerService(rpyc.Service):
@@ -18,13 +17,16 @@ class WorkerServerService(rpyc.Service):
     server = None
 
     # APIs for master
-    exposed_InputStreamExecutor  = InputStreamExecutor
-    exposed_OutputStreamExecutor = OutputStreamExecutor
+    exposed_JobRegistrar = JobRegistrar
 
     def exposed_kill(self):
         """Kill worker server"""
         WorkerServerService.server.close()
         WorkerServerService.server = None
+
+    def exposed_reg_job_graph(self, job_graph):
+        """Register job graph"""
+        ws.JOB_GRAPH = job_graph
 
     # APIs for workers
     def exposed_get_out_batch(self, job_id):    # [todo] - better to fetch multiple batches at a time for performance?

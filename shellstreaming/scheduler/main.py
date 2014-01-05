@@ -5,52 +5,56 @@
 
     :synopsis: Provides scheduler's main loop
 """
-import rpyc
-from shellstreaming.comm.job_dispatcher import JobDispatcher
+import time
+import logging
+from importlib import import_module
+import shellstreaming.master.master_struct as ms
 
 
-def main_loop(job_graph,
-              worker_hosts,  # [todo] - not only worker's hostname but also
-                             # [todo] - worker's resource info is important for scheduling decision.
-              worker_port):
+def main_loop(
+    job_graph,
+    worker_hosts,  # [todo] - not only worker's hostname but also
+                   # [todo] - worker's resource info is important for scheduling decision.
+    worker_port,
+
+    sched_module_name,
+    reschedule_interval_sec,
+):
     """Main loop of stream processing
+
+    Loop of 1-3.
+
+    1. calculate next job placement from current job placement, machine resource usage, ...
+    2. request each worker next job placement
+    3. sleep
     """
-    #あと，「inputstreamならいらないけど，outputstreamなら前のjobの情報が必要」とかなら，JobDispatcherも継承させるのがいいかも
+    logger = logging.getLogger('TerminalLogger')
 
-    # dispatch inputstreams
-    # [todo] - more performance consideration
-    for job_id in job_graph.begin_nodes():
-        job = job_graph.node[job_id]
-        print(job_id, job)
-        stream = JobDispatcher(worker_hosts[0], worker_port, job_id, job['class'], job['args'])
-    #     # dispatch(job, worker_hosts[0]])  # どうやってdispatchしたopをmigrateしよう?
-    #     #                                  # これが実際に何をやってるかによって，実行プロファイルを得たり，それからまたdispatchを変えたりってコードが変わってくる
+    # prepare each worker's JobRegistrar
+    job_registrars = {}
+    for worker in worker_hosts:
+        job_registrars[worker] = ms.conn_pool[worker].root.JobRegistrar()
 
-    import time
-    time.sleep(1)  # [fix] - soon after Dispatch, job_id is not yet registered to `ws.job_instances`
+    while True:
+        # 1. calculate next job placement from current job placement, machine resource usage, ...
+        sched_module = import_module(sched_module_name)
+        next_jobs_placement = sched_module.calc_job_placement(
+            ms.jobs_placement,
+            # machine resource, ...
+        )   # [todo] - most important part in scheduling
+        logger.debug('New job scheduling is calculated')
 
-    # dispatch outputstreams
-    for job_id in job_graph.end_nodes():
-        # choose best worker to fetch input batch
-        pred_worker = 'localhost'    # [fix] - scheduling
-        conn = rpyc.connect(pred_worker, worker_port)    # [fix] - connection pool
-        pred_job_id = job_graph.predecessors(job_id)[0]  # [fix] - when multiple pred jobs (union, join)
-        gen_in_batches = get_in_batches_generator(conn, pred_job_id)
+        # 2. request each worker next job placement
+        for job_id in ms.jobs_placement.iterkeys():
+            workers_to_reg   = tuple(set(next_jobs_placement[job_id]) - set(ms.jobs_placement[job_id]))
+            workers_to_unreg = tuple(set(ms.jobs_placement[job_id])  - set(next_jobs_placement[job_id]))
+            for worker in workers_to_reg:
+                job_registrar = job_registrars[worker]
+                job_registrar.register(job_id)
+            for worker in workers_to_unreg:
+                job_registrar = job_registrars[worker]
+                job_registrar.unregister(job_id)
 
-        job = job_graph.node[job_id]
-        print(job_id, job)
-        stream = JobDispatcher(worker_hosts[0], worker_port, job_id, job['class'], job['args'], gen_in_batches)
-
-    stream.join()  # [todo] - wait only last job?
-
-
-def get_in_batches_generator(conn, job_id):
-    """Return generator of input batches
-
-    :param conn: :class:`rpyc`'s connection object to a worker server
-    :param job_id: job's id to fetch batches from
-    """
-    def gen():
-        while True:
-            yield conn.root.get_out_batch(job_id)
-    return gen
+        # 3. sleep
+        ms.jobs_placement = next_jobs_placement
+        time.sleep(reschedule_interval_sec)

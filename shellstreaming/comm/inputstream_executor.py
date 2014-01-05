@@ -15,5 +15,5 @@ class InputStreamExecutor(JobExecutor):
 
     def exposed_execute(self):
         """Main loop of each job"""
-        stream = self._job_class(*self._job_args)
+        stream = self._job_class(*self._job_args)  # 基本はここに output_queue とかの引数を加えればいいけど，そもそも登録だけしかしない
         ws.job_instance[self._job_id] = stream

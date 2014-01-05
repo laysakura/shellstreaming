@@ -10,6 +10,14 @@ import importlib
 from abc import ABCMeta, abstractmethod
 
 
+
+# JobDispatcherは，JobExecutorをexecuteするんじゃだめ．
+# conn.root.JobRegisterみたいなのでworkerにjobを登録だけする．
+# 各workerは，WorkerServerServiceでmasterからのリクエストを受けつつも，登録されたjobを別のスレッドで実行していく
+# (JobRegisterは，jobの登録だけじゃなくて削除もできるIFにしよう．)
+
+
+
 class JobExecutor(object):
     """Abstract executor of jobs for worker processes"""
     __metaclass__ = ABCMeta
@@ -25,7 +33,7 @@ class JobExecutor(object):
         :param gen_in_batches: generator object of input batches. Since inputstream does not have ascendant job,
                                it can be `None` for :class:`InputStreamExecutor`.
         """
-        self._job_id    = job_id
+        self._job_id = job_id
 
         self._job_class = getattr(
             importlib.import_module('.'.join(job_class_fullname.split('.')[:-1])),

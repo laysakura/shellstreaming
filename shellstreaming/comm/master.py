@@ -12,6 +12,7 @@ import shlex
 import logging
 from subprocess import Popen
 import networkx as nx
+import rpyc
 import shellstreaming
 from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
@@ -19,6 +20,7 @@ from shellstreaming.util import import_from_file
 from shellstreaming.comm.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.main import main_loop
 from shellstreaming.comm.util import wait_worker_server, kill_worker_server
+import shellstreaming.master.master_struct as ms
 from shellstreaming import api
 
 
@@ -62,10 +64,24 @@ def main():
     try:
         # make job graph from user's stream app description
         job_graph = _parse_stream_py(args.stream_py)
+        # draw job graph
         if config.get('master', 'job_graph_path') != '':
             _draw_job_graph(job_graph, config.get('master', 'job_graph_path'))
+        # initialize :module:`master_struct`
+        for job_id in job_graph.nodes_iter():
+            ms.jobs_placement[job_id] = []
+        for host in worker_hosts:
+            ms.conn_pool[host] = rpyc.connect(host, worker_port)
+        # register job graph to each worker
+        for host in worker_hosts:
+            conn = ms.conn_pool[host]
+            conn.root.reg_job_graph(job_graph)
         # start master's main loop
-        main_loop(job_graph, worker_hosts, worker_port)
+        main_loop(
+            job_graph, worker_hosts, worker_port,
+            config.get('scheduler', 'scheduler_module'),
+            config.getint('scheduler', 'reschedule_interval_sec'),
+        )
     except KeyboardInterrupt as e:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
         for host in worker_hosts:
