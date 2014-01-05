@@ -169,7 +169,7 @@ def _parse_stream_py(stream_py):
     module    = import_from_file(stream_py)
     main_func = getattr(module, 'main')
     job_graph = JobGraph()
-    main_func(job_graph)
+    main_func(job_graph)    # [fix] - ユーザにとって意味のわからない `job_graph` を与えるな
     return job_graph
 
 

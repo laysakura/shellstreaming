@@ -8,3 +8,5 @@ def main(job_graph):
     print('debug from user!!')  # この辺のprintが実はloggerによって吐かれる，みたいなの欲しい
     randint_stream = InputStream(job_graph, RandInt, (0, 100))  # 実際にinputstreamができる場所もシステムで勝手に決める
     OutputStream(job_graph, LocalFile, ('/tmp/result.txt', ), randint_stream, 'localhost')  # => localhost:/tmp/result.txt
+    # [todo] - outputの場所は「誰にoutputstreamを立てて欲しいか(worker server単位)」でなく
+    # [todo] - 「誰のnodeにoutputが置かれて欲しいか(worker node単位)」になってるけど，これは妥当か
