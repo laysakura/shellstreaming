@@ -6,13 +6,10 @@
     :synopsis: Provides abstract FiniteStream and InfiniteStream.
 """
 import threading
-try:
-    from Queue import Queue, Empty
-except ImportError:
-    from queue import Queue, Empty
 from abc import ABCMeta, abstractmethod
 from shellstreaming.timed_batch import TimedBatch
 from shellstreaming.timespan import Timespan
+from shellstreaming.batch_queue import BatchQueue
 
 
 class Base(threading.Thread):
@@ -33,7 +30,7 @@ class Base(threading.Thread):
         :param batch_span_ms: timespan to assemble records as batch
         """
         self._batch_span_ms = batch_span_ms
-        self._batch_q       = Queue()
+        self._batch_q       = BatchQueue()
 
         # for creating batches one by one
         self._next_batch_span = None
@@ -115,10 +112,10 @@ class Base(threading.Thread):
 
         def _produce_next_batch():
             batch = TimedBatch(self._next_batch_span, tuple(self._next_batch))
-            self._batch_q.put(batch)
+            self._batch_q.push(batch)
 
         def _no_more_batch():
-            self._batch_q.put(None)
+            self._batch_q.push(None)
 
         def _create_next_batch():
             self._next_batch      = []
@@ -171,14 +168,7 @@ class InfiniteStream(Base):
         if self.interrupted():
             raise StopIteration
 
-        while True:
-            try:
-                # [todo] - return batch with oldest timestamp?
-                batch = self._batch_q.get(timeout=365 * 24 * 60 * 60)  # workaround: enable Ctrl-C http://bugs.python.org/issue1360
-                break
-            except Empty:
-                continue
-
+        batch = self._batch_q.pop()
         assert(batch is not None)
         return batch
 
@@ -224,14 +214,7 @@ class FiniteStream(Base):
             raise StopIteration
 
         # [todo] - return batch with oldest timestamp?
-        while True:
-            try:
-                # [todo] - return batch with oldest timestamp?
-                batch = self._batch_q.get(timeout=365 * 24 * 60 * 60)  # workaround: enable Ctrl-C http://bugs.python.org/issue1360
-                break
-            except Empty:
-                continue
-
+        batch = self._batch_q.pop()
         if batch is None:  # means producer thread has sent end signal
             raise StopIteration
         return batch
