@@ -5,18 +5,14 @@
 
     :synopsis: Provides abstract istream
 """
-import threading
-from abc import ABCMeta, abstractmethod
+from shellstreaming.base_job import BaseJob
 from shellstreaming.timed_batch import TimedBatch
 from shellstreaming.timespan import Timespan
 
 
-class Base(threading.Thread):
+class Base(BaseJob):
     """Base class for istream
-
-    An inputstream class must have `run()` method, which runs as a thread to fetch input data from outside.
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, output_queue, batch_span_ms):
         """Constructor
@@ -31,21 +27,13 @@ class Base(threading.Thread):
         self._next_batch_span = None
         self._next_batch      = None
 
-        # threading
-        threading.Thread.__init__(self)
-        self.daemon     = True               # to die when master process dies
-        self._interrupt = threading.Event()  # to become ready to die when `interrupt()` is called
-        self.start()
+        BaseJob.__init__(self)
 
     def interrupt(self):
         """API to safely kill data-fetching thread.
         """
-        self._interrupt.set()
         self._batch_q.push(None)  # producer has end data-fetching
-
-    def _interrupted(self):
-        """Function for inputstream subclasses to probe interruption"""
-        return self._interrupt.is_set()
+        BaseJob.interrupt(self)
 
     def add(self, record):
         """Function for inputstream subclasses to add records fetched.
@@ -93,11 +81,3 @@ class Base(threading.Thread):
             _create_next_batch()
 
         self._next_batch.append(record)
-
-    @abstractmethod
-    def run(self):  # pragma: no cover
-        """Start istream thread
-
-        This function must stop after :func:`interrupt` is called
-        """
-        pass
