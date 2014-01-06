@@ -16,16 +16,19 @@ def update_instances(job_graph, registered_jobs, job_instances):  # [todo] - fin
     :param registered_jobs: (reference only)
     """
     for job_id in registered_jobs:
+        print('job_id: ', job_id)
         # launch not-yet-instanciated job
         if job_id not in job_instances or job_instances[job_id] == []:
             job_attr = job_graph.node[job_id]
             job_class, job_args, job_type = (job_attr['class'], job_attr['args'], job_attr['type'])
-            # create output batch queues for job w/ job_id.
+            # create input/output batch queues for job w/ job_id if not yet created.
             # Note that queue creation should be done in job instance level (not job level)
             # because even unregistered job's instance may have remaining task
+            in_edges  = job_graph.in_stream_edge_ids(job_id)
             out_edges = job_graph.out_stream_edge_ids(job_id)
-            for edge in out_edges:
-                ws.batch_queues[edge] = BatchQueue()
+            for edge in in_edges + out_edges:
+                if edge not in ws.batch_queues:
+                    ws.batch_queues[edge] = BatchQueue()
             # launch job instance
             assert(job_type in ('istream', 'operator', 'ostream'))
             in_edges = job_graph.in_stream_edge_ids(job_id)
