@@ -24,4 +24,5 @@ def get_default_conf():
         'reschedule_interval_sec'    : '10',
 
         'log_path'                   : join(gettempdir(), 'shellstreaming-worker.log'),
+        'worker_scheduler_module'    : 'shellstreaming.scheduler.worker_sched_single_thread',
     })

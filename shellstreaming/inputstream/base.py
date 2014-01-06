@@ -3,7 +3,7 @@
     shellstreaming.inputstream.base
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :synopsis: Provides abstract FiniteStream and InfiniteStream.
+    :synopsis: Provides abstract istream
 """
 import threading
 from abc import ABCMeta, abstractmethod
@@ -12,12 +12,7 @@ from shellstreaming.timespan import Timespan
 
 
 class Base(threading.Thread):
-    """Base class for :class:`FiniteStream` & :class:`InfiniteStream`.
-
-    .. warning::
-        Do not create direct subclasses of `Base <#shellstreaming.inputstream.base.Base>`_ .
-        Use `FiniteStream <#shellstreaming.inputstream.base.FiniteStream>`_ or
-        `InfiniteStream <#shellstreaming.inputstream.base.InfiniteStream>`_ instead.
+    """Base class for istream
 
     An inputstream class must have `run()` method, which runs as a thread to fetch input data from outside.
     """

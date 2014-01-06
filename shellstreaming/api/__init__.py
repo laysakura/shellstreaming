@@ -47,16 +47,13 @@ def _reg_job(job_class, job_class_args, job_type, in_stream):
     # add node
     job_id = "%d: %s" % (_num_job_node, job_class.__name__)
     _num_job_node += 1
-    _job_graph.add_node(job_id, attr_dict={
-        'class' : job_class,
-        'args'  : job_class_args,
-    })
+    _job_graph.add_node(job_id, job_class, job_class_args, job_type)
 
     if job_type in ('operator', 'ostream'):
         # edge from pred job to this job
         assert(in_stream is not None)
         to_from = (in_stream.src_job_id, job_id)
-        _job_graph.add_edge(*to_from)
+        _job_graph.add_edge(*to_from, stream_edge_id=in_stream.id)
         _job_graph.edge_labels[to_from] = in_stream.id
 
     if job_type == 'ostream':

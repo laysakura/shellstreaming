@@ -34,10 +34,11 @@ def main_loop(
     job_registrars = {}
     for worker in worker_hosts:
         job_registrars[worker] = ms.conn_pool[worker].root.JobRegistrar()
+    # prepare scheduler module
+    sched_module = import_module(sched_module_name)
 
     while True:
         # 1. calculate next job placement from current job placement, machine resource usage, ...
-        sched_module = import_module(sched_module_name)
         next_jobs_placement = sched_module.calc_job_placement(
             ms.jobs_placement,
             # machine resource, ...

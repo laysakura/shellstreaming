@@ -5,14 +5,20 @@
 
     :synopsis: Provides master process's entry point
 """
+# standard module
 import argparse
 import os
 from os.path import abspath, dirname, join, expanduser
 import shlex
 import logging
 from subprocess import Popen
+
+# 3rd party
+import cPickle as pickle
 import networkx as nx
 import rpyc
+
+# my module
 import shellstreaming
 from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
@@ -50,7 +56,7 @@ def main():
     if config.getboolean('debug', 'single_process_debug'):
         # launch a worker server on localhost
         logger.debug('Entering single_process_debug mode')
-        t = start_worker_server_thread(worker_port, logger)
+        th_service = start_worker_server_thread(worker_port, logger)
     else:
         # auto-deploy, launch worker server on worker hosts
         _launch_workers(
@@ -73,9 +79,16 @@ def main():
         for host in worker_hosts:
             ms.conn_pool[host] = rpyc.connect(host, worker_port)
         # register job graph to each worker
+        pickled_job_graph = pickle.dumps(job_graph)
         for host in worker_hosts:
             conn = ms.conn_pool[host]
-            conn.root.reg_job_graph(job_graph)
+            conn.root.reg_job_graph(pickled_job_graph)
+        # launch worker-local scheduler on each worker
+        if config.getboolean('debug', 'single_process_debug'):
+            conn = ms.conn_pool['localhost']
+            conn.root.start_worker_local_scheduler(config.get('worker', 'worker_scheduler_module'))
+        else:
+            assert(False)  # [todo] - laucn worker-local scheduler on each worker
         # start master's main loop
         main_loop(
             job_graph, worker_hosts, worker_port,

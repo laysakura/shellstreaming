@@ -18,12 +18,12 @@ job_instances = {}
 
 .. code-block:: python
     {
-        '<job id>': <job instance>,
+        '<job id>': [<job instance>, ...],
         ...
     }
 """
 
-output_queues = {}
+batch_queues = {}
 """Queue to put output batches
 
 .. code-block:: python

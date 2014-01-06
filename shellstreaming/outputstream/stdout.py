@@ -5,15 +5,17 @@
 
     :synopsis: Output records to stdout
 """
+from shellstreaming.outputstream.base import Base
 
 
-class Stdout(object):  # [fix] - ostreamも何かinterface継承
+class Stdout(Base):
     """Output records to stdout"""
 
-    def __init__(self):
-        """Setup outputstream"""
-
-    def write(self, batch):
+    def run(self):
         """Output batch to stdout"""
-        # [fix] - how about output format?????
-        print(str(batch))
+        while True:
+            batch = self._batch_q.pop()
+            if batch is None:
+                break
+            # [fix] - how about output format?????
+            print(str(batch))
