@@ -17,8 +17,8 @@ class LocalFile(Base):
         :param path: path to output file (overwritten)
         :param **kw: passed to :func:`Base.__init__()`
         """
-        Base.__init__(self, **kw)
         self._f = open(path, 'w')
+        Base.__init__(self, **kw)
 
     def __del__(self):
         self._f.close()

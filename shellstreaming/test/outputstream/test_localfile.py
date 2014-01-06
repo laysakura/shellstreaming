@@ -6,6 +6,7 @@ from tempfile import gettempdir
 from relshell.record import Record
 from relshell.recorddef import RecordDef
 from relshell.batch import Batch
+from shellstreaming.batch_queue import BatchQueue
 from shellstreaming.outputstream.localfile import LocalFile
 
 
@@ -17,10 +18,15 @@ def teardown():
 
 
 def test_localfile_usage():
-    stream  = _create_batches()
-    ostream = LocalFile(TEST_FILE)
-    for batch in stream:
-        ostream.write(batch)    # [fix] - Batch's output format has to be customized by user
+    # prepare input queue
+    q = BatchQueue()
+    for batch in _create_batches():
+        q.push(batch)    # [fix] - Batch's output format has to be customized by user
+    q.push(None)
+
+    # run ostream
+    ostream = LocalFile(TEST_FILE, input_queue=q)
+    ostream.join()
 
     # check contents
     with open(TEST_FILE) as f:
