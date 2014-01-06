@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from shellstreaming.api import *
-from shellstreaming.inputstream.randint import RandInt
-from shellstreaming.outputstream.localfile import LocalFile
+from shellstreaming import api
+from shellstreaming.inputstream import RandIntIStream
+from shellstreaming.outputstream import StdoutOStream
 
 
-def main(job_graph):
-    print('debug from user!!')  # この辺のprintが実はloggerによって吐かれる，みたいなの欲しい
-    randint_stream = InputStream(job_graph, RandInt, (0, 100))  # 実際にinputstreamができる場所もシステムで勝手に決める
-    OutputStream(job_graph, LocalFile, ('/tmp/result.txt', ), randint_stream, 'localhost')  # => localhost:/tmp/result.txt
+def main():
+    randint_stream = api.IStream(RandIntIStream, (0, 100))
+    api.OStream(StdoutOStream, (), randint_stream, 'localhost')  # => output is written to stdout by localhost's worker server

@@ -5,22 +5,29 @@
 
     :synopsis: Provides master process's entry point
 """
+# standard module
 import argparse
 import os
 from os.path import abspath, dirname, join, expanduser
 import shlex
 import logging
 from subprocess import Popen
+
+# 3rd party
+import cPickle as pickle
 import networkx as nx
+import rpyc
+
+# my module
 import shellstreaming
 from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
 from shellstreaming.comm.run_worker_server import start_worker_server_thread
-from shellstreaming.comm.inputstream_dispatcher import InputStreamDispatcher
+from shellstreaming.scheduler.main import main_loop
 from shellstreaming.comm.util import wait_worker_server, kill_worker_server
-from shellstreaming.jobgraph import JobGraph
-from shellstreaming.api import *
+import shellstreaming.master.master_struct as ms
+from shellstreaming import api
 
 
 DEFAULT_CONFIGS = (expanduser(join('~', '.shellstreaming.cnf')), )
@@ -49,7 +56,7 @@ def main():
     if config.getboolean('debug', 'single_process_debug'):
         # launch a worker server on localhost
         logger.debug('Entering single_process_debug mode')
-        t = start_worker_server_thread(worker_port, logger)
+        th_service = start_worker_server_thread(worker_port, logger)
     else:
         # auto-deploy, launch worker server on worker hosts
         _launch_workers(
@@ -63,10 +70,31 @@ def main():
     try:
         # make job graph from user's stream app description
         job_graph = _parse_stream_py(args.stream_py)
+        # draw job graph
         if config.get('master', 'job_graph_path') != '':
             _draw_job_graph(job_graph, config.get('master', 'job_graph_path'))
+        # initialize :module:`master_struct`
+        for job_id in job_graph.nodes_iter():
+            ms.jobs_placement[job_id] = []
+        for host in worker_hosts:
+            ms.conn_pool[host] = rpyc.connect(host, worker_port)
+        # register job graph to each worker
+        pickled_job_graph = pickle.dumps(job_graph)
+        for host in worker_hosts:
+            conn = ms.conn_pool[host]
+            conn.root.reg_job_graph(pickled_job_graph)
+        # launch worker-local scheduler on each worker
+        if config.getboolean('debug', 'single_process_debug'):
+            conn = ms.conn_pool['localhost']
+            conn.root.start_worker_local_scheduler(config.get('worker', 'worker_scheduler_module'))
+        else:
+            assert(False)  # [todo] - laucn worker-local scheduler on each worker
         # start master's main loop
-        _do_stream_processing(job_graph, worker_hosts, worker_port)
+        main_loop(
+            job_graph, worker_hosts, worker_port,
+            config.get('master', 'master_scheduler_module'),
+            config.getint('master', 'reschedule_interval_sec'),
+        )
     except KeyboardInterrupt as e:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
         for host in worker_hosts:
@@ -168,26 +196,27 @@ def _parse_stream_py(stream_py):
     """
     module    = import_from_file(stream_py)
     main_func = getattr(module, 'main')
-    job_graph = JobGraph()
-    main_func(job_graph)
-    return job_graph
+    main_func()    # `api._job_graph` is changed internally
+    return api._job_graph
 
 
 def _draw_job_graph(job_graph, path):
     import matplotlib.pyplot as plt
-    nx.draw(job_graph)
+
+    pos = nx.spring_layout(job_graph)
+    nx.draw(job_graph, pos)
+    # red color for istream
+    nx.draw_networkx_nodes(job_graph, pos, nodelist=job_graph.begin_nodes(), node_color='r')
+    # blue color for ostream
+    nx.draw_networkx_nodes(job_graph, pos, nodelist=job_graph.end_nodes(), node_color='b')
+    # white color for operator
+    nx.draw_networkx_nodes(
+        job_graph, pos,
+        nodelist=tuple(set(job_graph.nodes()) - set(job_graph.begin_nodes()) - set(job_graph.end_nodes())),
+        node_color='w')
+    # edge label
+    nx.draw_networkx_edge_labels(job_graph, pos, job_graph.edge_labels)
     plt.savefig(path)
+
     logger = logging.getLogger('TerminalLogger')
     logger.info('Job graph figure is generated on: %s' % (path))
-
-
-def _do_stream_processing(job_graph, worker_hosts, worker_port):
-    # dispatch inputstreams
-    for n in job_graph.begin_nodes():
-        istream = job_graph.node[n]
-        print(istream)
-        stream = InputStreamDispatcher(worker_hosts[0], worker_port, istream['name'], istream['args'])
-    #     # dispatch(job, worker_hosts[0]])  # どうやってdispatchしたopをmigrateしよう?
-    #     #                                  # これが実際に何をやってるかによって，実行プロファイルを得たり，それからまたdispatchを変えたりってコードが変わってくる
-    stream.join()
-    pass

@@ -12,50 +12,49 @@
 import argparse
 import time
 import sys
-from os.path import join
-from tempfile import gettempdir
-from ConfigParser import SafeConfigParser as Config
 from threading import Thread
 from rpyc.utils.server import ThreadedServer as Server
 import logging
-from shellstreaming.logger import FileLogger, setup_TerminalLogger
+from shellstreaming.config import get_default_conf
+from shellstreaming.logger import setup_FileLogger, setup_TerminalLogger
+import shellstreaming.worker.worker_struct as ws
 from shellstreaming.comm.worker_server_service import WorkerServerService
-
-
-DEFAULT_CONFIG_VALUE = {
-    'log_path'  : join(gettempdir(), 'shellstreaming-worker.log'),
-    'log_level' : 'DEBUG',
-}
-"""Default key-values of config file. Keys not included in this dict is required config."""
 
 
 def main(cnfpath):
     # setup config
-    config = Config(DEFAULT_CONFIG_VALUE)
+    config = get_default_conf()
     config.read(cnfpath)
 
     # setup logger
     (loglevel, logpath) = (eval('logging.' + config.get('worker', 'log_level')), config.get('worker', 'log_path'))
-    WorkerServerService.logger = FileLogger(loglevel, logpath, 100 * 1e6)
+    setup_FileLogger(loglevel, logpath)
+    logger = logging.getLogger('FileLogger')
     setup_TerminalLogger(loglevel)
-    logger = logging.getLogger('TerminalLogger')
-    logger.debug('Log is written in <%s> in `%s` level' % (logpath, loglevel))
+    logging.getLogger('TerminalLogger').debug('Log is written in <%s> in `%s` level' % (logpath, loglevel))
 
-    # start `WorkerServerService`
+    # start `WorkerServerService` thread
     port = config.getint('worker', 'port')
-    WorkerServerService.logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
-    t = start_worker_server_thread(port, WorkerServerService.logger)
+    logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
+    th_service = start_worker_server_thread(port, logger)
 
-    while WorkerServerService.server:
-        # wait for `server` to be `close()`ed by master the client.
+    # start worker-local scheduling thread
+    logger.debug('Starting worker-local scheduler')
+    th_sched = start_worker_local_scheduler(config.get('worker', 'worker_scheduler_module'))
+
+    while WorkerServerService.server:    # wait for `server` to be `close()`ed by master client.
         time.sleep(1.0)
 
-    WorkerServerService.logger.debug('`WorkerServerService` has been closed.')
-    t.join()
+    logger.debug('`WorkerServerService` has been closed.')
+    th_service.join()
+    th_sched.join()
 
 
 def start_worker_server_thread(port, logger):
-    WorkerServerService.server = Server(WorkerServerService, port=port, logger=logger)
+    WorkerServerService.server = Server(
+        WorkerServerService, port=port,
+        logger=logger,
+    )
     t = Thread(target=WorkerServerService.server.start)
     t.daemon = True
     t.start()
