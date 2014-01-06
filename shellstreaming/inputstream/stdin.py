@@ -5,10 +5,9 @@
 
     :synopsis: Infinite input stream from stdin
 """
-import sys
-from shellstreaming.inputstream.base import Base
-from shellstreaming.timed_record import TimedRecord
+from relshell.record import Record
 from relshell.recorddef import RecordDef
+from shellstreaming.inputstream.base import Base
 
 
 class Stdin(Base):
@@ -29,6 +28,6 @@ class Stdin(Base):
             # sys.stderr.write('Enter record contents: ')
             try:
                 line = raw_input().rstrip('\r\n')
-                self.add(TimedRecord(rdef, line))
-            except EOFError as e:
+                self.add(rdef, Record(line))
+            except EOFError:
                 continue

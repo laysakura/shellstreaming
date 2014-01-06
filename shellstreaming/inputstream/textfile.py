@@ -7,9 +7,9 @@
 
     A line is used as record with single column.
 """
-from shellstreaming.inputstream.base import Base
-from shellstreaming.timed_record import TimedRecord
+from relshell.record import Record
 from relshell.recorddef import RecordDef
+from shellstreaming.inputstream.base import Base
 
 
 class TextFile(Base):
@@ -30,6 +30,5 @@ class TextFile(Base):
             for line in f:
                 if self._interrupted():
                     break
-                self.add(TimedRecord(rdef, line))
-
-        self.add(None)  # producer has end data-fetching
+                self.add(rdef, Record(line))
+        self.add(rdef, None)  # producer has end data-fetching

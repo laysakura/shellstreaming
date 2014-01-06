@@ -10,7 +10,7 @@ def test_Base_add_no_record():
             Base.__init__(self, output_queue, batch_span_ms)
 
         def run(self):
-            self.add(None)
+            self.add(None, None)
 
     q = BatchQueue()
     istream = EmptyStream(q)

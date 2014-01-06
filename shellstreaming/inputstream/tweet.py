@@ -9,8 +9,8 @@ import json
 import requests
 from requests_oauthlib import OAuth1
 from relshell.recorddef import RecordDef
+from relshell.record import Record
 from shellstreaming.inputstream.base import Base
-from shellstreaming.timed_record import TimedRecord
 
 
 class Tweet(Base):
@@ -60,13 +60,15 @@ class Tweet(Base):
             if 'text' in line_dict:  # [fix] - wired condition...
                 (text, lang, created_at, screen_name) = (
                     line_dict['text'], line_dict['lang'], line_dict['created_at'], line_dict['user']['screen_name'])
-                self.add(TimedRecord(
+                self.add(
                     rdef,
-                    text.encode('utf-8') if type(text) == unicode else text,
-                    lang.encode('utf-8') if type(text) == unicode else lang,
-                    created_at.encode('utf-8') if type(text) == unicode else created_at,
-                    screen_name.encode('utf-8') if type(text) == unicode else screen_name,
-                ))
+                    Record(
+                        text.encode('utf-8') if type(text) == unicode else text,
+                        lang.encode('utf-8') if type(text) == unicode else lang,
+                        created_at.encode('utf-8') if type(text) == unicode else created_at,
+                        screen_name.encode('utf-8') if type(text) == unicode else screen_name,
+                    )
+                )
 
     @staticmethod
     def _get_twitter_streaming_response(

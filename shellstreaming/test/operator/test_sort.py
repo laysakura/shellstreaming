@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 import nose.tools as ns
-from datetime import datetime
-from shellstreaming.timed_batch import TimedBatch
+from relshell.batch import Batch
 from relshell.recorddef import RecordDef
-from shellstreaming.timed_record import TimedRecord
-from shellstreaming.timespan import Timespan
-from shellstreaming.timestamp import Timestamp
+from relshell.record import Record
 from shellstreaming.batch_queue import BatchQueue
 from shellstreaming.operator.sort import Sort
 
@@ -15,13 +12,13 @@ def _create_test_batch():
         {'name': 'col0', 'type': 'INT'},
         {'name': 'col1', 'type': 'STRING'},
     ])
-    return TimedBatch(
-        Timespan(Timestamp(datetime.now()), 10),
+    return Batch(
+        rdef,
         (
-            TimedRecord(rdef, 123, '101'),
-            TimedRecord(rdef, 777, '11'),
-            TimedRecord(rdef, 333, '200'),
-            TimedRecord(rdef, 777, '30'),
+            Record(123, '101'),
+            Record(777, '11'),
+            Record(333, '200'),
+            Record(777, '30'),
         ))
 
 

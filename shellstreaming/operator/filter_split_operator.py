@@ -5,11 +5,8 @@
 
     :synopsis: Provides filtering operators with multiple outputs
 """
-from datetime import datetime
 from relshell.recorddef import RecordDef
-from shellstreaming.timespan import Timespan
-from shellstreaming.timestamp import Timestamp
-from shellstreaming.timed_batch import TimedBatch
+from relshell.batch import Batch
 from shellstreaming.operator.base import Base
 
 
@@ -52,7 +49,7 @@ class FilterSplitOperator(Base):
             # filter records by conditions
 
             # make `eval`able conditions
-            rdef = RecordDef([{'name': 'num', 'type': 'INT'}])  # [fix] - rdefはrecordごとでなくbatchごとに持たせる
+            rdef = batch.record_def()
             eval_conditions = [FilterSplitOperator._colnames_to_colrefs(cond, rdef, 'rec') for cond in self._conditions]
             # record list to pack into Batch
             out_batch_recs = {cond: [] for cond in self._conditions}
@@ -67,7 +64,7 @@ class FilterSplitOperator(Base):
 
             # push filtered records as Batches
             for cond in self._conditions:
-                out_batch = TimedBatch(Timespan(Timestamp(datetime.now()), 10), tuple(out_batch_recs[cond]))  # [fix] - timestamp使わないでいいよ・・・
+                out_batch = Batch(rdef, tuple(out_batch_recs[cond]))
                 self._out_qs[cond].push(out_batch)
 
     @staticmethod

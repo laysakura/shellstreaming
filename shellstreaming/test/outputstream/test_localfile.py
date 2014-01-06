@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from nose.tools import *
+import nose.tools as ns
 import os
 from os.path import join
 from tempfile import gettempdir
@@ -30,13 +30,13 @@ def test_localfile_usage():
 
     # check contents
     with open(TEST_FILE) as f:
-        eq_(f.read(),
+        ns.eq_(f.read(),
 '''(
-    ("col0": "111", )
-    ("col0": "222", )
+    ("111", )
+    ("222", )
 )
 (
-    ("col0": "333", )
+    ("333", )
 )
 '''
         )
@@ -45,11 +45,6 @@ def test_localfile_usage():
 def _create_batches():
     rdef = RecordDef([{'name': 'col0', 'type': 'INT'}])
     return (
-        Batch((
-            Record(rdef, 111),
-            Record(rdef, 222),
-        )),
-        Batch((
-            Record(rdef, 333),
-        ))
+        Batch(rdef, (Record(111), Record(222), )),
+        Batch(rdef, (Record(333), )),
     )
