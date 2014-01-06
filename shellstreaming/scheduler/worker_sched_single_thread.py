@@ -5,6 +5,7 @@
 
     :synopsis: Instanciate all jobs w/ single thread
 """
+import logging
 from shellstreaming.batch_queue import BatchQueue
 import shellstreaming.worker.worker_struct as ws
 
@@ -15,8 +16,8 @@ def update_instances(job_graph, registered_jobs, job_instances):  # [todo] - fin
     :param job_graph:       (reference only)
     :param registered_jobs: (reference only)
     """
+    logger = logging.getLogger('TerminalLogger')
     for job_id in registered_jobs:
-        print('job_id: ', job_id)
         # launch not-yet-instanciated job
         if job_id not in job_instances or job_instances[job_id] == []:
             job_attr = job_graph.node[job_id]
@@ -31,7 +32,7 @@ def update_instances(job_graph, registered_jobs, job_instances):  # [todo] - fin
                     ws.batch_queues[edge] = BatchQueue()
             # launch job instance
             assert(job_type in ('istream', 'operator', 'ostream'))
-            in_edges = job_graph.in_stream_edge_ids(job_id)
+            logger.debug('Launching job instance: %s' % (job_id))
             if job_type == 'istream':
                 assert(len(out_edges) == 1 and len(in_edges) == 0)
                 job_instance = job_class(*job_args, output_queue=ws.batch_queues[out_edges[0]])  # [todo] - use batch_time_ms?

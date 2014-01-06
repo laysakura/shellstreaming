@@ -15,5 +15,5 @@ def main():
         ),
         randint_stream,
     )
-    api.OStream(LocalFileOStream, ('lo_stream.txt'), lo_stream, 'localhost')
-    api.OStream(LocalFileOStream, ('hi_stream.txt'), hi_stream, 'localhost')
+    api.OStream(LocalFileOStream, ('lo_stream.txt', ), lo_stream, 'localhost')
+    api.OStream(LocalFileOStream, ('hi_stream.txt', ), hi_stream, 'localhost')
