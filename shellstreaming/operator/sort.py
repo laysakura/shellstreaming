@@ -5,7 +5,7 @@
 
     :synopsis: Provides sort operators
 """
-from shellstreaming.timed_batch import TimedBatch
+from relshell.batch import Batch
 from shellstreaming.operator.base import Base
 
 
@@ -50,7 +50,7 @@ class Sort(Base):
                 batch._records, reverse=self._desc,
                 cmp=lambda rec_x, rec_y: cmp(rec_x[self._col], rec_y[self._col]),
             )
-            out_batch = TimedBatch(batch.timespan, tuple(sorted_rec))  # [todo] - is it OK to always use timestamp from inputstream?
+            out_batch = Batch(batch.record_def(), tuple(sorted_rec))
             self._out_q.push(out_batch)
 
     @staticmethod

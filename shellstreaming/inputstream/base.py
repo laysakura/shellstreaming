@@ -5,9 +5,14 @@
 
     :synopsis: Provides abstract istream
 """
-from shellstreaming.base_job import BaseJob
-from shellstreaming.timed_batch import TimedBatch
+# standard module
+from datetime import datetime
+
+# my module
+from relshell.batch import Batch
+from shellstreaming.timestamp import Timestamp
 from shellstreaming.timespan import Timespan
+from shellstreaming.base_job import BaseJob
 
 
 class Base(BaseJob):
@@ -35,7 +40,7 @@ class Base(BaseJob):
         self._batch_q.push(None)  # producer has end data-fetching
         BaseJob.interrupt(self)
 
-    def add(self, record):
+    def add(self, rdef, record):
         """Function for inputstream subclasses to add records fetched.
 
         .. warning::
@@ -44,6 +49,7 @@ class Base(BaseJob):
 
             Therefore, current version does not support user-defined timestamp.
 
+        :param rdef:   Give valid `class`:RecordDef: even when record is `None`.
         :param record: Give `None` to signal consumer that data-fetching process has end.
         """
         # [fixme] - record.timestamp is asserted as arrival time. User defined timestamp is not supported.
@@ -56,7 +62,7 @@ class Base(BaseJob):
             _no_more_batch()
 
         def _produce_next_batch():
-            batch = TimedBatch(self._next_batch_span, tuple(self._next_batch))
+            batch = Batch(rdef, tuple(self._next_batch))
             self._batch_q.push(batch)
 
         def _no_more_batch():
@@ -64,7 +70,7 @@ class Base(BaseJob):
 
         def _create_next_batch():
             self._next_batch      = []
-            self._next_batch_span = Timespan(record.timestamp, self._batch_span_ms)
+            self._next_batch_span = Timespan(Timestamp(datetime.now()), self._batch_span_ms)
 
         if record is None:
             _when_got_last_record()
@@ -73,9 +79,7 @@ class Base(BaseJob):
         if self._next_batch is None:
             _create_next_batch()
 
-        assert(not record.timestamp.runoff_lower(self._next_batch_span))
-
-        if record.timestamp.runoff_higher(self._next_batch_span):
+        if Timestamp(datetime.now()).runoff_higher(self._next_batch_span):
             # this record is for 2nd batch
             _produce_next_batch()
             _create_next_batch()

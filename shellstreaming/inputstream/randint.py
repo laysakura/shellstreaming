@@ -9,9 +9,9 @@
 """
 import random
 import time
-from shellstreaming.inputstream.base import Base
-from shellstreaming.timed_record import TimedRecord
+from relshell.record import Record
 from relshell.recorddef import RecordDef
+from shellstreaming.inputstream.base import Base
 
 
 class RandInt(Base):
@@ -33,4 +33,4 @@ class RandInt(Base):
             time.sleep(0.001)
             if self._interrupted():
                 break
-            self.add(TimedRecord(rdef, random.randint(self._min, self._max)))
+            self.add(rdef, Record(random.randint(self._min, self._max)))
