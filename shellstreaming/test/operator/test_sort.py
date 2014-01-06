@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from nose.tools import *
+import nose.tools as ns
 from datetime import datetime
 from shellstreaming.timed_batch import TimedBatch
 from relshell.recorddef import RecordDef
 from shellstreaming.timed_record import TimedRecord
 from shellstreaming.timespan import Timespan
 from shellstreaming.timestamp import Timestamp
+from shellstreaming.batch_queue import BatchQueue
 from shellstreaming.operator.sort import Sort
 
 
@@ -25,27 +26,44 @@ def _create_test_batch():
 
 
 def test_sort_usage():
+    in_q, out_q = (BatchQueue(), BatchQueue())
+    in_q.push(_create_test_batch())
+    in_q.push(None)
+
     # ascendant order
-    op = Sort(0)
-    sorted_batch = op.execute(_create_test_batch())
+    op = Sort(0, input_queues={'a': in_q}, output_queues={'sorted': out_q})
+    op.join()
+    sorted_batch = out_q.pop()
     col0s = []
     for record in sorted_batch:
         col0s.append(record[0])
-    eq_(col0s, [123, 333, 777, 777])
+    ns.eq_(col0s, [123, 333, 777, 777])
+
+
+def test_sort_desc():
+    in_q, out_q = (BatchQueue(), BatchQueue())
+    in_q.push(_create_test_batch())
+    in_q.push(None)
 
     # descendant order
-    op = Sort(0, desc=True)
-    sorted_batch = op.execute(_create_test_batch())
+    op = Sort(0, desc=True, input_queues={'a': in_q}, output_queues={'sorted': out_q})
+    op.join()
+    sorted_batch = out_q.pop()
     col0s = []
     for record in sorted_batch:
         col0s.append(record[0])
-    eq_(col0s, [777, 777, 333, 123])
+    ns.eq_(col0s, [777, 777, 333, 123])
 
 
 def test_sort_by_string():
-    op = Sort(1)
-    sorted_batch = op.execute(_create_test_batch())
+    in_q, out_q = (BatchQueue(), BatchQueue())
+    in_q.push(_create_test_batch())
+    in_q.push(None)
+
+    op = Sort(1, input_queues={'a': in_q}, output_queues={'sorted': out_q})
+    op.join()
+    sorted_batch = out_q.pop()
     col1s = []
     for record in sorted_batch:
         col1s.append(record[1])
-    eq_(col1s, ['101', '11', '200', '30'])
+    ns.eq_(col1s, ['101', '11', '200', '30'])

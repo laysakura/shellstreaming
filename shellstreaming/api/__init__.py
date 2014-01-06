@@ -68,7 +68,7 @@ def _reg_job(job_class, job_class_args, job_type, in_stream):
         # some operator has multiple output streams
         assert(job_type == 'operator')
         streams = []
-        for s in job_class.stream_names(job_class_args):
+        for s in job_class.out_stream_edge_id_suffixes(job_class_args):
             stream_id = "%d: %s" % (_num_stream_edge, s)
             _num_stream_edge += 1
             streams.append(StreamEdge(stream_id, src_job_id=job_id))
