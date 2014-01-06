@@ -11,7 +11,7 @@ from importlib import import_module
 import shellstreaming.master.master_struct as ms
 
 
-def main_loop(
+def sched_loop(
     job_graph,
     worker_hosts,  # [todo] - not only worker's hostname but also
                    # [todo] - worker's resource info is important for scheduling decision.
@@ -20,7 +20,7 @@ def main_loop(
     sched_module_name,
     reschedule_interval_sec,
 ):
-    """Main loop of stream processing
+    """Scheduler main loop of stream processing
 
     Loop of 1-3.
 

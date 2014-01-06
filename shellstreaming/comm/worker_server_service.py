@@ -5,11 +5,11 @@
 
     :synopsis: Provides worker process's server
 """
-import time
 from threading import Thread
 import cPickle as pickle
 import rpyc
 from shellstreaming.worker import worker_struct as ws
+from shellstreaming.scheduler.worker_main import sched_loop
 from shellstreaming.worker.job_registrar import JobRegistrar
 
 
@@ -27,15 +27,13 @@ class WorkerServerService(rpyc.Service):
         WorkerServerService.server.close()
         WorkerServerService.server = None
 
-    def exposed_start_worker_local_scheduler(self, sched_module_name):
-        def _sched_loop():
-            from importlib import import_module
-            sched_module = import_module(sched_module_name)
-            while True:
-                sched_module.update_instances(ws.JOB_GRAPH, ws.REGISTERED_JOBS, ws.job_instances)
-                time.sleep(0.1)  # [fix] - consider sleep time
-
-        t = Thread(target=_sched_loop)
+    def exposed_start_worker_local_scheduler(
+            self,
+            sched_module_name, reschedule_interval_sec
+    ):
+        t = Thread(target=sched_loop, args=(
+            ws.JOB_GRAPH, sched_module_name, reschedule_interval_sec
+        ))
         t.daemon = True
         t.start()
         return t

@@ -24,7 +24,7 @@ from shellstreaming.logger import setup_TerminalLogger
 from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
 from shellstreaming.comm.run_worker_server import start_worker_server_thread
-from shellstreaming.scheduler.main import main_loop
+from shellstreaming.scheduler.master_main import sched_loop
 from shellstreaming.comm.util import wait_worker_server, kill_worker_server
 import shellstreaming.master.master_struct as ms
 from shellstreaming import api
@@ -86,14 +86,17 @@ def main():
         # launch worker-local scheduler on each worker
         if config.getboolean('debug', 'single_process_debug'):
             conn = ms.conn_pool['localhost']
-            conn.root.start_worker_local_scheduler(config.get('worker', 'worker_scheduler_module'))
+            conn.root.start_worker_local_scheduler(
+                config.get('worker', 'worker_scheduler_module'),
+                config.getint('worker', 'worker_reschedule_interval_sec'),
+            )
         else:
-            assert(False)  # [todo] - laucn worker-local scheduler on each worker
+            assert(False)  # [todo] - lauch worker-local scheduler on each worker
         # start master's main loop
-        main_loop(
+        sched_loop(
             job_graph, worker_hosts, worker_port,
             config.get('master', 'master_scheduler_module'),
-            config.getint('master', 'reschedule_interval_sec'),
+            config.getint('master', 'master_reschedule_interval_sec'),
         )
     except KeyboardInterrupt as e:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
