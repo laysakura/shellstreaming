@@ -43,8 +43,8 @@ def update_instances(job_graph, registered_jobs, job_instances):  # [todo] - fin
                 assert(len(out_edges) >= 1 and len(in_edges) >= 1)
                 job_instance = job_class(
                     *job_args,
-                    input_queues=[ws.batch_queues[edge] for edge in in_edges],
-                    output_queues=[ws.batch_queues[edge] for edge in out_edges]
+                    input_queues={edge: ws.batch_queues[edge] for edge in in_edges},
+                    output_queues={edge: ws.batch_queues[edge] for edge in out_edges}
                 )
             # register launced job
             job_instances[job_id] = [job_instance]

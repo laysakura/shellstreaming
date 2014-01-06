@@ -100,5 +100,5 @@ class Selection(Base):
             assert(False)
 
     @staticmethod
-    def stream_names():
+    def out_stream_edge_id_suffixes():
         return ('filtered', )

@@ -41,5 +41,5 @@ class Sort(Base):
         return TimedBatch(batch.timespan, tuple(records))  # [todo] - is it OK to always use timestamp from inputstream?
 
     @staticmethod
-    def stream_names():
+    def out_stream_edge_id_suffixes():
         return ('sorted', )

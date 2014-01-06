@@ -5,34 +5,34 @@
 
     :synopsis: Provides abstract class for operators
 """
-from abc import ABCMeta, abstractmethod
+from shellstreaming.base_job import BaseJob
 from shellstreaming.util import abstractstatic
 
 
-class Base(object):
+class Base(BaseJob):
     """Base class for operators"""
-    __metaclass__ = ABCMeta
 
-    def __init__(self):
-        """Constructor"""
-        pass
+    def __init__(self, input_queues, output_queues):
+        """Constructor
 
-    @abstractmethod
-    def execute(self, batch):  # pragma: no cover
-        """Execute operator
-
-        :param batch: input
-        :returns:     output batch
+        :param input_queues:  queue to pop input batches
+        :param output_queues: queue to push output batches
+        :type input_queues: {<StreamEdge id>: <BatchQueue instance>, ...}
+        :type output_queues: same as :param:`input_queues`
         """
-        pass
+        BaseJob.__init__(self)
 
     @abstractstatic
-    def stream_names(*args):
-        """Return names of output streams
+    def out_stream_edge_id_suffixes(*args):
+        """Return suffixes of outcomming StreamEdge id
 
-        Each output stream must have different name.
+        Each element must be matched with StreamEdge id by using `str.endswith()`
+
+        .. code-block:: python
+            for suf in out_stream_edge_id_suffixes(...):
+                if StreamEdge.id.endswith(suf):
+                    ...
 
         :param *args: same as parameters of :func:`self.__init__()`
-        :returns: tuple of output stream names
         """
         pass
