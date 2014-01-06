@@ -13,7 +13,7 @@ from shellstreaming.operator.base import Base
 class Sort(Base):
     """Sort operator"""
 
-    def __init__(self, column_index, desc=False):
+    def __init__(self, column_index, desc=False, **kw):
         """Creates sort operators.
 
         Works like SQL's ``order by [desc] col_val``.
@@ -23,22 +23,35 @@ class Sort(Base):
         """
         self._col  = column_index
         self._desc = desc
-        Base.__init__(self)
 
-    def execute(self, batch):
+        in_qs, out_qs = (kw['input_queues'], kw['output_queues'])
+        # input queue
+        assert(len(in_qs) == 1)
+        self._in_q = in_qs.values()[0]
+        # output queues
+        assert(len(out_qs) == 1 and 'sorted' in out_qs)
+        self._out_q = out_qs['sorted']
+
+        Base.__init__(self, **kw)
+
+    def run(self):
         """Sort records
 
         :param batch: batch to sort
         :returns:     sorted batch
         """
-        records = []
-        for rec in batch:
-            records.append(rec)
-        records.sort(
-            cmp=lambda rec_x, rec_y: cmp(rec_x[self._col], rec_y[self._col]),
-            reverse=self._desc
-        )  # [todo] - faster algorithm. E.g. keep sorted order when inserting
-        return TimedBatch(batch.timespan, tuple(records))  # [todo] - is it OK to always use timestamp from inputstream?
+        while True:
+            batch = self._in_q.pop()
+            if batch is None:
+                self._out_q.push(None)
+                break
+
+            sorted_rec = sorted(
+                batch._records, reverse=self._desc,
+                cmp=lambda rec_x, rec_y: cmp(rec_x[self._col], rec_y[self._col]),
+            )
+            out_batch = TimedBatch(batch.timespan, tuple(sorted_rec))  # [todo] - is it OK to always use timestamp from inputstream?
+            self._out_q.push(out_batch)
 
     @staticmethod
     def out_stream_edge_id_suffixes():

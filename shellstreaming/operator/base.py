@@ -22,6 +22,12 @@ class Base(BaseJob):
         """
         BaseJob.__init__(self)
 
+    def interrupt(self):
+        """API to safely kill data-fetching thread.
+        """
+        self._batch_q.push(None)  # producer has end data-fetching
+        BaseJob.interrupt(self)
+
     @abstractstatic
     def out_stream_edge_id_suffixes(*args):
         """Return suffixes of outcomming StreamEdge id

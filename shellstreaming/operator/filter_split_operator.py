@@ -46,6 +46,7 @@ class FilterSplitOperator(Base):
         while True:
             batch = self._in_q.pop()
             if batch is None:
+                map(lambda q: q.push(None), self._out_qs)
                 break
 
             # filter records by conditions
