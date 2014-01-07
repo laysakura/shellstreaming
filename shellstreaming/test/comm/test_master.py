@@ -5,7 +5,7 @@
 from nose.tools import *
 import os
 from os.path import abspath, dirname, join
-from shellstreaming.comm.util import kill_worker_server
+from shellstreaming.util.comm import kill_worker_server
 from shellstreaming.comm.master import _launch_workers
 
 

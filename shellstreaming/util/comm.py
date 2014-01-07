@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.comm.util
+    shellstreaming.util.comm
     ~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides utility functions

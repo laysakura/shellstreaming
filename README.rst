@@ -25,14 +25,15 @@ Module structure
 
 - shellstreaming
   - master  # master server's entry point
-  - worker  # worker server's entry point
-  - config  # default configuration
+  - worker  # worker server's entry point & worker specific codes
   - operator
   - istream
   - ostream
+  - config  # default configuration
   - scheduler
   - core    # 'important' misc modules
   - util    # trivial misc modules
+  - autodeploy  # autodeploy scripts
 
 
 API reference

@@ -3,7 +3,7 @@ from nose.tools import *
 from rpyc.utils.server import ThreadedServer as Server
 from threading import Thread
 from shellstreaming.comm.worker_server_service import WorkerServerService
-from shellstreaming.comm.util import kill_worker_server, wait_worker_server
+from shellstreaming.util.comm import kill_worker_server, wait_worker_server
 
 
 @IOError

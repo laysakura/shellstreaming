@@ -9,21 +9,26 @@
         This script is supposed to be child process of `python worker.py`.
 
 """
+# standard module
 import argparse
 import time
 import sys
 from threading import Thread
-from rpyc.utils.server import ThreadedServer as Server
 import logging
-from shellstreaming.config import get_default_conf
+from ConfigParser import SafeConfigParser
+
+# 3rd party module
+from rpyc.utils.server import ThreadedServer as Server
+
+# my module
+from shellstreaming.config import DEFAULT_CONFIG
 from shellstreaming.logger import setup_FileLogger, setup_TerminalLogger
-import shellstreaming.worker.worker_struct as ws
 from shellstreaming.comm.worker_server_service import WorkerServerService
 
 
 def main(cnfpath):
     # setup config
-    config = get_default_conf()
+    config = SafeConfigParser(DEFAULT_CONFIG)
     config.read(cnfpath)
 
     # setup logger
@@ -34,7 +39,7 @@ def main(cnfpath):
     logging.getLogger('TerminalLogger').debug('Log is written in <%s> in `%s` level' % (logpath, loglevel))
 
     # start `WorkerServerService` thread
-    port = config.getint('worker', 'port')
+    port = config.getint('worker', 'worker_port')
     logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
     th_service = start_worker_server_thread(port, logger)
 

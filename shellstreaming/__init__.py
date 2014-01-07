@@ -22,7 +22,14 @@ install_requires = [
 ]
 packages = [
     'shellstreaming',
-    'shellstreaming.istream',
+    'shellstreaming.master',
+    'shellstreaming.worker',
     'shellstreaming.operator',
-    'shellstreaming.comm',
+    'shellstreaming.istream',
+    'shellstreaming.ostream',
+    'shellstreaming.config',
+    'shellstreaming.scheduler',
+    'shellstreaming.core',
+    'shellstreaming.util',
+    'shellstreaming.autodeploy',
 ]

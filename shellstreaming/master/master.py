@@ -8,10 +8,11 @@
 # standard module
 import argparse
 import os
-from os.path import abspath, dirname, join, expanduser
+from os.path import abspath, dirname, join
 import shlex
 import logging
 from subprocess import Popen
+from ConfigParser import SafeConfigParser
 
 # 3rd party
 import cPickle as pickle
@@ -19,19 +20,14 @@ import networkx as nx
 import rpyc
 
 # my module
-import shellstreaming
+from shellstreaming.config import DEFAULT_CONFIG, DEFAULT_CONFIG_LOCATION
 from shellstreaming.logger import setup_TerminalLogger
-from shellstreaming.config import get_default_conf
 from shellstreaming.util import import_from_file
 from shellstreaming.comm.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.master_main import sched_loop
-from shellstreaming.comm.util import wait_worker_server, kill_worker_server
+from shellstreaming.util.comm import wait_worker_server, kill_worker_server
 import shellstreaming.master.master_struct as ms
 from shellstreaming import api
-
-
-DEFAULT_CONFIGS = (expanduser(join('~', '.shellstreaming.cnf')), )
-"""Path from which default config file is searched (from left)"""
 
 
 def main():
@@ -43,7 +39,7 @@ def main():
     args = _parse_args()
 
     # setup config
-    cnfpath = args.config if args.config else _get_existing_cnf(DEFAULT_CONFIGS)
+    cnfpath = args.config if args.config else _get_existing_cnf(DEFAULT_CONFIG_LOCATION)
     config  = _setup_config(cnfpath)
 
     # setup logger
@@ -52,7 +48,7 @@ def main():
     logger.info('Used config file: %s' % (cnfpath))
 
     # launch worker servers
-    (worker_hosts, worker_port) = (config.get('worker', 'hosts').split(','), config.getint('worker', 'port'))
+    (worker_hosts, worker_port) = (config.get('worker', 'hosts').split(','), config.getint('worker', 'worker_port'))
     if config.getboolean('debug', 'single_process_debug'):
         # launch a worker server on localhost
         logger.debug('Entering single_process_debug mode')
@@ -114,7 +110,7 @@ def _parse_args():
         '--config', '-c',
         default=None,
         help='''Configuration file. If not specified, %(default_configs)s are searched (from left) and one found is used.''' % {
-            'default_configs': ', '.join(DEFAULT_CONFIGS),
+            'default_configs': ', '.join(DEFAULT_CONFIG_LOCATION),
         })
     parser.add_argument(
         'stream_py',
@@ -127,13 +123,13 @@ def _parse_args():
 
 def _setup_config(cnfpath):
     if cnfpath is None:
-        raise IOError('Config file not found: Specify via `--config` option or put one of %s.' % (DEFAULT_CONFIGS))
-    config = get_default_conf()
+        raise IOError('Config file not found: Specify via `--config` option or put one of %s.' % (DEFAULT_CONFIG_LOCATION))
+    config = SafeConfigParser(DEFAULT_CONFIG)
     config.read(cnfpath)
     return config
 
 
-def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIGS):
+def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIG_LOCATION):
     for cnfpath in cnf_candidates:
         if os.path.exists(cnfpath):
             return cnfpath
