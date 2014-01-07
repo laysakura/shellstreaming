@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.operator.filter_split_operator
+    shellstreaming.operator.filter_split
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides filtering operators with multiple outputs
@@ -10,7 +10,7 @@ from relshell.batch import Batch
 from shellstreaming.operator.base import Base
 
 
-class FilterSplitOperator(Base):
+class FilterSplit(Base):
     """"""
 
     def __init__(self, *conditions, **kw):
@@ -49,7 +49,7 @@ class FilterSplitOperator(Base):
 
             # make `eval`able conditions
             rdef = batch.record_def()
-            eval_conditions = [FilterSplitOperator._colnames_to_colrefs(cond, rdef, 'rec') for cond in self._conditions]
+            eval_conditions = [FilterSplit._colnames_to_colrefs(cond, rdef, 'rec') for cond in self._conditions]
             # record list to pack into Batch
             out_batch_recs = {cond: [] for cond in self._conditions}
 
@@ -75,9 +75,9 @@ class FilterSplitOperator(Base):
         """
 
         >>> rdef = RecordDef([{'name': 'col0'}, {'name': 'col1'}, {'name': 'col2'}])
-        >>> FilterSplitOperator._colnames_to_colrefs('col2', rdef, 'rec')
+        >>> FilterSplit._colnames_to_colrefs('col2', rdef, 'rec')
         'rec[2]'
-        >>> FilterSplitOperator._colnames_to_colrefs('col0 == 100 and col1!=col2', rdef, 'rec')
+        >>> FilterSplit._colnames_to_colrefs('col0 == 100 and col1!=col2', rdef, 'rec')
         'rec[0] == 100 and rec[1]!=rec[2]'
         """
         for i in xrange(len(rdef)):

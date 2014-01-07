@@ -21,3 +21,9 @@ class JobRegistrar(object):
         """Unregister :param:`job_id` from job list to execute"""
         assert(job_id in ws.REGISTERED_JOBS)
         del ws.REGISTERED_JOBS[job_id]
+
+    def exposed_finished_jobs(self):
+        """Return list of finished jobs"""
+        finished = ws.finished_jobs[:]
+        del ws.finished_jobs[:]
+        return finished

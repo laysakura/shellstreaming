@@ -23,7 +23,8 @@ def sched_loop(
     """
     sched_module = import_module(sched_module_name)
     while True:
-        sched_module.update_instances(job_graph, ws.REGISTERED_JOBS, ws.job_instances)
+        sched_module.update_instances(job_graph, ws.REGISTERED_JOBS,
+                                      ws.finished_jobs, ws.job_instances, ws.batch_queues)
         time.sleep(reschedule_interval_sec)
 
 

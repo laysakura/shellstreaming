@@ -5,11 +5,10 @@
 
     :synopsis: Provides worker process's server
 """
-from threading import Thread
 import cPickle as pickle
 import rpyc
 from shellstreaming.worker import worker_struct as ws
-from shellstreaming.scheduler.worker_main import sched_loop, start_sched_loop
+from shellstreaming.scheduler.worker_main import start_sched_loop
 from shellstreaming.worker.job_registrar import JobRegistrar
 
 

@@ -63,6 +63,7 @@ class Base(BaseJob):
             if self._next_batch:
                 _produce_next_batch()
             self._batch_q.push(None)  # tell downstreams no more batch will arrive
+            self.interrupt()
 
         def _produce_next_batch():
             batch = Batch(rdef, tuple(self._next_batch))

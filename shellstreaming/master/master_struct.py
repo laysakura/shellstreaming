@@ -12,9 +12,11 @@ jobs_placement = {}
 
 .. code-block:: python
     {
-        '<job id>': [<worker id>, <worker id>, ...],
+        '<job id>': [<worker id>, <worker id>, ...],  # running job
+        '<job id>': [],                               # finished job
         ...
     }
+    # <job id> not in jobs_placement => job not started yet
 """
 
 conn_pool = {}

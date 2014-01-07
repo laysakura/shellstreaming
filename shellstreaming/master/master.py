@@ -71,8 +71,6 @@ def main():
         if config.get('shellstreaming', 'job_graph_path') != '':
             _draw_job_graph(job_graph, config.get('shellstreaming', 'job_graph_path'))
         # initialize :module:`master_struct`
-        for job_id in job_graph.nodes_iter():
-            ms.jobs_placement[job_id] = []
         for host in worker_hosts:
             ms.conn_pool[host] = rpyc.connect(host, worker_port)
         # register job graph to each worker

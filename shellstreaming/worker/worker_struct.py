@@ -23,6 +23,12 @@ job_instances = {}
     }
 """
 
+finished_jobs = []
+"""Jobs which are assigned by master and finished.
+
+When master checks this structur for scheduling, this structur must be empty.
+"""
+
 batch_queues = {}
 """Queue to put output batches
 

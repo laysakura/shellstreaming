@@ -5,7 +5,4 @@
 
     :synopsis: Export pre-defined Operators
 """
-from shellstreaming.operator import filter_split_operator
-
-
-FilterSplitOperator = filter_split_operator.FilterSplitOperator
+from shellstreaming.operator.filter_split import FilterSplit
