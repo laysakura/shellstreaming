@@ -13,8 +13,8 @@ from shellstreaming.ostream.localfile import LocalFile
 TEST_FILE = join(gettempdir(), 'shellstreaming_test_localfile.txt')
 
 
-# def teardown():
-#     os.remove(TEST_FILE)
+def teardown():
+    os.remove(TEST_FILE)
 
 
 def test_localfile_usage():
