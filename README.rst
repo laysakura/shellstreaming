@@ -20,6 +20,21 @@ Installation
 For developers
 --------------
 
+Module structure
+################
+
+- shellstreaming
+  - master  # master server's entry point
+  - worker  # worker server's entry point
+  - config  # default configuration
+  - operator
+  - istream
+  - ostream
+  - scheduler
+  - core    # 'important' misc modules
+  - util    # trivial misc modules
+
+
 API reference
 #############
 
