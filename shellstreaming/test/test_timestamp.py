@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
 import datetime
-from shellstreaming.error import UnsupportedTypeError
 from shellstreaming.timespan import Timespan
 from shellstreaming.timestamp import Timestamp
 
