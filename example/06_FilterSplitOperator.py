@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from shellstreaming import api
-from shellstreaming.inputstream import RandIntIStream
+from shellstreaming.istream import RandIntIStream
 from shellstreaming.operator import FilterSplitOperator
-from shellstreaming.outputstream import LocalFileOStream
+from shellstreaming.ostream import LocalFileOStream
 
 
 def main():

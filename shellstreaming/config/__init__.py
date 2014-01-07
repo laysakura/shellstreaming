@@ -5,25 +5,28 @@
 
     :synopsis: Provides default configs
 """
-from os.path import join
+from os.path import join, expanduser
 from tempfile import gettempdir
-from ConfigParser import SafeConfigParser
 
 
-def get_default_conf():
-    """Return :class:`SafeConfigParser` object with default values
-    """
-    return SafeConfigParser({
-        'parallel_deploy'            : 'False',
-        'ssh_private_key'            : 'None',
-        'send_latest_codes_on_start' : 'True',
-        'job_graph_path'             : '',
-        'single_process_debug'       : 'False',
+DEFAULT_CONFIG_LOCATION = (expanduser(join('~', '.shellstreaming.cnf')), )
+"""Path from which default config file is searched (from left)"""
 
-        'master_scheduler_module'        : 'shellstreaming.scheduler.master_sched_localhost',
-        'master_reschedule_interval_sec' : '10',
+DEFAULT_CONFIG = {
+    'parallel_deploy'            : 'False',
+    'ssh_private_key'            : 'None',
+    'send_latest_codes_on_start' : 'True',
 
-        'log_path'                       : join(gettempdir(), 'shellstreaming-worker.log'),
-        'worker_scheduler_module'        : 'shellstreaming.scheduler.worker_sched_single_thread',
-        'worker_reschedule_interval_sec' : '1',
-    })
+    'worker_port'                : '18871',
+
+    'job_graph_path'             : '',
+    'single_process_debug'       : 'False',
+
+    'master_scheduler_module'        : 'shellstreaming.scheduler.master_sched_localhost',
+    'master_reschedule_interval_sec' : '10',
+
+    'log_path'                       : join(gettempdir(), 'shellstreaming-worker.log'),
+    'worker_scheduler_module'        : 'shellstreaming.scheduler.worker_sched_single_thread',
+    'worker_reschedule_interval_sec' : '1',
+}
+"""Default config values"""

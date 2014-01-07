@@ -25,14 +25,16 @@ Module structure
 
 - shellstreaming
   - master  # master server's entry point
-  - worker  # worker server's entry point
-  - config  # default configuration
+  - worker  # worker server's entry point & worker specific codes
   - operator
   - istream
   - ostream
+  - jobgraph
   - scheduler
+  - config  # default configuration
   - core    # 'important' misc modules
   - util    # trivial misc modules
+  - autodeploy  # autodeploy scripts
 
 
 API reference
@@ -88,7 +90,7 @@ TODO
 
 - --dry-run オプション; Jobグラフだけ描画したり
 
-- "How to define custom inputstream/outputstream" 的なドキュメントとその方法
+- "How to define custom istream/ostream" 的なドキュメントとその方法
 
 - マスタワーカ間の通信はrpycで、ワーカ同士の通信はバッチの受け渡しがあるので生ソケットで
 

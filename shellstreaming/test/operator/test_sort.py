@@ -3,7 +3,7 @@ import nose.tools as ns
 from relshell.batch import Batch
 from relshell.recorddef import RecordDef
 from relshell.record import Record
-from shellstreaming.batch_queue import BatchQueue
+from shellstreaming.core.batch_queue import BatchQueue
 from shellstreaming.operator.sort import Sort
 
 
