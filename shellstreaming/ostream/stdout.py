@@ -5,17 +5,16 @@
 
     :synopsis: Output records to stdout
 """
-from shellstreaming.ostream.base import Base
+# standard module
+import sys
+
+# my module
+from shellstreaming.ostream.io_stream import IoStream
 
 
-class Stdout(Base):
+class Stdout(IoStream):
     """Output records to stdout"""
 
-    def run(self):
-        """Output batch to stdout"""
-        while True:
-            batch = self._batch_q.pop()
-            if batch is None:
-                break
-            # [fix] - how about output format?????
-            print(str(batch))
+    def __init__(self, **kw):
+        """"""
+        IoStream.__init__(self, sys.stdout, **kw)
