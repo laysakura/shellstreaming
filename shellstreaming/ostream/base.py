@@ -5,7 +5,7 @@
 
     :synopsis: Provides abstract ostream
 """
-from shellstreaming.base_job import BaseJob
+from shellstreaming.core.base_job import BaseJob
 
 
 class Base(BaseJob):

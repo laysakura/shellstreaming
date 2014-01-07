@@ -28,4 +28,4 @@ doc/coverage/
 
 htmlcov/
 
-shellstreaming/test/data/shellstreaming_test_tweet.cnf
+!core/

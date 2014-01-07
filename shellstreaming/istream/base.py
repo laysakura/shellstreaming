@@ -12,7 +12,7 @@ from datetime import datetime
 from relshell.batch import Batch
 from shellstreaming.timestamp import Timestamp
 from shellstreaming.timespan import Timespan
-from shellstreaming.base_job import BaseJob
+from shellstreaming.core.base_job import BaseJob
 
 
 class Base(BaseJob):
