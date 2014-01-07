@@ -16,8 +16,8 @@ def main():
         FilterSplit,
         'num < 50', 'num >= 50',
     )
-    api.OStream('localhost', lo_stream, LocalFile, LOW_OUTPUT_FILE)
-    api.OStream('localhost', hi_stream, LocalFile, HIGH_OUTPUT_FILE)
+    api.OStream('localhost', lo_stream, LocalFile, LOW_OUTPUT_FILE,  output_format='json')
+    api.OStream('localhost', hi_stream, LocalFile, HIGH_OUTPUT_FILE, output_format='json')
 
 
 def test():
