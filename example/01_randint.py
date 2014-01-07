@@ -5,5 +5,5 @@ from shellstreaming.ostream import Stdout
 
 
 def main():
-    randint_stream = api.IStream(RandInt, (0, 100))
-    api.OStream(Stdout, (), randint_stream, 'localhost')  # => output is written to stdout by localhost's worker server
+    randint_stream = api.IStream(RandInt, 0, 100)
+    api.OStream('localhost', randint_stream, Stdout)  # => output is written to stdout by localhost's worker server
