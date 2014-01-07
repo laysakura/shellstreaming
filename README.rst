@@ -29,8 +29,9 @@ Module structure
   - operator
   - istream
   - ostream
-  - config  # default configuration
+  - jobgraph
   - scheduler
+  - config  # default configuration
   - core    # 'important' misc modules
   - util    # trivial misc modules
   - autodeploy  # autodeploy scripts
