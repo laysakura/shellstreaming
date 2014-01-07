@@ -23,6 +23,8 @@ cnfpath      = None
 def setup():
     global cnfpath
     (fd, cnfpath) = tempfile.mkstemp(prefix='shellstreaming-', suffix='.cnf')
+    with os.fdopen(fd, 'w') as f:
+        f.writelines('[shellstreaming]')
 
 
 def teardown():

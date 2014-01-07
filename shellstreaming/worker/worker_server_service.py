@@ -9,7 +9,7 @@ from threading import Thread
 import cPickle as pickle
 import rpyc
 from shellstreaming.worker import worker_struct as ws
-from shellstreaming.scheduler.worker_main import sched_loop
+from shellstreaming.scheduler.worker_main import sched_loop, start_sched_loop
 from shellstreaming.worker.job_registrar import JobRegistrar
 
 
@@ -31,12 +31,8 @@ class WorkerServerService(rpyc.Service):
             self,
             sched_module_name, reschedule_interval_sec
     ):
-        t = Thread(target=sched_loop, args=(
-            ws.JOB_GRAPH, sched_module_name, reschedule_interval_sec
-        ))
-        t.daemon = True
-        t.start()
-        return t
+        """Start worker local scheduler"""
+        return start_sched_loop(sched_module_name, reschedule_interval_sec)
 
     def exposed_reg_job_graph(self, pickled_job_graph):
         """Register job graph"""

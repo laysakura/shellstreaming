@@ -23,6 +23,7 @@ from rpyc.utils.server import ThreadedServer as Server
 # my module
 from shellstreaming.config import DEFAULT_CONFIG
 from shellstreaming.util.logger import setup_FileLogger, setup_TerminalLogger
+from shellstreaming.scheduler.worker_main import start_sched_loop
 from shellstreaming.worker.worker_server_service import WorkerServerService
 
 
@@ -32,20 +33,22 @@ def main(cnfpath):
     config.read(cnfpath)
 
     # setup logger
-    (loglevel, logpath) = (eval('logging.' + config.get('worker', 'log_level')), config.get('worker', 'log_path'))
+    loglevel = eval('logging.' + config.get('shellstreaming', 'log_level'))
+    logpath  = config.get('shellstreaming', 'worker_log_path')
     setup_FileLogger(loglevel, logpath)
     logger = logging.getLogger('FileLogger')
     setup_TerminalLogger(loglevel)
     logging.getLogger('TerminalLogger').debug('Log is written in <%s> in `%s` level' % (logpath, loglevel))
 
     # start `WorkerServerService` thread
-    port = config.getint('worker', 'worker_port')
+    port = config.getint('shellstreaming', 'worker_port')
     logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
     th_service = start_worker_server_thread(port, logger)
 
     # start worker-local scheduling thread
     logger.debug('Starting worker-local scheduler')
-    th_sched = start_worker_local_scheduler(config.get('worker', 'worker_scheduler_module'))
+    th_sched = start_sched_loop(config.get('shellstreaming', 'worker_scheduler_module'),
+                                config.get('shellstreaming', 'worker_reschedule_interval_sec'))
 
     while WorkerServerService.server:    # wait for `server` to be `close()`ed by master client.
         time.sleep(1.0)
