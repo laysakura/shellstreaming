@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from nose.tools import *
+import nose.tools as ns
 from shellstreaming.core.batch_queue import BatchQueue
 from shellstreaming.istream.base import Base
 

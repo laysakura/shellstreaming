@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from nose.tools import *
+import nose.tools as ns
 import time
 from os.path import abspath, dirname, join
 from shellstreaming.core.batch_queue import BatchQueue
@@ -23,12 +23,12 @@ def test_textfile_usage():
 
         n_batches += 1
         for record in batch:
-            eq_(len(record), 1)
+            ns.eq_(len(record), 1)
             line = record[0]
-            eq_('line ', line[0:5])
-            ok_(0 <= int(line[5:]) < 100)  # record order in a batch is not always 'oldest-first'
+            ns.eq_('line ', line[0:5])
+            ns.ok_(0 <= int(line[5:]) < 100)  # record order in a batch is not always 'oldest-first'
             n_records += 1
 
     print('number of batches (%d) >= 1 ?' % (n_batches))
-    ok_(n_batches >= 1)
-    eq_(n_records, 100)
+    ns.ok_(n_batches >= 1)
+    ns.eq_(n_records, 100)
