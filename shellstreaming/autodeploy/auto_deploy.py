@@ -8,7 +8,7 @@
     Call this script from `fabric`.
     Refer to `test_auto_deploy.py` to see how to call this.
 """
-from fabric.api import *
+import fabric.api as fab
 from fabric.decorators import serial
 from os.path import abspath, dirname, join, basename
 import logging
@@ -16,7 +16,7 @@ import tempfile
 import sys
 
 # use `../../shellstreaming` as package if it exists
-# (to reflect changes on `../../shellstreaming/**.py` quickly if using `<github-repo>/shellstreaming.autodeploy.auto_deploy.py`)
+# (to reflect changes on `../../shellstreaming/**.py` quickly if using `<github-repo>/shellstreaming/autodeploy/auto_deploy.py`)
 basedir = join(abspath(dirname(__file__)), '..', '..')
 sys.path = [basedir] + sys.path
 from shellstreaming.util.logger import setup_TerminalLogger
@@ -32,7 +32,7 @@ LOCAL_LATEST_PKG   = join(tempfile.gettempdir(), 'shellstreaming-latest-pkg')
 LOCAL_MIN_SETUP_PY = join(LOCAL_LATEST_PKG, 'setup.py')
 REMOTE_DEPLOY      = join(tempfile.gettempdir(), 'shellstreaming-deploy')
 REMOTE_PKG_ROOT    = join(REMOTE_DEPLOY, 'shellstreaming-root')
-REMOTE_WORKER_PY   = join(REMOTE_PKG_ROOT, 'shellstreaming', 'comm', 'worker.py')
+REMOTE_WORKER_PY   = join(REMOTE_PKG_ROOT, 'shellstreaming', 'worker', 'worker.py')
 REMOTE_VIRTUALENV_ACTIVATE = join(REMOTE_DEPLOY, 'bin', 'activate')
 
 
@@ -66,25 +66,25 @@ def deploy(cnfpath=''):
     assert(already_packed)
 
     # create deploy directory on remote host
-    run('rm -rf %s' % (REMOTE_DEPLOY))
-    run('mkdir %s'  % (REMOTE_DEPLOY))
+    fab.run('rm -rf %s' % (REMOTE_DEPLOY))
+    fab.run('mkdir %s'  % (REMOTE_DEPLOY))
 
     # upload the config file
     if cnfpath != '':
-        put(cnfpath, REMOTE_DEPLOY)
+        fab.put(cnfpath, REMOTE_DEPLOY)
 
     # upload the source tarball to deploy directory on remote host
-    put(_get_pkg_targz(), REMOTE_DEPLOY)
+    fab.put(_get_pkg_targz(), REMOTE_DEPLOY)
 
-    with cd(REMOTE_DEPLOY):
+    with fab.cd(REMOTE_DEPLOY):
         remote_pkg_targz = basename(_get_pkg_targz())
-        run('tar xzf %s' % (remote_pkg_targz))
-        run('mv %s %s'   % (_get_pkg_name(), REMOTE_PKG_ROOT))
-        run('rm -f %s'   % (remote_pkg_targz))
-        run('virtualenv .')
-    with cd(REMOTE_PKG_ROOT):
-        with prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE):
-            run('python setup.py install')  # installing into virtualenv's environment
+        fab.run('tar xzf %s' % (remote_pkg_targz))
+        fab.run('mv %s %s'   % (_get_pkg_name(), REMOTE_PKG_ROOT))
+        fab.run('rm -f %s'   % (remote_pkg_targz))
+        fab.run('virtualenv .')
+    with fab.cd(REMOTE_PKG_ROOT):
+        with fab.prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE):
+            fab.run('python setup.py install')  # installing into virtualenv's environment
 
 
 def start_worker(cnfpath):
@@ -95,9 +95,9 @@ def start_worker(cnfpath):
     :param worker_server_port: TCP port number to launch rpyc server on worker
     :param cnfpath: path to config file
     """
-    with cd(REMOTE_PKG_ROOT):
-        with prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE):
-            run('python %(remote_worker_py)s --config=%(cnfpath)s' % {
+    with fab.cd(REMOTE_PKG_ROOT):
+        with fab.prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE):
+            fab.run('python %(remote_worker_py)s --config=%(cnfpath)s' % {
                 'remote_worker_py' : REMOTE_WORKER_PY,
                 'cnfpath'          : cnfpath,
             })
@@ -107,9 +107,9 @@ def _mk_latest_pkg():
     logger = logging.getLogger('TerminalLogger')
     logger.info('Current package is <%s>. This is being deployed to worker nodes.' % (LOCAL_SRC_PKG))
 
-    local('rm -rf %s'   % (LOCAL_LATEST_PKG))
-    local('mkdir -p %s' % (LOCAL_LATEST_PKG))
-    local('cp -rf %s %s' % (LOCAL_SRC_PKG, LOCAL_LATEST_PKG))
+    fab.local('rm -rf %s'   % (LOCAL_LATEST_PKG))
+    fab.local('mkdir -p %s' % (LOCAL_LATEST_PKG))
+    fab.local('cp -rf %s %s' % (LOCAL_SRC_PKG, LOCAL_LATEST_PKG))
 
     with open(LOCAL_MIN_SETUP_PY, 'w') as f_setup_py:
         f_setup_py.write(
@@ -130,14 +130,14 @@ setup(
 
 
 def _mk_targz():
-    with lcd(LOCAL_LATEST_PKG):
-        local('rm -rf %s %s' % (_get_pkg_name(), _get_pkg_targz()))
-        local('python setup.py sdist --formats=gztar', capture=False)
+    with fab.lcd(LOCAL_LATEST_PKG):
+        fab.local('rm -rf %s %s' % (_get_pkg_name(), _get_pkg_targz()))
+        fab.local('python setup.py sdist --formats=gztar', capture=False)
 
 
 def _get_pkg_name():
-    with lcd(LOCAL_LATEST_PKG):
-        return local('python setup.py --fullname', capture=True).strip()
+    with fab.lcd(LOCAL_LATEST_PKG):
+        return fab.local('python setup.py --fullname', capture=True).strip()
 
 
 def _get_pkg_targz():
