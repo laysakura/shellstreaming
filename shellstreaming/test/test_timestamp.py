@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
 import datetime
-from shellstreaming.timespan import Timespan
+from shellstreaming.core.timespan import Timespan
 from shellstreaming.timestamp import Timestamp
 
 

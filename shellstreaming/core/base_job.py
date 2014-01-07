@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.base_job
+    shellstreaming.core.base_job
     ~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides abstract base of job instances (istream, ostream, operator)
