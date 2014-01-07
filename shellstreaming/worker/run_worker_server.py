@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.comm.run_worker_server
+    shellstreaming.worker.run_worker_server
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: When called from shell, starts :class:`WorkerServerService`.
@@ -23,7 +23,7 @@ from rpyc.utils.server import ThreadedServer as Server
 # my module
 from shellstreaming.config import DEFAULT_CONFIG
 from shellstreaming.logger import setup_FileLogger, setup_TerminalLogger
-from shellstreaming.comm.worker_server_service import WorkerServerService
+from shellstreaming.worker.worker_server_service import WorkerServerService
 
 
 def main(cnfpath):

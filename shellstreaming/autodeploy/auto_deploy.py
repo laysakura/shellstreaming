@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.comm.auto_deploy
+    shellstreaming.autodeploy.auto_deploy
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides `auto-deploy` feature.
@@ -16,7 +16,7 @@ import tempfile
 import sys
 
 # use `../../shellstreaming` as package if it exists
-# (to reflect changes on `../../shellstreaming/**.py` quickly if using `<github-repo>/shellstreaming/comm/auto_deploy.py`)
+# (to reflect changes on `../../shellstreaming/**.py` quickly if using `<github-repo>/shellstreaming.autodeploy.auto_deploy.py`)
 basedir = join(abspath(dirname(__file__)), '..', '..')
 sys.path = [basedir] + sys.path
 from shellstreaming.logger import setup_TerminalLogger

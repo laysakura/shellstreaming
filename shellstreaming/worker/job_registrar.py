@@ -5,7 +5,7 @@
 
     :synopsis: Registrar of jobs
 """
-# from shellstreaming.comm.worker_server_service import WorkerServerService
+# from shellstreaming.worker.worker_server_service import WorkerServerService
 from shellstreaming.worker import worker_struct as ws
 
 

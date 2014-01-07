@@ -6,7 +6,7 @@
     :synopsis: Provides abstract class for operators
 """
 from shellstreaming.base_job import BaseJob
-from shellstreaming.util import abstractstatic
+from shellstreaming.util.decorator import abstractstatic
 
 
 class Base(BaseJob):

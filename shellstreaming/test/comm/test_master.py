@@ -6,7 +6,7 @@ from nose.tools import *
 import os
 from os.path import abspath, dirname, join
 from shellstreaming.util.comm import kill_worker_server
-from shellstreaming.comm.master import _launch_workers
+from shellstreaming.master.master import _launch_workers
 
 
 basedir        = join(abspath(dirname(__file__)), '..', '..')

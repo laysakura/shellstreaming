@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.comm.master
+    shellstreaming.master.master
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides master process's entry point
@@ -22,8 +22,8 @@ import rpyc
 # my module
 from shellstreaming.config import DEFAULT_CONFIG, DEFAULT_CONFIG_LOCATION
 from shellstreaming.logger import setup_TerminalLogger
-from shellstreaming.util import import_from_file
-from shellstreaming.comm.run_worker_server import start_worker_server_thread
+from shellstreaming.util.importer import import_from_file
+from shellstreaming.worker.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.master_main import sched_loop
 from shellstreaming.util.comm import wait_worker_server, kill_worker_server
 import shellstreaming.master.master_struct as ms

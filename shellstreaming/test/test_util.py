@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
 from os.path import join, dirname, abspath
-from shellstreaming.util import import_from_file
+from shellstreaming.util.importer import import_from_file
 
 
 def f():

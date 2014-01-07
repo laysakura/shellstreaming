@@ -1,23 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.util
-    ~~~~~~~~~~~~~~~~~~~
+    shellstreaming.util.importer
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :synopsis: Provides utility
+    :synopsis: Provides import methods
 """
 from os.path import abspath, dirname, basename
 import sys
 from importlib import import_module
-
-
-class abstractstatic(staticmethod):
-    """provides @abstractstatic decorator"""
-    __slots__ = ()
-
-    def __init__(self, function):
-        super(abstractstatic, self).__init__(function)
-        function.__isabstractmethod__ = True
-    __isabstractmethod__ = True
 
 
 def import_from_file(path):

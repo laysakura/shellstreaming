@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.comm.worker
+    shellstreaming.worker.worker
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides worker process's entry point.

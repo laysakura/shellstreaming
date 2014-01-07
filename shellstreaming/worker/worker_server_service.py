@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.comm.worker_server
+    shellstreaming.worker.worker_server
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides worker process's server
