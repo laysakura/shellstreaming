@@ -13,8 +13,8 @@ from shellstreaming.ostream.localfile import LocalFile
 TEST_FILE = join(gettempdir(), 'shellstreaming_test_localfile.txt')
 
 
-def teardown():
-    os.remove(TEST_FILE)
+# def teardown():
+#     os.remove(TEST_FILE)
 
 
 def test_localfile_usage():
@@ -25,19 +25,15 @@ def test_localfile_usage():
     q.push(None)
 
     # run ostream
-    ostream = LocalFile(TEST_FILE, input_queue=q)
+    ostream = LocalFile(TEST_FILE, output_format='csv', input_queue=q)
     ostream.join()
 
     # check contents
     with open(TEST_FILE) as f:
         ns.eq_(f.read(),
-'''(
-    ("111", )
-    ("222", )
-)
-(
-    ("333", )
-)
+'''"111"
+"222"
+"333"
 '''
         )
 
