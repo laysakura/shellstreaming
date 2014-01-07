@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.inputstream.tweet
+    shellstreaming.istream.tweet
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Generates public tweets sequence.
@@ -10,7 +10,7 @@ import requests
 from requests_oauthlib import OAuth1
 from relshell.recorddef import RecordDef
 from relshell.record import Record
-from shellstreaming.inputstream.base import Base
+from shellstreaming.istream.base import Base
 
 
 class Tweet(Base):
@@ -18,7 +18,7 @@ class Tweet(Base):
 
     .. note::
         Not every attribute is fetched from API.
-        You need to fix :class:`Tweet` to add other attributes, or develop another `inputstream`.
+        You need to fix :class:`Tweet` to add other attributes, or develop another `istream`.
         See `Tweets <https://dev.twitter.com/docs/platform-objects/tweets>`_ for further attributes.
     """
     def __init__(

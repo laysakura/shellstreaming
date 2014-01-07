@@ -2,7 +2,7 @@
 from nose.tools import *
 import time
 from shellstreaming.batch_queue import BatchQueue
-from shellstreaming.inputstream.randint import RandInt
+from shellstreaming.istream.randint import RandInt
 
 
 def test_randint_usage():

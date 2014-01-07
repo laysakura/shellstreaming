@@ -88,7 +88,7 @@ TODO
 
 - --dry-run オプション; Jobグラフだけ描画したり
 
-- "How to define custom inputstream/outputstream" 的なドキュメントとその方法
+- "How to define custom istream/ostream" 的なドキュメントとその方法
 
 - マスタワーカ間の通信はrpycで、ワーカ同士の通信はバッチの受け渡しがあるので生ソケットで
 

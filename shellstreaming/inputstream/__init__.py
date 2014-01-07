@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.inputstream
+    shellstreaming.istream
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Export pre-defined IStreams
 """
-from shellstreaming.inputstream import randint
+from shellstreaming.istream import randint
 
 
 RandIntIStream = randint.RandInt

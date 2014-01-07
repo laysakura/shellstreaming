@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.inputstream.base
+    shellstreaming.istream.base
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides abstract istream
@@ -41,7 +41,7 @@ class Base(BaseJob):
         BaseJob.interrupt(self)
 
     def add(self, rdef, record):
-        """Function for inputstream subclasses to add records fetched.
+        """Function for istream subclasses to add records fetched.
 
         .. warning::
             Current constraint: `record.timestamp` of formmer must be not greater than that of later one.

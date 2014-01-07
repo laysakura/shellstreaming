@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from shellstreaming import api
-from shellstreaming.inputstream import RandIntIStream
-from shellstreaming.outputstream import StdoutOStream
+from shellstreaming.istream import RandIntIStream
+from shellstreaming.ostream import StdoutOStream
 
 
 def main():

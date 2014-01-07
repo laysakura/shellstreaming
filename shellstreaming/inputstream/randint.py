@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.inputstream.randint
+    shellstreaming.istream.randint
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Generates random integer sequence.
@@ -11,7 +11,7 @@ import random
 import time
 from relshell.record import Record
 from relshell.recorddef import RecordDef
-from shellstreaming.inputstream.base import Base
+from shellstreaming.istream.base import Base
 
 
 class RandInt(Base):

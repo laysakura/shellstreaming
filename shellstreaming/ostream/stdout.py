@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.outputstream.stdout
+    shellstreaming.ostream.stdout
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Output records to stdout
 """
-from shellstreaming.outputstream.base import Base
+from shellstreaming.ostream.base import Base
 
 
 class Stdout(Base):

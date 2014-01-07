@@ -6,13 +6,13 @@ from nose.tools import *
 from os.path import abspath, dirname, join, exists
 from ConfigParser import SafeConfigParser
 from shellstreaming.batch_queue import BatchQueue
-from shellstreaming.inputstream.tweet import Tweet
+from shellstreaming.istream.tweet import Tweet
 
 
 def test_tweet_usage():
     # To fully pass this test, create 'shellstreaming/test/data/shellstreaming_test_tweet.cnf' whose contents are:
     #
-    # [inputstream.tweet]
+    # [istream.tweet]
     # consumer_key = <your consumer key>
     # consumer_secret = <your consumer secret>
     # access_token = <your access token>
@@ -26,10 +26,10 @@ def test_tweet_usage():
     q         = BatchQueue()
     stream = Tweet(
         public_tweets_url='https://stream.twitter.com/1.1/statuses/sample.json',
-        consumer_key=config.get('inputstream.tweet', 'consumer_key'),
-        consumer_secret=config.get('inputstream.tweet', 'consumer_secret'),
-        access_token=config.get('inputstream.tweet', 'access_token'),
-        access_token_secret=config.get('inputstream.tweet', 'access_token_secret'),
+        consumer_key=config.get('istream.tweet', 'consumer_key'),
+        consumer_secret=config.get('istream.tweet', 'consumer_secret'),
+        access_token=config.get('istream.tweet', 'access_token'),
+        access_token_secret=config.get('istream.tweet', 'access_token_secret'),
 
         output_queue=q,
         batch_span_ms=1000,

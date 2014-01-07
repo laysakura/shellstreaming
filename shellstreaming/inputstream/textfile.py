@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.inputstream.textfile
+    shellstreaming.istream.textfile
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: FiniteStream for text files.
@@ -9,7 +9,7 @@
 """
 from relshell.record import Record
 from relshell.recorddef import RecordDef
-from shellstreaming.inputstream.base import Base
+from shellstreaming.istream.base import Base
 
 
 class TextFile(Base):

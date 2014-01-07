@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.inputstream.stdin
+    shellstreaming.istream.stdin
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Infinite input stream from stdin
 """
 from relshell.record import Record
 from relshell.recorddef import RecordDef
-from shellstreaming.inputstream.base import Base
+from shellstreaming.istream.base import Base
 
 
 class Stdin(Base):

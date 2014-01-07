@@ -22,7 +22,7 @@ install_requires = [
 ]
 packages = [
     'shellstreaming',
-    'shellstreaming.inputstream',
+    'shellstreaming.istream',
     'shellstreaming.operator',
     'shellstreaming.comm',
 ]

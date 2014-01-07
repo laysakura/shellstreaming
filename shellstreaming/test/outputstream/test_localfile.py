@@ -7,7 +7,7 @@ from relshell.record import Record
 from relshell.recorddef import RecordDef
 from relshell.batch import Batch
 from shellstreaming.batch_queue import BatchQueue
-from shellstreaming.outputstream.localfile import LocalFile
+from shellstreaming.ostream.localfile import LocalFile
 
 
 TEST_FILE = join(gettempdir(), 'shellstreaming_test_localfile.txt')

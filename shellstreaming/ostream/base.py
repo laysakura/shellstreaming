@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.outputstream.base
+    shellstreaming.ostream.base
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides abstract ostream

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
 from shellstreaming.batch_queue import BatchQueue
-from shellstreaming.inputstream.base import Base
+from shellstreaming.istream.base import Base
 
 
 def test_Base_add_no_record():

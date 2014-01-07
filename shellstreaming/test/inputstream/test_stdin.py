@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
 import time
-from shellstreaming.inputstream.stdin import Stdin
+from shellstreaming.istream.stdin import Stdin
 
 
 def test_stdin_usage():

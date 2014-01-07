@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.outputstream.localfile
+    shellstreaming.ostream.localfile
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Output records into local file
 """
-from shellstreaming.outputstream.base import Base
+from shellstreaming.ostream.base import Base
 
 
 class LocalFile(Base):
     """Output records into local file"""
 
     def __init__(self, path, **kw):
-        """Setup outputstream
+        """Setup ostream
 
         :param path: path to output file (overwritten)
         :param **kw: passed to :func:`Base.__init__()`
