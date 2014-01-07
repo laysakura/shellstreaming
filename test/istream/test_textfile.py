@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import nose.tools as ns
-import time
 from os.path import abspath, dirname, join
 from shellstreaming.core.batch_queue import BatchQueue
 from shellstreaming.istream.textfile import TextFile
@@ -11,9 +10,8 @@ TEST_FILE = join(abspath(dirname(__file__)), '..', 'data', 'istream_textfile_inp
 
 def test_textfile_usage():
     n_batches = n_records = 0
-
     q       = BatchQueue()
-    istream = TextFile(TEST_FILE, q, batch_span_ms=20)
+    istream = TextFile(TEST_FILE, output_queue=q, batch_span_ms=20)
 
     # consume batches
     while True:

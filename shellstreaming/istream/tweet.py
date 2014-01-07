@@ -26,9 +26,7 @@ class Tweet(Base):
         public_tweets_url,
         consumer_key, consumer_secret,
         access_token, access_token_secret,
-
-        output_queue,
-        batch_span_ms=1000,
+        **kw
     ):
         """Constructor
 
@@ -42,7 +40,7 @@ class Tweet(Base):
         self._twitter_response = Tweet._get_twitter_streaming_response(
             public_tweets_url,
             consumer_key, consumer_secret, access_token, access_token_secret)
-        Base.__init__(self, output_queue, batch_span_ms)
+        Base.__init__(self, **kw)
 
     def run(self):
         """Fetches tweets from Twitter public stream"""

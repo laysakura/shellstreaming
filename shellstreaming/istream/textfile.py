@@ -14,14 +14,13 @@ from shellstreaming.istream.base import Base
 
 class TextFile(Base):
     """FiniteStream for text files"""
-    def __init__(self, path, output_queue, batch_span_ms=1000):
+    def __init__(self, path, **kw):
         """Constructor
 
         :param path:          path to text file
-        :param batch_span_ms: time span to assemble records as batch
         """
         self._path = path
-        Base.__init__(self, output_queue, batch_span_ms)
+        Base.__init__(self, **kw)
 
     def run(self):
         """Reads a text file line-by-line until EOF"""

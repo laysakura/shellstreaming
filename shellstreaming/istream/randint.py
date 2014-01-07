@@ -16,16 +16,15 @@ from shellstreaming.istream.base import Base
 
 class RandInt(Base):
     """Infinite input stream which generates random integer sequence"""
-    def __init__(self, min_int, max_int, output_queue, batch_span_ms=1000):
+    def __init__(self, min_int, max_int, **kw):
         """Constructor
 
         :param min_int:       minimum integer to generate
         :param max_int:       maximum integer to generate
-        :param batch_span_ms: time span to assemble records as batch
         """
         self._min = min_int
         self._max = max_int
-        Base.__init__(self, output_queue, batch_span_ms)
+        Base.__init__(self, **kw)
 
     def run(self):
         rdef = RecordDef([{'name': 'num', 'type': 'INT'}])

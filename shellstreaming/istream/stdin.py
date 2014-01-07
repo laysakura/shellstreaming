@@ -12,12 +12,10 @@ from shellstreaming.istream.base import Base
 
 class Stdin(Base):
     """Infinite input stream from stdin"""
-    def __init__(self, batch_span_ms=1000):
+    def __init__(self, **kw):
         """Constructor
-
-        :param batch_span_ms: time span to assemble records as batch
         """
-        Base.__init__(self, batch_span_ms)
+        Base.__init__(self, **kw)
 
     def run(self):
         rdef = RecordDef([{'name': 'line', 'type': 'STRING'}])
