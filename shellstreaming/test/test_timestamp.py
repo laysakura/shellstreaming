@@ -2,7 +2,7 @@
 from nose.tools import *
 import datetime
 from shellstreaming.core.timespan import Timespan
-from shellstreaming.timestamp import Timestamp
+from shellstreaming.core.timestamp import Timestamp
 
 
 def test_timestamp_ops():

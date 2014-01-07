@@ -2,7 +2,7 @@
 from nose.tools import *
 import time
 from os.path import abspath, dirname, join
-from shellstreaming.batch_queue import BatchQueue
+from shellstreaming.core.batch_queue import BatchQueue
 from shellstreaming.istream.textfile import TextFile
 
 

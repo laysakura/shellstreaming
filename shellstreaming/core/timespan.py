@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.timespan
+    shellstreaming.core.timespan
     ~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides timespan [t0, t1]
 """
-from shellstreaming.timestamp import Timestamp
+from shellstreaming.core.timestamp import Timestamp
 
 
 class Timespan(object):
@@ -14,7 +14,7 @@ class Timespan(object):
         """Constructor
 
         :param start:   beginning of timespan
-        :type start:    instance of `Timestamp <#shellstreaming.timestamp.Timestamp>`_
+        :type start:    instance of `Timestamp <#shellstreaming.core.timestamp.Timestamp>`_
         :param span_ms: timespan
         """
         assert(isinstance(start, Timestamp))

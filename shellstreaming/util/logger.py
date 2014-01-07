@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.logger
+    shellstreaming.util.logger
     ~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides logger

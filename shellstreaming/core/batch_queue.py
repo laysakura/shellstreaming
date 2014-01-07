@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.batch_queue
+    shellstreaming.core.batch_queue
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides queue of output batch

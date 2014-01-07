@@ -22,7 +22,7 @@ from rpyc.utils.server import ThreadedServer as Server
 
 # my module
 from shellstreaming.config import DEFAULT_CONFIG
-from shellstreaming.logger import setup_FileLogger, setup_TerminalLogger
+from shellstreaming.util.logger import setup_FileLogger, setup_TerminalLogger
 from shellstreaming.worker.worker_server_service import WorkerServerService
 
 

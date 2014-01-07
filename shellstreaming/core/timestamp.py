@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.timestamp
+    shellstreaming.core.timestamp
     ~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Provides efficient data structure to represent timestamp

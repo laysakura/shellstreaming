@@ -5,7 +5,7 @@
 from nose.tools import *
 from os.path import abspath, dirname, join, exists
 from ConfigParser import SafeConfigParser
-from shellstreaming.batch_queue import BatchQueue
+from shellstreaming.core.batch_queue import BatchQueue
 from shellstreaming.istream.tweet import Tweet
 
 

@@ -21,7 +21,7 @@ import rpyc
 
 # my module
 from shellstreaming.config import DEFAULT_CONFIG, DEFAULT_CONFIG_LOCATION
-from shellstreaming.logger import setup_TerminalLogger
+from shellstreaming.util.logger import setup_TerminalLogger
 from shellstreaming.util.importer import import_from_file
 from shellstreaming.worker.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.master_main import sched_loop

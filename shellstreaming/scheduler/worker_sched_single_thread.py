@@ -6,7 +6,7 @@
     :synopsis: Instanciate all jobs w/ single thread
 """
 import logging
-from shellstreaming.batch_queue import BatchQueue
+from shellstreaming.core.batch_queue import BatchQueue
 import shellstreaming.worker.worker_struct as ws
 
 

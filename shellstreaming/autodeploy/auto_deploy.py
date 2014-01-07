@@ -19,7 +19,7 @@ import sys
 # (to reflect changes on `../../shellstreaming/**.py` quickly if using `<github-repo>/shellstreaming.autodeploy.auto_deploy.py`)
 basedir = join(abspath(dirname(__file__)), '..', '..')
 sys.path = [basedir] + sys.path
-from shellstreaming.logger import setup_TerminalLogger
+from shellstreaming.util.logger import setup_TerminalLogger
 
 
 # prepare logger

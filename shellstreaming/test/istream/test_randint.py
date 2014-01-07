@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from nose.tools import *
 import time
-from shellstreaming.batch_queue import BatchQueue
+from shellstreaming.core.batch_queue import BatchQueue
 from shellstreaming.istream.randint import RandInt
 
 

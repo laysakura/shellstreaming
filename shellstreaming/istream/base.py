@@ -10,7 +10,7 @@ from datetime import datetime
 
 # my module
 from relshell.batch import Batch
-from shellstreaming.timestamp import Timestamp
+from shellstreaming.core.timestamp import Timestamp
 from shellstreaming.core.timespan import Timespan
 from shellstreaming.core.base_job import BaseJob
 
