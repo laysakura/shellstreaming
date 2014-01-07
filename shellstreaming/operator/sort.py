@@ -29,8 +29,8 @@ class Sort(Base):
         assert(len(in_qs) == 1)
         self._in_q = in_qs.values()[0]
         # output queues
-        assert(len(out_qs) == 1 and 'sorted' in out_qs)
-        self._out_q = out_qs['sorted']
+        assert(len(out_qs) == 1)
+        self._out_q = out_qs.values()[0]
 
         Base.__init__(self, **kw)
 

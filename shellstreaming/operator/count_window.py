@@ -39,8 +39,8 @@ class CountWindow(Base):  # [todo] - inherit common `Window` class?
         assert(len(in_qs) == 1)
         self._in_q = in_qs.values()[0]
         # output queues
-        assert(len(out_qs) == 1 and 'window' in out_qs)
-        self._out_q = out_qs['window']
+        assert(len(out_qs) == 1)
+        self._out_q = out_qs.values()[0]
 
         Base.__init__(self, **kw)
 
@@ -64,5 +64,5 @@ class CountWindow(Base):  # [todo] - inherit common `Window` class?
                     slide_cnt = 0
 
     @staticmethod
-    def out_stream_edge_id_suffixes():
+    def out_stream_edge_id_suffixes(args):
         return ('window', )

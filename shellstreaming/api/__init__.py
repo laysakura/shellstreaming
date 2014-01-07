@@ -33,6 +33,9 @@ def IStream(istream, *istream_args, **istream_kw):
 
 def Operator(in_stream, operator, *operator_args, **operator_kw):
     streams = _reg_job('operator', in_stream, operator, operator_args, operator_kw)
+    assert(len(streams) >= 1)
+    if len(streams) == 1:
+        streams = streams[0]
     return streams
 
 

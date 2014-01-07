@@ -205,7 +205,10 @@ def _run_test(stream_py):
     """Run validation code in user's script"""
     logger    = logging.getLogger('TerminalLogger')
     module    = import_from_file(stream_py)
-    test_func = getattr(module, 'test')
+    test_func = getattr(module, 'test', None)
+    if test_func is None:
+        return
+
     test_func_name = '%s.%s' % (test_func.__module__, test_func.__name__)
     try:
         test_func()
