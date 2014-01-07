@@ -36,9 +36,6 @@ class Sort(Base):
 
     def run(self):
         """Sort records
-
-        :param batch: batch to sort
-        :returns:     sorted batch
         """
         while True:
             batch = self._in_q.pop()
