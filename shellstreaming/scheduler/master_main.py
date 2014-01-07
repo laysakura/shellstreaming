@@ -46,7 +46,7 @@ def sched_loop(
         logger.debug('New job scheduling is calculated')
 
         # 2. request each worker next job placement
-        for job_id in ms.jobs_placement.iterkeys():
+        for job_id in job_graph.nodes_iter():
             workers_to_reg   = tuple(set(next_jobs_placement[job_id]) - set(ms.jobs_placement[job_id]))
             workers_to_unreg = tuple(set(ms.jobs_placement[job_id])  - set(next_jobs_placement[job_id]))
             for worker in workers_to_reg:
@@ -59,3 +59,6 @@ def sched_loop(
         # 3. sleep
         ms.jobs_placement = next_jobs_placement
         time.sleep(reschedule_interval_sec)
+
+        # 4. check finished jobs
+        ms.jobs_finished
