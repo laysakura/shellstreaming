@@ -48,7 +48,7 @@ def main():
     logger.info('Used config file: %s' % (cnfpath))
 
     # launch worker servers
-    worker_hosts = config.get('shellstreaming', 'worker_hosts').split(','),
+    worker_hosts = config.get('shellstreaming', 'worker_hosts').split(',')
     worker_port  = config.getint('shellstreaming', 'worker_port')
     if config.getboolean('shellstreaming', 'single_process_debug'):
         # launch a worker server on localhost
