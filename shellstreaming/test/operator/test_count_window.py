@@ -26,7 +26,6 @@ def test_count_window_usage():
     ns.eq_(out_q.pop(), Batch(RDEF, (           Record(1),)))
     ns.eq_(out_q.pop(), Batch(RDEF, (Record(1), Record(2))))
     ns.eq_(out_q.pop(), Batch(RDEF, (Record(2), Record(3))))
-    ns.eq_(out_q.pop(), Batch(RDEF, (Record(3),          )))
     ns.ok_(out_q.pop() is None)
 
 
@@ -46,7 +45,6 @@ def test_multiple_batch_input():
     ns.eq_(out_q.pop(), Batch(RDEF, (Record(3), Record(1))))
     ns.eq_(out_q.pop(), Batch(RDEF, (Record(1), Record(2))))
     ns.eq_(out_q.pop(), Batch(RDEF, (Record(2), Record(3))))
-    ns.eq_(out_q.pop(), Batch(RDEF, (Record(3),          )))
     ns.ok_(out_q.pop() is None)
 
 
@@ -63,6 +61,5 @@ def test_slide_size():
 
     ns.eq_(out_q.pop(), Batch(RDEF, (Record(1), Record(2))))
     ns.eq_(out_q.pop(), Batch(RDEF, (Record(3), Record(1))))
-    ns.eq_(out_q.pop(), Batch(RDEF, (Record(1), Record(2))))
-    ns.eq_(out_q.pop(), Batch(RDEF, (Record(3),          )))
+    ns.eq_(out_q.pop(), Batch(RDEF, (Record(2), Record(3))))
     ns.ok_(out_q.pop() is None)
