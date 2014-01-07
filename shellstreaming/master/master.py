@@ -93,6 +93,8 @@ def main():
             config.get('shellstreaming', 'master_scheduler_module'),
             config.getint('shellstreaming', 'master_reschedule_interval_sec'),
         )
+        # run user's validation codes
+        _run_test(args.stream_py)
     except KeyboardInterrupt as e:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
         for host in worker_hosts:
@@ -197,6 +199,20 @@ def _parse_stream_py(stream_py):
     main_func = getattr(module, 'main')
     main_func()    # `api._job_graph` is changed internally
     return api._job_graph
+
+
+def _run_test(stream_py):
+    """Run validation code in user's script"""
+    logger    = logging.getLogger('TerminalLogger')
+    module    = import_from_file(stream_py)
+    test_func = getattr(module, 'test')
+    test_func_name = '%s.%s' % (test_func.__module__, test_func.__name__)
+    try:
+        test_func()
+        logger.info('%s finished without any exception' % (test_func_name))
+    except:
+        logger.error('Exception has been raised in %s' % (test_func_name))
+        raise
 
 
 def _draw_job_graph(job_graph, path):

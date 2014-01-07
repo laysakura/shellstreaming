@@ -14,3 +14,7 @@ def main():
     )
     api.OStream('localhost', lo_stream, LocalFile, 'lo_stream.txt')
     api.OStream('localhost', hi_stream, LocalFile, 'hi_stream.txt')
+
+
+def test():
+    pass
