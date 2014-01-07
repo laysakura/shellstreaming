@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from nose.tools import *
+import nose.tools as ns
 from rpyc.utils.server import ThreadedServer as Server
 from threading import Thread
 from shellstreaming.worker.worker_server_service import WorkerServerService
@@ -23,6 +23,6 @@ def test_kill_worker_server():
     kill_worker_server('localhost', port)
 
 
-@raises(IOError)
+@ns.raises(IOError)
 def test_kill_worker_server_when_no_server():
     kill_worker_server('localhost', 19999)  # IOError when no server is established

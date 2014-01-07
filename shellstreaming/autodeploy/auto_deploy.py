@@ -62,7 +62,6 @@ def deploy(cnfpath=''):
 
     :param cnfpath: config file deployed to :data:`REMOTE_DEPLOY`. if empty string, config file is not deployed.
     """
-    global already_packed
     assert(already_packed)
 
     # create deploy directory on remote host

@@ -2,7 +2,7 @@
 
 # This test is supposed to be ignored in `setup.cfg`
 
-from nose.tools import *
+import nose.tools as ns
 from os.path import abspath, dirname, join, exists
 from ConfigParser import SafeConfigParser
 from shellstreaming.core.batch_queue import BatchQueue

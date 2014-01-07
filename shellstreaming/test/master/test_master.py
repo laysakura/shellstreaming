@@ -2,7 +2,7 @@
 
 # to pass this test, "ssh -i $HOME/.ssh/id_rsa localhost" has to be in success.
 
-from nose.tools import *
+import nose.tools as ns
 import os
 from os.path import abspath, dirname, join
 from shellstreaming.util.comm import kill_worker_server

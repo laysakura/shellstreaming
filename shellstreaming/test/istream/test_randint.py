@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from nose.tools import *
+import nose.tools as ns
 import time
 from shellstreaming.core.batch_queue import BatchQueue
 from shellstreaming.istream.randint import RandInt
@@ -19,5 +19,5 @@ def test_randint_usage():
             break
 
         for i_record, record in enumerate(batch):
-            ok_(0 <= record[0] <= 10)
+            ns.ok_(0 <= record[0] <= 10)
         # print('batch has %d records' % (i_record + 1))

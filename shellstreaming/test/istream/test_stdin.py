@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from nose.tools import *
+import nose.tools as ns
 import time
 from shellstreaming.istream.stdin import Stdin
 
@@ -10,5 +10,5 @@ def test_stdin_usage():
     # for batch in stream:
     #     print('a batch contents ----')
     #     for record in batch:
-    #         eq_(len(record), 1)
+    #         ns.eq_(len(record), 1)
     #         print(record)
