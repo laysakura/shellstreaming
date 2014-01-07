@@ -105,7 +105,8 @@ def main():
 
 
 def _parse_args():
-    parser = argparse.ArgumentParser(description=shellstreaming.__description__)
+    from shellstreaming import __description__
+    parser = argparse.ArgumentParser(description=__description__)
 
     parser.add_argument(
         '--config', '-c',
