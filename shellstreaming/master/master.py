@@ -43,13 +43,14 @@ def main():
     config  = _setup_config(cnfpath)
 
     # setup logger
-    setup_TerminalLogger(config.get('master', 'log_level'))
+    setup_TerminalLogger(config.get('shellstreaming', 'log_level'))
     logger = logging.getLogger('TerminalLogger')
     logger.info('Used config file: %s' % (cnfpath))
 
     # launch worker servers
-    (worker_hosts, worker_port) = (config.get('worker', 'hosts').split(','), config.getint('worker', 'worker_port'))
-    if config.getboolean('debug', 'single_process_debug'):
+    worker_hosts = config.get('shellstreaming', 'worker_hosts').split(','),
+    worker_port  = config.getint('shellstreaming', 'worker_port')
+    if config.getboolean('shellstreaming', 'single_process_debug'):
         # launch a worker server on localhost
         logger.debug('Entering single_process_debug mode')
         th_service = start_worker_server_thread(worker_port, logger)
@@ -58,17 +59,17 @@ def main():
         _launch_workers(
             worker_hosts, worker_port,
             cnf_sent_to_worker=cnfpath,
-            parallel_deploy=config.getboolean('auto_deploy', 'parallel_deploy'),
-            ssh_private_key=config.get('auto_deploy', 'ssh_private_key'),
-            send_latest_codes_on_start=config.getboolean('auto_deploy', 'send_latest_codes_on_start'),
+            parallel_deploy=config.getboolean('shellstreaming', 'parallel_deploy'),
+            ssh_private_key=config.get('shellstreaming', 'ssh_private_key'),
+            send_latest_codes_on_start=config.getboolean('shellstreaming', 'send_latest_codes_on_start'),
         )
 
     try:
         # make job graph from user's stream app description
         job_graph = _parse_stream_py(args.stream_py)
         # draw job graph
-        if config.get('master', 'job_graph_path') != '':
-            _draw_job_graph(job_graph, config.get('master', 'job_graph_path'))
+        if config.get('shellstreaming', 'job_graph_path') != '':
+            _draw_job_graph(job_graph, config.get('shellstreaming', 'job_graph_path'))
         # initialize :module:`master_struct`
         for job_id in job_graph.nodes_iter():
             ms.jobs_placement[job_id] = []
@@ -80,19 +81,19 @@ def main():
             conn = ms.conn_pool[host]
             conn.root.reg_job_graph(pickled_job_graph)
         # launch worker-local scheduler on each worker
-        if config.getboolean('debug', 'single_process_debug'):
+        if config.getboolean('shellstreaming', 'single_process_debug'):
             conn = ms.conn_pool['localhost']
             conn.root.start_worker_local_scheduler(
-                config.get('worker', 'worker_scheduler_module'),
-                config.getint('worker', 'worker_reschedule_interval_sec'),
+                config.get('shellstreaming', 'worker_scheduler_module'),
+                config.getint('shellstreaming', 'worker_reschedule_interval_sec'),
             )
         else:
             assert(False)  # [todo] - lauch worker-local scheduler on each worker
         # start master's main loop
         sched_loop(
             job_graph, worker_hosts, worker_port,
-            config.get('master', 'master_scheduler_module'),
-            config.getint('master', 'master_reschedule_interval_sec'),
+            config.get('shellstreaming', 'master_scheduler_module'),
+            config.getint('shellstreaming', 'master_reschedule_interval_sec'),
         )
     except KeyboardInterrupt as e:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
