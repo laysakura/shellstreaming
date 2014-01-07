@@ -16,7 +16,7 @@ class FilterSplitOperator(Base):
     def __init__(self, *conditions, **kw):
         """
 
-        :param *conditions: tuple of conditions.
+        :param conditions: tuple of conditions.
             Each condition is simply `eval`ed after replacing column name into actual value.
         """
         self._conditions = conditions
@@ -33,7 +33,6 @@ class FilterSplitOperator(Base):
             for edge_id, q in out_qs.iteritems():
                 if edge_id.endswith(cond):
                     self._out_qs[cond] = q
-        print(self._out_qs)
 
         Base.__init__(self, **kw)
 
@@ -43,7 +42,7 @@ class FilterSplitOperator(Base):
         while True:
             batch = self._in_q.pop()
             if batch is None:
-                map(lambda q: q.push(None), self._out_qs)
+                map(lambda q: q.push(None), self._out_qs.values())
                 break
 
             # filter records by conditions

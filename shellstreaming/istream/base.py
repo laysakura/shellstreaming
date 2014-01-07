@@ -19,7 +19,7 @@ class Base(BaseJob):
     """Base class for istream
     """
 
-    def __init__(self, output_queue, batch_span_ms, max_records=None):
+    def __init__(self, output_queue, batch_span_ms=100, max_records=None):
         """Constructor
 
         :param output_queue:  queue to output batches

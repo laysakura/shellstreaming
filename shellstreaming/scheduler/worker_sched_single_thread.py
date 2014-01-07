@@ -21,7 +21,8 @@ def update_instances(job_graph, registered_jobs, job_instances):  # [todo] - fin
         # launch not-yet-instanciated job
         if job_id not in job_instances or job_instances[job_id] == []:
             job_attr = job_graph.node[job_id]
-            job_class, job_args, job_type = (job_attr['class'], job_attr['args'], job_attr['type'])
+            job_type, job_class = (job_attr['type'], job_attr['class'])
+            job_args, job_kw    = (job_attr['args'], job_attr['kwargs'])
             # create input/output batch queues for job w/ job_id if not yet created.
             # Note that queue creation should be done in job instance level (not job level)
             # because even unregistered job's instance may have remaining task
@@ -38,17 +39,23 @@ def update_instances(job_graph, registered_jobs, job_instances):  # [todo] - fin
                 job_instance = job_class(
                     *job_args,
                     output_queue=ws.batch_queues[out_edges[0]],
-                    batch_span_ms=100    # [fix] - consider batch_span_ms deeply
+                    **job_kw
                 )
             elif job_type == 'ostream':
                 assert(len(out_edges) == 0 and len(in_edges) == 1)
-                job_instance = job_class(*job_args, input_queue=ws.batch_queues[in_edges[0]])
+                job_instance = job_class(
+                    *job_args,
+                    input_queue=ws.batch_queues[in_edges[0]],
+                    **job_kw
+                )
             else:  # 'operator'
                 assert(len(out_edges) >= 1 and len(in_edges) >= 1)
+                print(job_args)
                 job_instance = job_class(
                     *job_args,
                     input_queues={edge: ws.batch_queues[edge] for edge in in_edges},
-                    output_queues={edge: ws.batch_queues[edge] for edge in out_edges}
+                    output_queues={edge: ws.batch_queues[edge] for edge in out_edges},
+                    **job_kw
                 )
             # register launced job
             job_instances[job_id] = [job_instance]

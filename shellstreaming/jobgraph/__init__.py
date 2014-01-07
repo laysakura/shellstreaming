@@ -46,17 +46,15 @@ class JobGraph(nx.DiGraph):
         """
         return [n for n in self.nodes() if self.out_edges(n) == []]
 
-    def add_node(
-            self, job_id,
-            job_class, job_class_args, job_type,
-    ):
+    def add_node(self, job_id, job_type, job_class, job_class_args, job_class_kw):
         """Override :func:`Digraph.add_node` to force put necessary attributes to every node"""
         nx.DiGraph.add_node(
             self, job_id,
             attr_dict={
-                'class' : job_class,
-                'args'  : job_class_args,
-                'type'  : job_type,
+                'class'  : job_class,
+                'args'   : job_class_args,
+                'kwargs' : job_class_kw,
+                'type'   : job_type,
             }
         )
 
@@ -79,3 +77,6 @@ class StreamEdge(object):
         self.id          = id
         self.src_job_id  = src_job_id
         self.dest_job_id = dest_job_id
+
+    def __str__(self):
+        return self.id

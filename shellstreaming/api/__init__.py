@@ -13,11 +13,12 @@ _num_job_node    = 0           # used for unique job node id
 _num_stream_edge = 0           # used for unique stream edge id
 
 
-def IStream(istream, istream_args):
+def IStream(istream, *istream_args, **istream_kw):
     """Create an istream.
 
-    :param istream:      reference to an inputsteram class
-    :param inputsteram_args: tuple of args to :param:`inputsteram`.__init__()
+    :param istream:      reference to an istream class
+    :param *istream_args: args to :param:`istream`.__init__()
+    :param **istream_kw: keyword args to :param:`istream`.__init__()
     :returns: stream object (`node_id` internally)
 
     **Example**
@@ -26,20 +27,20 @@ def IStream(istream, istream_args):
         randint_stream = Istream(RandInt, (0, 100))
         ...
     """
-    stream = _reg_job(istream, istream_args, 'istream', None)
+    stream = _reg_job('istream', None, istream, istream_args, istream_kw)
     return stream
 
 
-def Operator(operator, operator_args, in_stream):
-    streams = _reg_job(operator, operator_args, 'operator', in_stream)
+def Operator(in_stream, operator, *operator_args, **operator_kw):
+    streams = _reg_job('operator', in_stream, operator, operator_args, operator_kw)
     return streams
 
 
-def OStream(ostream, ostream_args, in_stream, dest):    # [fix] - `dest` のワーカにostream instanceを立てるようにする
-    _reg_job(ostream, ostream_args, 'ostream', in_stream)
+def OStream(dest, in_stream, ostream, *ostream_args, **ostream_kw):   # [fix] - `dest` のワーカにostream instanceを立てるようにする
+    _reg_job('ostream', in_stream, ostream, ostream_args, ostream_kw)
 
 
-def _reg_job(job_class, job_class_args, job_type, in_stream):
+def _reg_job(job_type, in_stream, job_class, job_class_args, job_class_kw):
     """Update :data:`_job_graph`
     """
     global _job_graph, _num_job_node, _num_stream_edge
@@ -47,7 +48,7 @@ def _reg_job(job_class, job_class_args, job_type, in_stream):
     # add node
     job_id = "%d: %s" % (_num_job_node, job_class.__name__)
     _num_job_node += 1
-    _job_graph.add_node(job_id, job_class, job_class_args, job_type)
+    _job_graph.add_node(job_id, job_type, job_class, job_class_args, job_class_kw)
 
     if job_type in ('operator', 'ostream'):
         # edge from pred job to this job

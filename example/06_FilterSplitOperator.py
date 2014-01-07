@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 from shellstreaming import api
-from shellstreaming.istream import RandIntIStream
+from shellstreaming.istream import RandInt
 from shellstreaming.operator import FilterSplitOperator
-from shellstreaming.ostream import LocalFileOStream
+from shellstreaming.ostream import LocalFile
 
 
 def main():
-    randint_stream = api.IStream(RandIntIStream, (0, 100))
+    randint_stream = api.IStream(RandInt, 0, 100, max_records=1)
     lo_stream, hi_stream = api.Operator(
-        FilterSplitOperator,
-        (
-            'num < 50',   # lo_stream
-            'num >= 50',  # hi_stream
-        ),
         randint_stream,
+        FilterSplitOperator,
+        'num < 50', 'num >= 50',
     )
-    api.OStream(LocalFileOStream, ('lo_stream.txt', ), lo_stream, 'localhost')
-    api.OStream(LocalFileOStream, ('hi_stream.txt', ), hi_stream, 'localhost')
+    api.OStream('localhost', lo_stream, LocalFile, 'lo_stream.txt')
+    api.OStream('localhost', hi_stream, LocalFile, 'hi_stream.txt')
