@@ -35,7 +35,11 @@ def update_instances(job_graph, registered_jobs, job_instances):  # [todo] - fin
             logger.debug('Launching job instance: %s' % (job_id))
             if job_type == 'istream':
                 assert(len(out_edges) == 1 and len(in_edges) == 0)
-                job_instance = job_class(*job_args, output_queue=ws.batch_queues[out_edges[0]])  # [todo] - use batch_time_ms?
+                job_instance = job_class(
+                    *job_args,
+                    output_queue=ws.batch_queues[out_edges[0]],
+                    batch_span_ms=100    # [fix] - consider batch_span_ms deeply
+                )
             elif job_type == 'ostream':
                 assert(len(out_edges) == 0 and len(in_edges) == 1)
                 job_instance = job_class(*job_args, input_queue=ws.batch_queues[in_edges[0]])

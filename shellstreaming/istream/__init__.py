@@ -5,7 +5,7 @@
 
     :synopsis: Export pre-defined IStreams
 """
-from shellstreaming.istream import randint
-
-
-RandIntIStream = randint.RandInt
+from shellstreaming.istream.randint import RandInt
+from shellstreaming.istream.textfile import TextFile
+from shellstreaming.istream.stdin import Stdin
+from shellstreaming.istream.tweet import Tweet
