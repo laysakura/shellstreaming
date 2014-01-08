@@ -28,7 +28,7 @@ def test_sort_usage():
     in_q.push(None)
 
     # ascendant order
-    op = Sort(0, input_queues={'a': in_q}, output_queues={'sorted': out_q})
+    op = Sort('col0', input_queues={'a': in_q}, output_queues={'b': out_q})
     op.join()
     sorted_batch = out_q.pop()
     col0s = []
@@ -43,7 +43,7 @@ def test_sort_desc():
     in_q.push(None)
 
     # descendant order
-    op = Sort(0, desc=True, input_queues={'a': in_q}, output_queues={'sorted': out_q})
+    op = Sort('col0', desc=True, input_queues={'a': in_q}, output_queues={'b': out_q})
     op.join()
     sorted_batch = out_q.pop()
     col0s = []
@@ -57,7 +57,7 @@ def test_sort_by_string():
     in_q.push(_create_test_batch())
     in_q.push(None)
 
-    op = Sort(1, input_queues={'a': in_q}, output_queues={'sorted': out_q})
+    op = Sort('col1', input_queues={'a': in_q}, output_queues={'b': out_q})
     op.join()
     sorted_batch = out_q.pop()
     col1s = []

@@ -20,7 +20,7 @@ def test_count_window_usage():
     in_q.push(_create_test_batch())
     in_q.push(None)
 
-    win = CountWindow(size=2, input_queues={'a': in_q}, output_queues={'window': out_q})
+    win = CountWindow(size=2, input_queues={'a': in_q}, output_queues={'b': out_q})
     win.join()
 
     ns.eq_(out_q.pop(), Batch(RDEF, (           Record(1),)))
@@ -36,7 +36,7 @@ def test_multiple_batch_input():
     in_q.push(_create_test_batch())
     in_q.push(None)
 
-    win = CountWindow(size=2, input_queues={'a': in_q}, output_queues={'window': out_q})
+    win = CountWindow(size=2, input_queues={'a': in_q}, output_queues={'b': out_q})
     win.join()
 
     ns.eq_(out_q.pop(), Batch(RDEF, (           Record(1),)))
@@ -56,7 +56,7 @@ def test_slide_size():
     in_q.push(None)
 
     win = CountWindow(size=2, slide_size=2,
-                      input_queues={'a': in_q}, output_queues={'window': out_q})
+                      input_queues={'a': in_q}, output_queues={'b': out_q})
     win.join()
 
     ns.eq_(out_q.pop(), Batch(RDEF, (Record(1), Record(2))))

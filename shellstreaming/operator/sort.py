@@ -13,16 +13,16 @@ from shellstreaming.operator.base import Base
 class Sort(Base):
     """Sort operator"""
 
-    def __init__(self, column_index, desc=False, **kw):
+    def __init__(self, column_name, desc=False, **kw):
         """Creates sort operators.
 
         Works like SQL's ``order by [desc] col_val``.
 
-        :param column_index: index of column to filter
-        :param desc:         sort in reverse order when `True`
+        :param column_name: name of column to be sort key
+        :param desc:      sort in reverse order when `True`
         """
-        self._col  = column_index
-        self._desc = desc
+        self._colname = column_name
+        self._desc    = desc
 
         in_qs, out_qs = (kw['input_queues'], kw['output_queues'])
         # input queue
@@ -43,13 +43,15 @@ class Sort(Base):
                 self._out_q.push(None)
                 break
 
+            rdef   = batch.record_def()
+            colidx = rdef.colindex_by_colname(self._colname)
             sorted_rec = sorted(
                 batch._records, reverse=self._desc,
-                cmp=lambda rec_x, rec_y: cmp(rec_x[self._col], rec_y[self._col]),
+                cmp=lambda rec_x, rec_y: cmp(rec_x[colidx], rec_y[colidx]),
             )
             out_batch = Batch(batch.record_def(), tuple(sorted_rec))
             self._out_q.push(out_batch)
 
     @staticmethod
-    def out_stream_edge_id_suffixes():
+    def out_stream_edge_id_suffixes(args):
         return ('sorted', )
