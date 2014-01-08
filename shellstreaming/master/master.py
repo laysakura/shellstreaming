@@ -160,7 +160,7 @@ def _launch_workers(worker_hosts, worker_port,
     logger = logging.getLogger('TerminalLogger')
 
     # deploy & start workers' server
-    scriptpath = join(abspath(dirname(__file__)), 'auto_deploy.py')
+    scriptpath = join(abspath(dirname(__file__)), '..', 'autodeploy', 'auto_deploy.py')
 
     fab_tasks = []
     if send_latest_codes_on_start:
