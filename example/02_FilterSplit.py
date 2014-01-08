@@ -5,8 +5,8 @@ from shellstreaming.operator import FilterSplit
 from shellstreaming.ostream import LocalFile
 
 
-LOW_OUTPUT_FILE  = '/tmp/06_FilterSplit_lo.txt'
-HIGH_OUTPUT_FILE = '/tmp/06_FilterSplit_hi.txt'
+LOW_OUTPUT_FILE  = '/tmp/02_FilterSplit_lo.txt'
+HIGH_OUTPUT_FILE = '/tmp/02_FilterSplit_hi.txt'
 
 
 def main():
