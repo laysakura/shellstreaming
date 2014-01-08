@@ -9,13 +9,13 @@ OUTPUT_FILE = '/tmp/07_CountWindow.py'
 
 
 def main():
-    randint_stream = api.IStream(IncInt, max_records=6)
-    randint_win    = api.Operator(
-        randint_stream,
+    incint_stream = api.IStream(IncInt, max_records=6)
+    incint_win    = api.Operator(
+        incint_stream,
         CountWindow,
         3, slide_size=1
     )
-    api.OStream('localhost', randint_win, LocalFile, OUTPUT_FILE, output_format='json')
+    api.OStream('localhost', incint_win, LocalFile, OUTPUT_FILE, output_format='json')
 
 
 def test():
