@@ -25,9 +25,10 @@ DEFAULT_CONFIG = {
     'worker_reschedule_interval_sec' : '1',
 
     # auto_deploy
-    'parallel_deploy'            : 'False',
-    'ssh_private_key'            : 'None',
-    'send_latest_codes_on_start' : 'True',
+    'parallel_deploy'             : 'False',
+    'ssh_private_key'             : 'None',
+    'send_latest_config_on_start' : 'True',
+    'send_latest_codes_on_start'  : 'True',
 
     # debug
     'log_level'       : 'DEBUG',

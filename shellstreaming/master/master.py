@@ -66,6 +66,7 @@ def main():
             worker_log_path=config.get('shellstreaming', 'worker_log_path'),
             parallel_deploy=config.getboolean('shellstreaming', 'parallel_deploy'),
             ssh_private_key=config.get('shellstreaming', 'ssh_private_key'),
+            send_latest_config_on_start=config.getboolean('shellstreaming', 'send_latest_config_on_start'),
             send_latest_codes_on_start=config.getboolean('shellstreaming', 'send_latest_codes_on_start'),
         )
 
@@ -147,6 +148,7 @@ def _launch_workers(worker_hosts, worker_port,
                     worker_log_path,
                     parallel_deploy,
                     ssh_private_key,
+                    send_latest_config_on_start,
                     send_latest_codes_on_start,
     ):
     """Launch every worker server and return.
@@ -171,7 +173,9 @@ def _launch_workers(worker_hosts, worker_port,
     fab_tasks = []
     if send_latest_codes_on_start:
         fab_tasks.append('pack')
-        fab_tasks.append('deploy:cnfpath=%s' % (cnf_sent_to_worker))
+        fab_tasks.append('deploy_codes')
+    if send_latest_config_on_start or send_latest_codes_on_start:  # config is removed for latter case
+        fab_tasks.append('deploy_config:cnfpath=%s' % (cnf_sent_to_worker))
     fab_tasks.append('start_worker:cnfpath=%s,logpath=%s' % (cnf_sent_to_worker, worker_log_path))
 
     cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s %(parallel_deploy)s %(ssh_priv_key)s' % {
