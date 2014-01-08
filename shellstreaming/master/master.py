@@ -47,6 +47,10 @@ def main():
     logger = logging.getLogger('TerminalLogger')
     logger.info('Used config file: %s' % (cnfpath))
 
+    # overwrite worker_hosts when localhost_debug
+    if config.getboolean('shellstreaming', 'localhost_debug'):
+        config.set('shellstreaming', 'worker_hosts', 'localhost')
+
     # launch worker servers
     worker_hosts = config.get('shellstreaming', 'worker_hosts').split(',')
     worker_port  = config.getint('shellstreaming', 'worker_port')
