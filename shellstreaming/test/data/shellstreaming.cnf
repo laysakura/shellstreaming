@@ -1,5 +1,0 @@
-[worker]
-port = 18871
-
-[worker_list]
-worker0 = localhost

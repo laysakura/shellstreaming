@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>shellstreaming.inputstream.textfile &mdash; shellstreaming</title>
+    <title>shellstreaming.istream.textfile &mdash; shellstreaming</title>
     
     <link rel="stylesheet" href="../../../_static/laysakura.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -47,24 +47,24 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for shellstreaming.inputstream.textfile</h1><div class="highlight"><pre>
+  <h1>Source code for shellstreaming.istream.textfile</h1><div class="highlight"><pre>
 <span class="c"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    shellstreaming.inputstream.textfile</span>
+<span class="sd">    shellstreaming.istream.textfile</span>
 <span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
 
 <span class="sd">    :synopsis: FiniteStream for text files.</span>
 
 <span class="sd">    A line is used as record with single column.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">shellstreaming.inputstream.base</span> <span class="kn">import</span> <span class="n">FiniteStream</span>
+<span class="kn">from</span> <span class="nn">shellstreaming.istream.base</span> <span class="kn">import</span> <span class="n">FiniteStream</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.timed_record</span> <span class="kn">import</span> <span class="n">TimedRecord</span>
 <span class="kn">from</span> <span class="nn">relshell.recorddef</span> <span class="kn">import</span> <span class="n">RecordDef</span>
 
 
-<div class="viewcode-block" id="TextFile"><a class="viewcode-back" href="../../../api/inputstream.html#shellstreaming.inputstream.textfile.TextFile">[docs]</a><span class="k">class</span> <span class="nc">TextFile</span><span class="p">(</span><span class="n">FiniteStream</span><span class="p">):</span>
+<div class="viewcode-block" id="TextFile"><a class="viewcode-back" href="../../../api/istream.html#shellstreaming.istream.textfile.TextFile">[docs]</a><span class="k">class</span> <span class="nc">TextFile</span><span class="p">(</span><span class="n">FiniteStream</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;FiniteStream for text files&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="TextFile.__init__"><a class="viewcode-back" href="../../../api/inputstream.html#shellstreaming.inputstream.textfile.TextFile.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">batch_span_ms</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<div class="viewcode-block" id="TextFile.__init__"><a class="viewcode-back" href="../../../api/istream.html#shellstreaming.istream.textfile.TextFile.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">batch_span_ms</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor</span>
 
 <span class="sd">        :param path:          path to text file</span>
@@ -73,7 +73,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">path</span>
         <span class="n">FiniteStream</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_span_ms</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="TextFile.run"><a class="viewcode-back" href="../../../api/inputstream.html#shellstreaming.inputstream.textfile.TextFile.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TextFile.run"><a class="viewcode-back" href="../../../api/istream.html#shellstreaming.istream.textfile.TextFile.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reads a text file line-by-line until EOF&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">rdef</span> <span class="o">=</span> <span class="n">RecordDef</span><span class="p">([{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;line&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;STRING&#39;</span><span class="p">}])</span>

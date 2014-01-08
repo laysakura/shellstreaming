@@ -2,7 +2,7 @@
 *.pyc
 core
 
-bin/
+build/
 dist/
 lib/
 man/
@@ -28,4 +28,4 @@ doc/coverage/
 
 htmlcov/
 
-shellstreaming/test/data/shellstreaming_test_tweet.cnf
+!core/
