@@ -15,7 +15,7 @@ DEFAULT_CONFIG_LOCATION = (expanduser(join('~', '.shellstreaming.cnf')), )
 DEFAULT_CONFIG = {
     # master
     'job_graph_path'                 : '',
-    'master_scheduler_module'        : 'shellstreaming.scheduler.master_sched_localhost',
+    'master_scheduler_module'        : 'shellstreaming.scheduler.master_sched_firstnode',
     'master_reschedule_interval_sec' : '3',
 
     # worker
@@ -25,9 +25,10 @@ DEFAULT_CONFIG = {
     'worker_reschedule_interval_sec' : '1',
 
     # auto_deploy
-    'parallel_deploy'            : 'False',
-    'ssh_private_key'            : 'None',
-    'send_latest_codes_on_start' : 'True',
+    'parallel_deploy'             : 'False',
+    'ssh_private_key'             : 'None',
+    'send_latest_config_on_start' : 'True',
+    'send_latest_codes_on_start'  : 'True',
 
     # debug
     'log_level'       : 'DEBUG',
