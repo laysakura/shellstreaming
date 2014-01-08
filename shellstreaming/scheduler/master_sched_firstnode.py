@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.scheduler.master_sched_localhost
+    shellstreaming.scheduler.master_sched_firstnode
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :synopsis: Schedules all jobs to localhost worker (for testing purpose)
