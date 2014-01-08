@@ -22,7 +22,7 @@ from rpyc.utils.server import ThreadedServer as Server
 
 # my module
 from shellstreaming.config import DEFAULT_CONFIG
-from shellstreaming.util.logger import setup_FileLogger, setup_TerminalLogger
+from shellstreaming.util.logger import setup_TerminalLogger
 from shellstreaming.util.comm import kill_worker_server
 from shellstreaming.scheduler.worker_main import start_sched_loop
 from shellstreaming.worker.worker_server_service import WorkerServerService
@@ -35,11 +35,8 @@ def main(cnfpath):
 
     # setup logger
     loglevel = eval('logging.' + config.get('shellstreaming', 'log_level'))
-    logpath  = config.get('shellstreaming', 'worker_log_path')
-    setup_FileLogger(loglevel, logpath)
-    logger = logging.getLogger('FileLogger')
     setup_TerminalLogger(loglevel)
-    logging.getLogger('TerminalLogger').debug('Log is written in <%s> in `%s` level' % (logpath, loglevel))
+    logger = logging.getLogger('TerminalLogger')
 
     # start `WorkerServerService` thread
     port = config.getint('shellstreaming', 'worker_port')
