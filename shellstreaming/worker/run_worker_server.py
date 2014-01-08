@@ -46,17 +46,11 @@ def main(cnfpath):
     logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
     th_service = start_worker_server_thread(port, logger)
 
-    # start worker-local scheduling thread
-    logger.debug('Starting worker-local scheduler')
-    th_sched = start_sched_loop(config.get('shellstreaming', 'worker_scheduler_module'),
-                                config.get('shellstreaming', 'worker_reschedule_interval_sec'))
-
     while WorkerServerService.server:    # wait for `server` to be `close()`ed by master client.
         time.sleep(1.0)
 
     logger.debug('`WorkerServerService` has been closed.')
     th_service.join()
-    th_sched.join()
 
 
 def start_worker_server_thread(port, logger):

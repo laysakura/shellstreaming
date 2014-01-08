@@ -88,7 +88,7 @@ def main():
             conn = ms.conn_pool[host]
             conn.root.start_worker_local_scheduler(
                 config.get('shellstreaming', 'worker_scheduler_module'),
-                config.getint('shellstreaming', 'worker_reschedule_interval_sec'))
+                config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'))
         # start master's main loop
         sched_loop(
             job_graph, worker_hosts, worker_port,
