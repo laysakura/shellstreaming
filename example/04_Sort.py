@@ -5,7 +5,7 @@ from shellstreaming.operator import CountWindow, Sort
 from shellstreaming.ostream import LocalFile
 
 
-OUTPUT_FILE = '/tmp/04_Sort.py'
+OUTPUT_FILE = '/tmp/04_Sort.txt'
 
 
 def main():
