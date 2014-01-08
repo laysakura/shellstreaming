@@ -43,9 +43,9 @@ def sched_loop(
             if job_id not in ms.jobs_placement:  # no worker is assigined for this job_id
                 continue
             assigned_workers = ms.jobs_placement[job_id]
-            for w in assigned_workers:
+            for worker in assigned_workers:
                 if job_id in finished_jobs[worker]:
-                    assigned_workers.remove(w)
+                    assigned_workers.remove(worker)
 
         # 1. calculate next job placement from current job placement, machine resource usage, ...
         next_jobs_placement = sched_module.calc_job_placement(
