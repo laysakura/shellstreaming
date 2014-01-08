@@ -26,6 +26,7 @@ from shellstreaming.util.importer import import_from_file
 from shellstreaming.worker.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.master_main import sched_loop
 from shellstreaming.util.comm import wait_worker_server, kill_worker_server
+from shellstreaming.master.job_placement import JobPlacement
 import shellstreaming.master.master_struct as ms
 from shellstreaming import api
 
@@ -77,6 +78,7 @@ def main():
         if config.get('shellstreaming', 'job_graph_path') != '':
             _draw_job_graph(job_graph, config.get('shellstreaming', 'job_graph_path'))
         # initialize :module:`master_struct`
+        ms.job_placement = JobPlacement(job_graph)
         for host in worker_hosts:
             ms.conn_pool[host] = rpyc.connect(host, worker_port)
         # register job graph to each worker
