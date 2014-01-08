@@ -5,7 +5,10 @@
 
     :synopsis: Registrar of jobs
 """
-# from shellstreaming.worker.worker_server_service import WorkerServerService
+# standard module
+import cPickle as pickle
+
+# my module
 from shellstreaming.worker import worker_struct as ws
 
 
@@ -26,4 +29,4 @@ class JobRegistrar(object):
         """Return list of finished jobs"""
         finished = ws.finished_jobs[:]
         del ws.finished_jobs[:]
-        return finished
+        return pickle.dumps(finished)
