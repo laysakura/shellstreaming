@@ -30,8 +30,7 @@ def sched_loop(
 
 def start_sched_loop(sched_module_name, reschedule_interval_sec):
     t = Thread(target=sched_loop, args=(
-        ws.JOB_GRAPH, sched_module_name, reschedule_interval_sec
-    ))
+        ws.JOB_GRAPH, sched_module_name, reschedule_interval_sec))
     t.daemon = True
     t.start()
     return t

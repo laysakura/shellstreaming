@@ -23,6 +23,7 @@ from rpyc.utils.server import ThreadedServer as Server
 # my module
 from shellstreaming.config import DEFAULT_CONFIG
 from shellstreaming.util.logger import setup_FileLogger, setup_TerminalLogger
+from shellstreaming.util.comm import kill_worker_server
 from shellstreaming.scheduler.worker_main import start_sched_loop
 from shellstreaming.worker.worker_server_service import WorkerServerService
 
@@ -45,20 +46,21 @@ def main(cnfpath):
     logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
     th_service = start_worker_server_thread(port, logger)
 
-    # start worker-local scheduling thread
-    logger.debug('Starting worker-local scheduler')
-    th_sched = start_sched_loop(config.get('shellstreaming', 'worker_scheduler_module'),
-                                config.get('shellstreaming', 'worker_reschedule_interval_sec'))
-
     while WorkerServerService.server:    # wait for `server` to be `close()`ed by master client.
         time.sleep(1.0)
 
     logger.debug('`WorkerServerService` has been closed.')
     th_service.join()
-    th_sched.join()
 
 
 def start_worker_server_thread(port, logger):
+    # attempt to kill already launched server (for avoiding `Address already in use`)
+    try:
+        kill_worker_server('localhost', port)
+    except IOError:
+        pass
+
+    # start new worker server
     WorkerServerService.server = Server(
         WorkerServerService, port=port,
         logger=logger,

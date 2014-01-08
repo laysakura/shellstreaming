@@ -86,19 +86,20 @@ def deploy(cnfpath=''):
             fab.run('python setup.py install')  # installing into virtualenv's environment
 
 
-def start_worker(cnfpath):
+def start_worker(cnfpath, logpath):
     """Start worker server via :func:`deploy`ed codes.
 
     When this task is called w/o preceeding :func:`deploy`, already-deployed codes are used.
 
-    :param worker_server_port: TCP port number to launch rpyc server on worker
+    :param logpath: path to log file
     :param cnfpath: path to config file
     """
     with fab.cd(REMOTE_PKG_ROOT):
         with fab.prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE):
-            fab.run('python %(remote_worker_py)s --config=%(cnfpath)s' % {
+            fab.run('python %(remote_worker_py)s --config=%(cnfpath)s --log=%(logpath)s' % {
                 'remote_worker_py' : REMOTE_WORKER_PY,
                 'cnfpath'          : cnfpath,
+                'logpath'          : logpath,
             })
 
 

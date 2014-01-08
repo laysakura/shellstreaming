@@ -47,18 +47,23 @@ def main():
     logger = logging.getLogger('TerminalLogger')
     logger.info('Used config file: %s' % (cnfpath))
 
+    # overwrite worker_hosts when localhost_debug
+    if config.getboolean('shellstreaming', 'localhost_debug'):
+        config.set('shellstreaming', 'worker_hosts', 'localhost')
+
     # launch worker servers
     worker_hosts = config.get('shellstreaming', 'worker_hosts').split(',')
     worker_port  = config.getint('shellstreaming', 'worker_port')
-    if config.getboolean('shellstreaming', 'single_process_debug'):
+    if config.getboolean('shellstreaming', 'localhost_debug'):
         # launch a worker server on localhost
-        logger.debug('Entering single_process_debug mode')
+        logger.debug('Entering localhost_debug mode')
         th_service = start_worker_server_thread(worker_port, logger)
     else:
         # auto-deploy, launch worker server on worker hosts
         _launch_workers(
             worker_hosts, worker_port,
             cnf_sent_to_worker=cnfpath,
+            worker_log_path=config.get('shellstreaming', 'worker_log_path'),
             parallel_deploy=config.getboolean('shellstreaming', 'parallel_deploy'),
             ssh_private_key=config.get('shellstreaming', 'ssh_private_key'),
             send_latest_codes_on_start=config.getboolean('shellstreaming', 'send_latest_codes_on_start'),
@@ -79,20 +84,16 @@ def main():
             conn = ms.conn_pool[host]
             conn.root.reg_job_graph(pickled_job_graph)
         # launch worker-local scheduler on each worker
-        if config.getboolean('shellstreaming', 'single_process_debug'):
-            conn = ms.conn_pool['localhost']
+        for host in worker_hosts:
+            conn = ms.conn_pool[host]
             conn.root.start_worker_local_scheduler(
                 config.get('shellstreaming', 'worker_scheduler_module'),
-                config.getint('shellstreaming', 'worker_reschedule_interval_sec'),
-            )
-        else:
-            assert(False)  # [todo] - lauch worker-local scheduler on each worker
+                config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'))
         # start master's main loop
         sched_loop(
             job_graph, worker_hosts, worker_port,
             config.get('shellstreaming', 'master_scheduler_module'),
-            config.getint('shellstreaming', 'master_reschedule_interval_sec'),
-        )
+            config.getint('shellstreaming', 'master_reschedule_interval_sec'))
         # run user's validation codes
         _run_test(args.stream_py)
     except KeyboardInterrupt as e:
@@ -140,6 +141,7 @@ def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIG_LOCATION):
 
 def _launch_workers(worker_hosts, worker_port,
                     cnf_sent_to_worker,
+                    worker_log_path,
                     parallel_deploy,
                     ssh_private_key,
                     send_latest_codes_on_start,
@@ -149,6 +151,7 @@ def _launch_workers(worker_hosts, worker_port,
     :param worker_hosts: worker hosts to launch worker servers
     :type worker_hosts:  list of hostname string
     :param worker_port:  worker servers' TCP port number
+    :param worker_log_path: worker servers' log path
     :param cnf_sent_to_worker: if not `None`, specified config file is sent to worker hosts and used by them
     :param parallel_deploy: If `True`, auto-deploy is done in parallel. Especially useful when you have
         many :param:`worker_hosts`.
@@ -160,13 +163,13 @@ def _launch_workers(worker_hosts, worker_port,
     logger = logging.getLogger('TerminalLogger')
 
     # deploy & start workers' server
-    scriptpath = join(abspath(dirname(__file__)), 'auto_deploy.py')
+    scriptpath = join(abspath(dirname(__file__)), '..', 'autodeploy', 'auto_deploy.py')
 
     fab_tasks = []
     if send_latest_codes_on_start:
         fab_tasks.append('pack')
         fab_tasks.append('deploy:cnfpath=%s' % (cnf_sent_to_worker))
-    fab_tasks.append('start_worker:cnfpath=%s' % (cnf_sent_to_worker))
+    fab_tasks.append('start_worker:cnfpath=%s,logpath=%s' % (cnf_sent_to_worker, worker_log_path))
 
     cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s %(parallel_deploy)s %(ssh_priv_key)s' % {
         'script'          : scriptpath,
