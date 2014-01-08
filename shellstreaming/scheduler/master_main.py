@@ -49,8 +49,7 @@ def sched_loop(
 
         # 1. calculate next job placement from current job placement, machine resource usage, ...
         next_jobs_placement = sched_module.calc_job_placement(
-            job_graph,
-            ms.jobs_placement,
+            job_graph, worker_hosts, ms.jobs_placement,
             # machine resource, ...
         )   # [todo] - most important part in scheduling
         logger.debug('New job scheduling is calculated')
