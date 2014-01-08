@@ -38,9 +38,9 @@ def sched_loop(
     while True:
         # 0. check if any job is alredy finished (update ms.job_placement)
         for worker in worker_hosts:
-            job_registrar = job_registrars[worker]
+            job_registrar         = job_registrars[worker]
             pickled_finished_jobs = job_registrar.finished_jobs()
-            finished_jobs = pickle.loads(pickled_finished_jobs)
+            finished_jobs         = pickle.loads(pickled_finished_jobs)
             map(lambda job_id: ms.job_placement.fire(job_id, worker), finished_jobs)
 
         # 1. finish scheduler loop if all jobs are finished
