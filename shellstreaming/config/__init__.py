@@ -30,7 +30,7 @@ DEFAULT_CONFIG = {
     'send_latest_codes_on_start' : 'True',
 
     # debug
-    'log_level'            : 'DEBUG',
-    'single_process_debug' : 'False',
+    'log_level'       : 'DEBUG',
+    'localhost_debug' : 'False',
 }
 """Default config values"""

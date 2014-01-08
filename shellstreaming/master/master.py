@@ -50,9 +50,9 @@ def main():
     # launch worker servers
     worker_hosts = config.get('shellstreaming', 'worker_hosts').split(',')
     worker_port  = config.getint('shellstreaming', 'worker_port')
-    if config.getboolean('shellstreaming', 'single_process_debug'):
+    if config.getboolean('shellstreaming', 'localhost_debug'):
         # launch a worker server on localhost
-        logger.debug('Entering single_process_debug mode')
+        logger.debug('Entering localhost_debug mode')
         th_service = start_worker_server_thread(worker_port, logger)
     else:
         # auto-deploy, launch worker server on worker hosts
@@ -79,7 +79,7 @@ def main():
             conn = ms.conn_pool[host]
             conn.root.reg_job_graph(pickled_job_graph)
         # launch worker-local scheduler on each worker
-        if config.getboolean('shellstreaming', 'single_process_debug'):
+        if config.getboolean('shellstreaming', 'localhost_debug'):
             conn = ms.conn_pool['localhost']
             conn.root.start_worker_local_scheduler(
                 config.get('shellstreaming', 'worker_scheduler_module'),
