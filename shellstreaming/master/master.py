@@ -94,13 +94,16 @@ def main():
             job_graph, worker_hosts, worker_port,
             config.get('shellstreaming', 'master_scheduler_module'),
             config.getint('shellstreaming', 'master_reschedule_interval_sec'))
-        # run user's validation codes
-        _run_test(args.stream_py)
+        # kill workers after all jobs are finieshd
+        logger.debug('Finished all job execution. Killing worker servers...')
+        map(lambda w: kill_worker_server(w, worker_port), worker_hosts)
     except KeyboardInterrupt as e:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
-        for host in worker_hosts:
-            kill_worker_server(host, worker_port)
+        map(lambda w: kill_worker_server(w, worker_port), worker_hosts)
         logger.exception(e)
+
+    # run user's validation codes
+    _run_test(args.stream_py)
 
     return 0
 
