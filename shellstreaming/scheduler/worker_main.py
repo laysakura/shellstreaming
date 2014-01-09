@@ -24,7 +24,10 @@ def sched_loop(
     """
     sched_module = import_module(sched_module_name)
     while True:
-        pickled_remote_queue_placement = remote_queue_placement_getter()
+        try:
+            pickled_remote_queue_placement = remote_queue_placement_getter()
+        except EOFError:  # master closes connection
+            break
         sched_module.update_instances(pickle.loads(pickled_remote_queue_placement))
         time.sleep(reschedule_interval_sec)
 
