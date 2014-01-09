@@ -81,6 +81,10 @@ def main():
         ms.job_placement = JobPlacement(job_graph)
         for host in worker_hosts:
             ms.conn_pool[host] = rpyc.connect(host, worker_port)
+        # set worker id to each worker
+        for host in worker_hosts:
+            conn = ms.conn_pool[host]
+            conn.root.set_worker_id(host)
         # register job graph to each worker
         pickled_job_graph = pickle.dumps(job_graph)
         for host in worker_hosts:

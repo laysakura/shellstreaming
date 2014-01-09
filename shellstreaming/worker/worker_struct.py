@@ -7,6 +7,9 @@
 """
 
 
+WORKER_ID = None
+"""Worker's id. Only :func:`exposd_set_worker_id` modifies this"""
+
 JOB_GRAPH = None
 """Job graph to refer. Only :func:`exposd_reg_job_graph` modifies this"""
 

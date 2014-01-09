@@ -97,7 +97,6 @@ def decide_input_queues(in_edges, remote_queue_placement):
 
     in_queues = {}  # to return
     for in_edge in in_edges:
-        target_workers = remote_queue_placement[in_edge]
         ## optimization: prioritize local queue
         if in_edge in ws.local_queues:
             in_queues[in_edge] = ws.local_queues[in_edge]
@@ -105,6 +104,7 @@ def decide_input_queues(in_edges, remote_queue_placement):
         else:
             ## remote worker's queue might already be empty, or not setup yet.
             ## try all workers
+            target_workers = set(remote_queue_placement[in_edge]) - set([ws.WORKER_ID])
             for target_worker in target_workers:  ## [fix] - choose most cost-effective one first
                 conn = ws.conn_pool[target_worker]
                 in_queues[in_edge] = conn.root.queue_netref(in_edge)

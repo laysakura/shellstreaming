@@ -39,6 +39,10 @@ class WorkerServerService(rpyc.Service):
         """Start worker local scheduler"""
         return start_sched_loop(sched_module_name, reschedule_interval_sec, remote_queue_placement_getter)
 
+    def exposed_set_worker_id(self, worker_id):
+        """Set worker_id from master"""
+        ws.WORKER_ID = worker_id
+
     def exposed_reg_job_graph(self, pickled_job_graph):
         """Register job graph"""
         job_graph = pickle.loads(pickled_job_graph)
