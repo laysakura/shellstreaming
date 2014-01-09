@@ -19,7 +19,7 @@ def main():
         randint_win,
         Sort, 'num'
     )
-    api.OStream('cloko000', sorted_win, LocalFile, OUTPUT_FILE, output_format='json')
+    api.OStream('localhost', sorted_win, LocalFile, OUTPUT_FILE, output_format='json')
 
 
 def test():
