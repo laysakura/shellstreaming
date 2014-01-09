@@ -65,6 +65,7 @@ def sched_loop(
             workers_to_unreg = tuple(set(ms.job_placement.assigned_workers(job_id)) -
                                      set(next_job_placement.assigned_workers(job_id)))
             for worker in workers_to_reg:
+                logger.debug('registering %s to %s' % (job_id, worker))
                 job_registrar = job_registrars[worker]
                 job_registrar.register(job_id)
             for worker in workers_to_unreg:

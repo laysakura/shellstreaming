@@ -12,6 +12,8 @@ class JobPlacement(object):
 
     def __init__(self, job_graph):
         """"""
+        self._job_graph  = job_graph
+
         self._job_place = {}
         """
         .. code-block:: python
@@ -22,22 +24,24 @@ class JobPlacement(object):
             }
             # <job id> not in jobs_placement => job not started yet
         """
-        self._job_graph  = job_graph
 
-        self._fixed_jobs = []
+        self._fixed_job = {}
         """Some jobs (typically some ostream) are fixed to some worker.
 
         .. code-block:: python
-            ['<job id>', ...]
+            {
+                '<fixed job id>': <worker id>,
+                ...
+            }
         """
         for job_id, job_attr in job_graph.nodes_iter(data=True):
-            if job_attr['fixed_worker'] is not None:
-                self._fixed_jobs.append(job_id)
-                self._job_place[job_id] = [job_attr['fixed_worker']]
+            fixed_worker = job_attr['fixed_worker']
+            if fixed_worker is not None:
+                self._fixed_job[job_id] = fixed_worker
 
-    def is_fixed(self, job_id):
-        """Return wheter :param:`job_id` is fixed job"""
-        return job_id in self._fixed_jobs
+    def fixed_to(self, job_id):
+        """Return worker_id which :param:`job_id` is fixed to"""
+        return self._fixed_job[job_id] if job_id in self._fixed_job else None
 
     def is_started(self, job_id):
         """Return if :param:`job_id` is already assigned to at least 1 worker"""
@@ -50,10 +54,10 @@ class JobPlacement(object):
     def assign(self, job_id, worker_id):
         """Assign :param:`job_id` to :param:`worker_id`
 
-        :raises: `ValueError` when :param:`job_id` is fixed job
+        :raises: `ValueError` when :param:`job_id` is fixed to wther worker
         """
-        if self.is_fixed(job_id):
-            raise ValueError('%s is fixed to %s' % (job_id, self._job_place[job_id][0]))
+        if self.fixed_to(job_id) and self.fixed_to(job_id) != worker_id:
+            raise ValueError('%s is fixed to %s' % (job_id, self.fixed_to(job_id)))
         assert(worker_id not in self.assigned_workers(job_id))
         if self.is_started(job_id):
             self._job_place[job_id].append(worker_id)
@@ -74,8 +78,8 @@ class JobPlacement(object):
     def copy(self):
         """Returns deep copy of `self`"""
         obj = JobPlacement(self._job_graph)
-        obj._job_place  = self._job_place.copy()
-        obj._fixed_jobs = self._fixed_jobs[:]
+        obj._job_place = self._job_place.copy()
+        obj._fixed_job = self._fixed_job.copy()
         return obj
 
     def __str__(self):

@@ -37,7 +37,7 @@ def update_instances(
             in_edges  = job_graph.in_stream_edge_ids(job_id)
             out_edges = job_graph.out_stream_edge_ids(job_id)
             for edge in in_edges + out_edges:
-                if edge not in batch_queues:
+                if edge not in batch_queues:  # [fix] - 自分のワーカに無くても他のワーカにあるかもしれない．それこそが正にやるべきこと
                     batch_queues[edge] = BatchQueue()
             # launch job instance
             assert(job_type in ('istream', 'operator', 'ostream'))
@@ -47,23 +47,20 @@ def update_instances(
                 job_instance = job_class(
                     *job_args,
                     output_queue=batch_queues[out_edges[0]],
-                    **job_kw
-                )
+                    **job_kw)
             elif job_type == 'ostream':
                 assert(len(out_edges) == 0 and len(in_edges) == 1)
                 job_instance = job_class(
                     *job_args,
                     input_queue=batch_queues[in_edges[0]],
-                    **job_kw
-                )
+                    **job_kw)
             else:  # 'operator'
                 assert(len(out_edges) >= 1 and len(in_edges) >= 1)
                 job_instance = job_class(
                     *job_args,
                     input_queues={edge: batch_queues[edge] for edge in in_edges},
                     output_queues={edge: batch_queues[edge] for edge in out_edges},
-                    **job_kw
-                )
+                    **job_kw)
             # register launced job
             job_instances[job_id] = [job_instance]
 
