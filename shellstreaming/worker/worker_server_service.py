@@ -5,9 +5,15 @@
 
     :synopsis: Provides worker process's server
 """
+# standard module
 import cPickle as pickle
+
+# 3rd party module
 import rpyc
+
+# my module
 from shellstreaming.worker import worker_struct as ws
+from shellstreaming.core.remote_queue import RemoteQueue
 from shellstreaming.scheduler.worker_main import start_sched_loop
 from shellstreaming.worker.job_registrar import JobRegistrar
 
@@ -28,10 +34,10 @@ class WorkerServerService(rpyc.Service):
 
     def exposed_start_worker_local_scheduler(
             self,
-            sched_module_name, reschedule_interval_sec
+            sched_module_name, reschedule_interval_sec, remote_queue_placement_getter
     ):
         """Start worker local scheduler"""
-        return start_sched_loop(sched_module_name, reschedule_interval_sec)
+        return start_sched_loop(sched_module_name, reschedule_interval_sec, remote_queue_placement_getter)
 
     def exposed_reg_job_graph(self, pickled_job_graph):
         """Register job graph"""
@@ -39,12 +45,13 @@ class WorkerServerService(rpyc.Service):
         ws.JOB_GRAPH = job_graph
 
     # APIs for workers
-    def exposed_pop_batch(self, stream_edge_id):
-        """Pass batches to caller worker from internal batch queue.
+    def exposed_queue_netref(self, stream_edge_id):
+        """Pass wrapper of BatchQueue to be remotely accessed
 
-        .. note::
-            This function is **blocking** just like :class:`Queue.Queue`
+        :returns: `None` when this worker does not have queue corresponding to :param:`stream_edge_id`
         """
-        q     = ws.output_queues[stream_edge_id]
-        batch = q.pop()
-        return batch
+        try:
+            q = ws.local_queues[stream_edge_id]
+            return RemoteQueue(q)
+        except KeyError:
+            return None
