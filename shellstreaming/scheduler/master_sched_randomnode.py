@@ -3,8 +3,9 @@
     shellstreaming.scheduler.master_sched_firstnode
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :synopsis: Schedules all jobs to first worker in list (for testing purpose)
+    :synopsis: Schedules jobs to random workers (for testing purpose)
 """
+import random
 
 
 def calc_job_placement(job_graph, worker_hosts, prev_jobs_placement):
@@ -16,5 +17,6 @@ def calc_job_placement(job_graph, worker_hosts, prev_jobs_placement):
             if fixed_worker:  # fixed job
                 next_jobs_placement.assign(job_id, fixed_worker)
             else:             # normal job
-                next_jobs_placement.assign(job_id, worker_hosts[0])
+                i = random.randint(0, len(worker_hosts) - 1)
+                next_jobs_placement.assign(job_id, worker_hosts[i])
     return next_jobs_placement

@@ -18,13 +18,15 @@ import logging
 from ConfigParser import SafeConfigParser
 
 # 3rd party module
+import rpyc
 from rpyc.utils.server import ThreadedServer as Server
 
 # my module
 from shellstreaming.config import DEFAULT_CONFIG
 from shellstreaming.util.logger import setup_TerminalLogger
-from shellstreaming.util.comm import kill_worker_server
+from shellstreaming.util.comm import kill_worker_server, wait_worker_server
 from shellstreaming.scheduler.worker_main import start_sched_loop
+import shellstreaming.worker.worker_struct as ws
 from shellstreaming.worker.worker_server_service import WorkerServerService
 
 
@@ -43,12 +45,19 @@ def main(cnfpath):
     logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
     th_service = start_worker_server_thread(port, logger)
 
-    while WorkerServerService.server:    # wait for `server` to be `close()`ed by master client.
+    # make connection to other workers
+    for worker in config.get('shellstreaming', 'worker_hosts').split(','):
+        wait_worker_server(worker, port)
+        ws.conn_pool[worker] = rpyc.connect(worker, port)
+
+    # wait for `server` to be `close()`ed by master client.
+    while WorkerServerService.server:
         time.sleep(1.0)
 
     logger.debug('`WorkerServerService` has been closed.')
     th_service.join()
 
+    return 0
 
 def start_worker_server_thread(port, logger):
     # attempt to kill already launched server (for avoiding `Address already in use`)

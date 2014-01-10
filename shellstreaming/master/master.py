@@ -26,6 +26,7 @@ from shellstreaming.util.importer import import_from_file
 from shellstreaming.worker.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.master_main import sched_loop
 from shellstreaming.util.comm import wait_worker_server, kill_worker_server
+from shellstreaming.master.job_placement import JobPlacement
 import shellstreaming.master.master_struct as ms
 from shellstreaming import api
 
@@ -77,8 +78,13 @@ def main():
         if config.get('shellstreaming', 'job_graph_path') != '':
             _draw_job_graph(job_graph, config.get('shellstreaming', 'job_graph_path'))
         # initialize :module:`master_struct`
+        ms.job_placement = JobPlacement(job_graph)
         for host in worker_hosts:
             ms.conn_pool[host] = rpyc.connect(host, worker_port)
+        # set worker id to each worker
+        for host in worker_hosts:
+            conn = ms.conn_pool[host]
+            conn.root.set_worker_id(host)
         # register job graph to each worker
         pickled_job_graph = pickle.dumps(job_graph)
         for host in worker_hosts:
@@ -90,11 +96,10 @@ def main():
             conn.root.start_worker_local_scheduler(
                 config.get('shellstreaming', 'worker_scheduler_module'),
                 config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'))
-        # start master's main loop
-        sched_loop(
-            job_graph, worker_hosts, worker_port,
-            config.get('shellstreaming', 'master_scheduler_module'),
-            config.getint('shellstreaming', 'master_reschedule_interval_sec'))
+        # start master's main loop.
+        sched_loop(job_graph, worker_hosts, worker_port,
+                   config.get('shellstreaming', 'master_scheduler_module'),
+                   config.getfloat('shellstreaming', 'master_reschedule_interval_sec'))
         # kill workers after all jobs are finieshd
         logger.debug('Finished all job execution. Killing worker servers...')
         map(lambda w: kill_worker_server(w, worker_port), worker_hosts)

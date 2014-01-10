@@ -5,9 +5,13 @@
 
     :synopsis: Provides scheduler's main loop
 """
+# standard module
 import time
 import logging
 from importlib import import_module
+import cPickle as pickle
+
+# my module
 import shellstreaming.master.master_struct as ms
 
 
@@ -32,48 +36,49 @@ def sched_loop(
     sched_module = import_module(sched_module_name)
 
     while True:
-        # 0. check if any job is alredy finished (update ms.jobs_placement)
-        ## collect finished-list from each worker
-        finished_jobs = {}
+        # check if any job is alredy finished (update ms.job_placement)
         for worker in worker_hosts:
-            job_registrar = job_registrars[worker]
-            finished_jobs[worker] = job_registrar.finished_jobs()
-        ## remove worker from ms.jobs_placement if it already finishes job
-        for job_id in job_graph.nodes_iter():
-            if job_id not in ms.jobs_placement:  # no worker is assigined for this job_id
-                continue
-            assigned_workers = ms.jobs_placement[job_id]
-            for worker in assigned_workers:
-                if job_id in finished_jobs[worker]:
-                    assigned_workers.remove(worker)
+            job_registrar         = job_registrars[worker]
+            pickled_finished_jobs = job_registrar.finished_jobs()
+            finished_jobs         = pickle.loads(pickled_finished_jobs)
+            map(lambda job_id: ms.job_placement.fire(job_id, worker), finished_jobs)
 
-        # 1. calculate next job placement from current job placement, machine resource usage, ...
-        next_jobs_placement = sched_module.calc_job_placement(
-            job_graph, worker_hosts, ms.jobs_placement,
-            # machine resource, ...
-        )   # [todo] - most important part in scheduling
-        logger.debug('New job scheduling is calculated')
-
-        # 2. finish scheduler loop if all jobs are finished
+        # finish scheduler loop if all jobs are finished
         # [fix] - waiting for at most `reschedule_interval_sec` after all jobs are really finished.
         # [fix] - better to be `push`ed from worker when worker has finished job.
-        remaining_jobs = filter(lambda job_id: len(next_jobs_placement[job_id]) > 0, job_graph.nodes_iter())
+        remaining_jobs = filter(lambda job_id: not ms.job_placement.is_finished(job_id), job_graph.nodes_iter())
         if remaining_jobs == []:
             logger.debug('Finished all jobs')
             break
 
-        # 3. request next job placement to workers
+        # calculate next job placement from current job placement, machine resource usage, ...
+        next_job_placement = sched_module.calc_job_placement(
+            job_graph, worker_hosts, ms.job_placement,
+            # machine resource, ...
+        )   # [todo] - most important part in scheduling
+        logger.debug('New job assignment is calculated: %s' % (next_job_placement))
+
+        # update queue placement
         for job_id in job_graph.nodes_iter():
-            job_placement    = set(ms.jobs_placement[job_id]) if job_id in ms.jobs_placement else set()
-            workers_to_reg   = tuple(set(next_jobs_placement[job_id]) - job_placement)
-            workers_to_unreg = tuple(job_placement - set(next_jobs_placement[job_id]))
+            out_edges = job_graph.out_stream_edge_ids(job_id)
+            for out_edge in out_edges:
+                ms.remote_queue_placement[out_edge] = next_job_placement.assigned_workers(job_id)
+        map(lambda w: ms.conn_pool[w].root.update_remote_queue_placement(pickle.dumps(ms.remote_queue_placement)), worker_hosts)
+        logger.debug('Remote queue placement is updated: %s' % (ms.remote_queue_placement))
+
+        # request next job placement to workers
+        for job_id in job_graph.nodes_iter():
+            workers_to_reg   = tuple(set(next_job_placement.assigned_workers(job_id)) -
+                                     set(ms.job_placement.assigned_workers(job_id)))
+            workers_to_unreg = tuple(set(ms.job_placement.assigned_workers(job_id)) -
+                                     set(next_job_placement.assigned_workers(job_id)))
             for worker in workers_to_reg:
                 job_registrar = job_registrars[worker]
                 job_registrar.register(job_id)
             for worker in workers_to_unreg:
                 job_registrar = job_registrars[worker]
                 job_registrar.unregister(job_id)
-        ms.jobs_placement = next_jobs_placement
+        ms.job_placement = next_job_placement
 
-        # 4. sleep
+        # sleep
         time.sleep(reschedule_interval_sec)
