@@ -110,6 +110,7 @@ def main():
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
         map(lambda w: kill_worker_server(w, worker_port), worker_hosts)
         logger.exception(e)
+        return 1
 
     # run user's validation codes
     _run_test(args.stream_py)
