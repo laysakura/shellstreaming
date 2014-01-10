@@ -13,10 +13,8 @@ import shellstreaming.worker.worker_struct as ws
 from shellstreaming.core.batch_queue import BatchQueue
 
 
-def update_instances(remote_queue_placement):
+def update_instances():
     """Execute, wait job instance thread.
-
-    :param remote_queue_placement: snapshot of master_struct.remote_queue_placement
     """
     logger = logging.getLogger('TerminalLogger')
 
@@ -30,7 +28,7 @@ def update_instances(remote_queue_placement):
             # decide input queue of each edge
             in_edges = ws.JOB_GRAPH.in_stream_edge_ids(job_id)
             try:
-                in_queues = decide_input_queues(in_edges, remote_queue_placement)
+                in_queues = decide_input_queues(in_edges)
             except AttributeError:  # when not all in_edges have prepaired queue
                 continue            # too early to launch this job => next job
 
@@ -82,7 +80,7 @@ def update_instances(remote_queue_placement):
         # [todo] - some batch might remain on the queue.
 
 
-def decide_input_queues(in_edges, remote_queue_placement):
+def decide_input_queues(in_edges):
     """
     :returns:
         .. code-block:: python
@@ -100,15 +98,18 @@ def decide_input_queues(in_edges, remote_queue_placement):
         ## optimization: prioritize local queue
         if in_edge in ws.local_queues:
             in_queues[in_edge] = ws.local_queues[in_edge]
-            logger.debug('queue of "%s" is decided to be from localhost' % (in_edge))
+            logger.debug('queue of "%s" is decided to be from %s' % (in_edge, ws.WORKER_ID))
         else:
             ## remote worker's queue might already be empty, or not setup yet.
             ## try all workers
-            target_workers = set(remote_queue_placement[in_edge]) - set([ws.WORKER_ID])
+            target_workers = set(ws.REMOTE_QUEUE_PLACEMENT[in_edge]) - set([ws.WORKER_ID])
             for target_worker in target_workers:  ## [fix] - choose most cost-effective one first
                 conn = ws.conn_pool[target_worker]
-                in_queues[in_edge] = conn.root.queue_netref(in_edge)
-                if in_queues[in_edge] is not None:
+                try:
+                    in_queues[in_edge] = conn.root.queue_netref(in_edge)
+                except EOFError as e:
+                    logger.debug('sometimes "connection closed by peer" happen here when connecting to %s ...' % (target_worker))  # [fix] - why connection error?
+                if in_edge in in_queues and in_queues[in_edge] is not None:
                     logger.debug('queue of "%s" is decided to be from %s' % (in_edge, target_worker))
         if in_edge not in in_queues or in_queues[in_edge] is None:
             raise AttributeError('%s does not have actual queue setup' % (in_edge))

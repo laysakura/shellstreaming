@@ -63,6 +63,8 @@ def sched_loop(
             out_edges = job_graph.out_stream_edge_ids(job_id)
             for out_edge in out_edges:
                 ms.remote_queue_placement[out_edge] = next_job_placement.assigned_workers(job_id)
+        map(lambda w: ms.conn_pool[w].root.update_remote_queue_placement(pickle.dumps(ms.remote_queue_placement)), worker_hosts)
+        logger.debug('Remote queue placement is updated: %s' % (ms.remote_queue_placement))
 
         # request next job placement to workers
         for job_id in job_graph.nodes_iter():

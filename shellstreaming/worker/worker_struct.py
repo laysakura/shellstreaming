@@ -16,6 +16,9 @@ JOB_GRAPH = None
 ASSIGNED_JOBS = []
 """Jobs to execute. Only :func:`exposd_register` and :func:`exposd_unregister` modify this"""
 
+REMOTE_QUEUE_PLACEMENT = None
+"""Remote queue to fetch batches. Only :func:`exposd_update_remote_queue_placement` modifies this"""
+
 job_instances = {}
 """Jobs' instances
 

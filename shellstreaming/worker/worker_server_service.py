@@ -32,12 +32,16 @@ class WorkerServerService(rpyc.Service):
         WorkerServerService.server.close()
         WorkerServerService.server = None
 
+    def exposed_update_remote_queue_placement(self, pickled_remote_queue_placement):
+        """Updates ws.REMOTE_QUEUE_PLACEMENT"""
+        ws.REMOTE_QUEUE_PLACEMENT = pickle.loads(pickled_remote_queue_placement)
+
     def exposed_start_worker_local_scheduler(
             self,
-            sched_module_name, reschedule_interval_sec, remote_queue_placement_getter
+            sched_module_name, reschedule_interval_sec
     ):
         """Start worker local scheduler"""
-        return start_sched_loop(sched_module_name, reschedule_interval_sec, remote_queue_placement_getter)
+        return start_sched_loop(sched_module_name, reschedule_interval_sec)
 
     def exposed_set_worker_id(self, worker_id):
         """Set worker_id from master"""

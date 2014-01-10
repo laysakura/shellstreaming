@@ -3,7 +3,7 @@
     shellstreaming.scheduler.master_sched_firstnode
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :synopsis: Schedules all jobs to localhost worker (for testing purpose)
+    :synopsis: Schedules all jobs to first worker in list (for testing purpose)
 """
 
 
