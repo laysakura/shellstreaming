@@ -5,6 +5,10 @@
 
     :synopsis: Provides filtering operators with multiple outputs
 """
+# standard module
+import cPickle as pickle
+
+# my module
 from relshell.recorddef import RecordDef
 from relshell.batch import Batch
 from shellstreaming.operator.base import Base
@@ -44,6 +48,8 @@ class FilterSplit(Base):
             if batch is None:
                 map(lambda q: q.push(None), self._out_qs.values())
                 break
+            if type(batch) == str:
+                batch = pickle.loads(batch)
 
             # filter records by conditions
 

@@ -33,9 +33,7 @@ class IoStream(Base):
             batch = self._batch_q.pop()
             if batch is None:
                 break
-
-            # [fix] - batch を unpickle するのが各job instanceの役目ってのは嫌だ
-            if getattr(batch, 'formatted_str', None) is None:
+            if type(batch) == str:
                 batch = pickle.loads(batch)
 
             self._io_stream.write(batch.formatted_str(self._output_format))
