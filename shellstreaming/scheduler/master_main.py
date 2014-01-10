@@ -36,12 +36,21 @@ def sched_loop(
     sched_module = import_module(sched_module_name)
 
     while True:
-        # check if any job is alredy finished (update ms.job_placement)
+        # fire worker if job is already finished
+        ## ask each worker if you have finished job
+        global_finished_jobs = []
         for worker in worker_hosts:
             job_registrar         = job_registrars[worker]
             pickled_finished_jobs = job_registrar.finished_jobs()
             finished_jobs         = pickle.loads(pickled_finished_jobs)
             map(lambda job_id: ms.job_placement.fire(job_id, worker), finished_jobs)
+            global_finished_jobs += finished_jobs
+        ## tell worker your job has already been done by others
+        for job_id in job_graph.nodes_iter():
+            for worker in ms.job_placement.assigned_workers(job_id):
+                if job_id in global_finished_jobs:
+                    logger.debug('oh %s! %s is alredy finished by other worker' % (worker, job_id))
+                    ms.job_placement.fire(job_id, worker)
 
         # finish scheduler loop if all jobs are finished
         # [fix] - waiting for at most `reschedule_interval_sec` after all jobs are really finished.

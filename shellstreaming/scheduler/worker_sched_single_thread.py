@@ -30,7 +30,8 @@ def update_instances():
             try:
                 in_queues = decide_input_queues(in_edges)
             except AttributeError:  # when not all in_edges have prepaired queue
-                continue            # too early to launch this job => next job
+                logger.debug('%s could not find input queue... constructing? finished already?' % (job_id))
+                continue
 
             # create output batch queues for job w/ job_id if not yet created.
             # Note that queue creation should be done in job instance level (not job level)
@@ -72,7 +73,7 @@ def update_instances():
         if instance.isAlive():
             continue
 
-        # this job is finished.
+        # this job is finished (None is passed from input queue).
         ws.finished_jobs.append(job_id)
         logger.debug('Job instance of %s has finished!!' % (job_id))
         # [todo] - remove batch queue...
