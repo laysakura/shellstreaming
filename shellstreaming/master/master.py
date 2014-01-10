@@ -6,6 +6,7 @@
     :synopsis: Provides master process's entry point
 """
 # standard module
+import time
 import argparse
 import os
 from os.path import abspath, dirname, join
@@ -97,9 +98,11 @@ def main():
                 config.get('shellstreaming', 'worker_scheduler_module'),
                 config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'))
         # start master's main loop.
+        t_sched_loop_sec0 = time.time()
         sched_loop(job_graph, worker_hosts, worker_port,
                    config.get('shellstreaming', 'master_scheduler_module'),
                    config.getfloat('shellstreaming', 'master_reschedule_interval_sec'))
+        t_sched_loop_sec1 = time.time()
         # kill workers after all jobs are finieshd
         logger.debug('Finished all job execution. Killing worker servers...')
         map(lambda w: kill_worker_server(w, worker_port), worker_hosts)
@@ -107,9 +110,18 @@ def main():
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
         map(lambda w: kill_worker_server(w, worker_port), worker_hosts)
         logger.exception(e)
+        return 1
 
     # run user's validation codes
     _run_test(args.stream_py)
+
+    # message
+    logger.info('''
+Successfully finished all job execution.
+Execution time: %(t_sched_loop_sec)f sec.
+''' % {
+    't_sched_loop_sec': t_sched_loop_sec1 - t_sched_loop_sec0
+})
 
     return 0
 
