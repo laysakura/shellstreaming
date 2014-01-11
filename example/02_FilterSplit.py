@@ -7,17 +7,18 @@ from shellstreaming.ostream import LocalFile
 
 LOW_OUTPUT_FILE  = '/tmp/02_FilterSplit_lo.txt'
 HIGH_OUTPUT_FILE = '/tmp/02_FilterSplit_hi.txt'
+NUM_IN_REC       = 10000
 
 
 def main():
-    randint_stream = api.IStream(RandInt, 0, 100, max_records=1000)
+    randint_stream = api.IStream(RandInt, 0, 100, max_records=NUM_IN_REC)
     lo_stream, hi_stream = api.Operator(
         randint_stream,
         FilterSplit,
         'num < 50', 'num >= 50',
     )
-    api.OStream('localhost', lo_stream, LocalFile, LOW_OUTPUT_FILE,  output_format='json')
-    api.OStream('localhost', hi_stream, LocalFile, HIGH_OUTPUT_FILE, output_format='json')
+    api.OStream('cloko000', lo_stream, LocalFile, LOW_OUTPUT_FILE,  output_format='json')
+    api.OStream('cloko000', hi_stream, LocalFile, HIGH_OUTPUT_FILE, output_format='json')
 
 
 def test():
@@ -33,4 +34,4 @@ def test():
         for hi, line in enumerate(f):
             record = json.loads(line)
             assert(50 <= int(record['num']) <= 100)
-    assert((lo + 1) + (hi + 1) == 1000)
+    assert((lo + 1) + (hi + 1) == NUM_IN_REC)

@@ -58,8 +58,11 @@ class WorkerServerService(rpyc.Service):
 
         :returns: `None` when this worker does not have queue corresponding to :param:`stream_edge_id`
         """
+        import logging
+        logger = logging.getLogger('TerminalLogger')
         try:
             q = ws.local_queues[stream_edge_id]
             return RemoteQueue(q)
         except KeyError:
+            logger.debug('%s is not in local_queue=%s' % (stream_edge_id, ws.local_queues))
             return None

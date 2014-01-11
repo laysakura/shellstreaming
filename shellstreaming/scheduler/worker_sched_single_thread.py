@@ -27,12 +27,12 @@ def update_instances():
             job_args, job_kw    = (job_attr['args'], job_attr['kwargs'])
             # decide input queue of each edge
             in_edges = ws.JOB_GRAPH.in_stream_edge_ids(job_id)
-            try:
-                in_queues = decide_input_queues(in_edges)
-            except AttributeError:  # when not all in_edges have prepaired queue
-                logger.debug('%s could not find input queue... constructing? finished already?' % (job_id))
-                continue
-
+            if job_type != 'istream':
+                try:
+                    in_queues = decide_input_queues(in_edges)
+                except AttributeError:  # when not all in_edges have prepaired queue
+                    logger.debug('%s could not find input queue... constructing? finished already?' % (job_id))
+                    continue
             # create output batch queues for job w/ job_id if not yet created.
             # Note that queue creation should be done in job instance level (not job level)
             # because even unregistered job's instance may have remaining task
@@ -73,12 +73,27 @@ def update_instances():
         if instance.isAlive():
             continue
 
-        # this job is finished (None is passed from input queue).
-        ws.finished_jobs.append(job_id)
-        logger.debug('Job instance of %s has finished!!' % (job_id))
-        # [todo] - remove batch queue...
-        # [todo] - but cannot done here because althouth upstream job has been finished,
-        # [todo] - some batch might remain on the queue.
+        ## job instance has finished.
+        ## remove input queue if it is in local
+        for in_edge in ws.JOB_GRAPH.in_stream_edge_ids(job_id):
+            if in_edge in ws.local_queues:
+                del ws.local_queues[in_edge]
+
+        #全部の上流 queue からNoneをとらないと終われない!!
+        instance.join()
+        ws.job_instances[job_id].remove(instance)
+        if not is_input_remain(job_id):
+            # this job is finished (None is passed from input queue).
+            ws.finished_jobs.append(job_id)
+            logger.debug('Job instance of %s has finished!!' % (job_id))
+
+
+def is_input_remain(job_id):
+    in_edges = ws.JOB_GRAPH.in_stream_edge_ids(job_id)
+    for in_edge in in_edges:
+        if in_edge in ws.local_queues or len(ws.REMOTE_QUEUE_PLACEMENT[in_edge]) > 0:
+            return True
+    return False
 
 
 def decide_input_queues(in_edges):
@@ -92,6 +107,7 @@ def decide_input_queues(in_edges):
 
     :raises: `AttributeError` when not all in_edges have prepaired queue
     """
+    assert(len(in_edges) > 0)
     logger = logging.getLogger('TerminalLogger')
 
     in_queues = {}  # to return
@@ -100,18 +116,23 @@ def decide_input_queues(in_edges):
         if in_edge in ws.local_queues:
             in_queues[in_edge] = ws.local_queues[in_edge]
             logger.debug('queue of "%s" is decided to be from %s' % (in_edge, ws.WORKER_ID))
-        else:
-            ## remote worker's queue might already be empty, or not setup yet.
-            ## try all workers
-            target_workers = set(ws.REMOTE_QUEUE_PLACEMENT[in_edge]) - set([ws.WORKER_ID])
-            for target_worker in target_workers:  ## [fix] - choose most cost-effective one first
-                conn = ws.conn_pool[target_worker]
-                try:
-                    in_queues[in_edge] = conn.root.queue_netref(in_edge)
-                except EOFError as e:
-                    logger.debug('sometimes "connection closed by peer" happen here when connecting to %s ...' % (target_worker))  # [fix] - why connection error?
-                if in_edge in in_queues and in_queues[in_edge] is not None:
-                    logger.debug('queue of "%s" is decided to be from %s' % (in_edge, target_worker))
-        if in_edge not in in_queues or in_queues[in_edge] is None:
+            logger.debug('in_queues=%s' % (in_queues))
+            return in_queues
+
+        ## remote worker's queue might already be empty, or not setup yet.
+        ## try all workers
+        target_workers = set(ws.REMOTE_QUEUE_PLACEMENT[in_edge]) - set([ws.WORKER_ID])
+        if len(target_workers) == 0:
             raise AttributeError('%s does not have actual queue setup' % (in_edge))
+        for target_worker in target_workers:  ## [fix] - choose most cost-effective one first
+            conn = ws.conn_pool[target_worker]
+            try:
+                in_queues[in_edge] = conn.root.queue_netref(in_edge)
+            except EOFError as e:
+                logger.debug('sometimes "connection closed by peer" happen here when connecting to %s ...' % (target_worker))  # [fi- why connection error?
+            if in_edge in in_queues and in_queues[in_edge] is not None:
+                logger.debug('queue of "%s" is decided to be from %s' % (in_edge, target_worker))
+            else:
+                raise AttributeError('%s does not have actual queue setup' % (in_edge))
+    logger.debug('in_queues=%s' % (in_queues))
     return in_queues
