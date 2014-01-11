@@ -42,12 +42,10 @@ class Sort(Base):
         """Sort records
         """
         while True:
-            batch = self._in_q.pop()
+            batch = self.pop(self._in_q)
             if batch is None:
                 self._out_q.push(None)
                 break
-            if type(batch) == str:
-                batch = pickle.loads(batch)
 
             rdef   = batch.record_def()
             colidx = rdef.colindex_by_colname(self._colname)

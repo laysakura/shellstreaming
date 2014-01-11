@@ -44,12 +44,10 @@ class FilterSplit(Base):
         """Filter batch according to :param:`*conditions`
         """
         while True:
-            batch = self._in_q.pop()
+            batch = self.pop(self._in_q)
             if batch is None:
                 map(lambda q: q.push(None), self._out_qs.values())
                 break
-            if type(batch) == str:
-                batch = pickle.loads(batch)
 
             # filter records by conditions
 

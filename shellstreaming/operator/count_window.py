@@ -50,14 +50,12 @@ class CountWindow(Base):  # [todo] - inherit common `Window` class?
         win       = deque(maxlen=self._sz)
         slide_cnt = 0  # output batch when `slide_cnt == self._slide_sz`
         while True:
-            batch = self._in_q.pop()
+            batch = self.pop(self._in_q)
             if batch is None:
                 self._out_q.push(None)  # [todo] - pushing `None` when finish op is not a bad idea.
                                         # [todo] - but sending 'punctuation' is more general.
                                         # [todo] - see: http://pic.dhe.ibm.com/infocenter/streams/v2r0/index.jsp?topic=%2Fcom.ibm.swg.im.infosphere.streams.spl-language-specification.doc%2Fdoc%2Fpunctuation.html
                 break
-            if type(batch) == str:
-                batch = pickle.loads(batch)
 
             for rec in batch:
                 win.append(rec)

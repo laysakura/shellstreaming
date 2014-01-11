@@ -40,3 +40,17 @@ class BaseJob(threading.Thread):
         This function must stop after :func:`interrupt` is called
         """
         pass
+
+    def pop(self, q):
+        """Pop batch from :param:`q`.
+
+        :class:`BatchQueue`, :class:`RemoteQueue` can be used as :param:`q` currently.
+        :returns: batch or `None`
+        """
+        # [fix] - support only QueueGroup
+        batch = q.pop()
+        if batch is None:
+            return None
+        if type(batch) == str:
+            batch = pickle.loads(batch)
+        return batch

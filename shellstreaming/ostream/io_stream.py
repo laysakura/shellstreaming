@@ -30,11 +30,9 @@ class IoStream(Base):
     def run(self):
         """Output batch to stdout"""
         while True:
-            batch = self._batch_q.pop()
+            batch = self.pop(self._batch_q)
             if batch is None:
                 break
-            if type(batch) == str:
-                batch = pickle.loads(batch)
 
             self._io_stream.write(batch.formatted_str(self._output_format))
             self._io_stream.flush()
