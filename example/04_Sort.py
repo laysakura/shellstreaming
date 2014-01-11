@@ -25,6 +25,7 @@ def main():
 def test():
     import json
 
+    num_lines = 0
     with open(OUTPUT_FILE) as f:
         while True:
             try:
@@ -32,5 +33,7 @@ def test():
                 second = int(json.loads(next(f))['num'])
                 third  = int(json.loads(next(f))['num'])
                 assert(first <= second <= third)
+                num_lines += 3
             except StopIteration:
                 break
+    assert(num_lines == 999)

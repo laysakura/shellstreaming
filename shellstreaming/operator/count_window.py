@@ -6,6 +6,7 @@
     :synopsis: Provides cout window
 """
 # standard module
+import cPickle as pickle
 from collections import deque
 
 # my module
@@ -55,6 +56,8 @@ class CountWindow(Base):  # [todo] - inherit common `Window` class?
                                         # [todo] - but sending 'punctuation' is more general.
                                         # [todo] - see: http://pic.dhe.ibm.com/infocenter/streams/v2r0/index.jsp?topic=%2Fcom.ibm.swg.im.infosphere.streams.spl-language-specification.doc%2Fdoc%2Fpunctuation.html
                 break
+            if type(batch) == str:
+                batch = pickle.loads(batch)
 
             for rec in batch:
                 win.append(rec)

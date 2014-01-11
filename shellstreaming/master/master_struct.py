@@ -7,16 +7,16 @@
 """
 
 
-jobs_placement = {}
-"""Which worker has been regstered job?
+job_placement = None
+"""Instance of :class:`JobPlacement`"""
 
+remote_queue_placement = {}
+"""
 .. code-block:: python
     {
-        '<job id>': [<worker id>, <worker id>, ...],  # running job
-        '<job id>': [],                               # finished job
+        '<edge id>': ['<worker id who has the queue corresponding to edge id>', ...],
         ...
     }
-    # <job id> not in jobs_placement => job not started yet
 """
 
 conn_pool = {}

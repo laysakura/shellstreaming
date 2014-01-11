@@ -5,7 +5,7 @@ from shellstreaming.operator import CountWindow
 from shellstreaming.ostream import LocalFile
 
 
-OUTPUT_FILE = '/tmp/03_CountWindow.py'
+OUTPUT_FILE = '/tmp/03_CountWindow.txt'
 
 
 def main():

@@ -36,7 +36,8 @@ REMOTE_WORKER_PY   = join(REMOTE_PKG_ROOT, 'shellstreaming', 'worker', 'worker.p
 REMOTE_VIRTUALENV_ACTIVATE = join(REMOTE_DEPLOY, 'bin', 'activate')
 
 
-already_packed = False
+# flags to check task execution order
+already_packed  = False
 
 
 @serial
@@ -57,20 +58,29 @@ def pack():
     already_packed = True
 
 
-def deploy(cnfpath=''):
+def deploy_config(cnfpath=''):
+    """Deploy config file to remote hosts.
+
+    :param cnfpath: config file deployed to :data:`REMOTE_DEPLOY`. if empty string, config file is not deployed.
+    """
+    # create deploy directory on remote host if not exists
+    fab.run('mkdir -p %s'  % (REMOTE_DEPLOY))
+
+    # upload the config file
+    if cnfpath != '':
+        fab.put(cnfpath, REMOTE_DEPLOY)
+
+
+def deploy_codes():
     """Deploy :func:`pack`ed codes to remote hosts.
 
     :param cnfpath: config file deployed to :data:`REMOTE_DEPLOY`. if empty string, config file is not deployed.
     """
     assert(already_packed)
 
-    # create deploy directory on remote host
-    fab.run('rm -rf %s' % (REMOTE_DEPLOY))
+    # newly create deploy directory on remote host
+    fab.run('rm -rf %s'  % (REMOTE_DEPLOY))
     fab.run('mkdir %s'  % (REMOTE_DEPLOY))
-
-    # upload the config file
-    if cnfpath != '':
-        fab.put(cnfpath, REMOTE_DEPLOY)
 
     # upload the source tarball to deploy directory on remote host
     fab.put(_get_pkg_targz(), REMOTE_DEPLOY)
@@ -86,19 +96,20 @@ def deploy(cnfpath=''):
             fab.run('python setup.py install')  # installing into virtualenv's environment
 
 
-def start_worker(cnfpath):
+def start_worker(cnfpath, logpath):
     """Start worker server via :func:`deploy`ed codes.
 
     When this task is called w/o preceeding :func:`deploy`, already-deployed codes are used.
 
-    :param worker_server_port: TCP port number to launch rpyc server on worker
+    :param logpath: path to log file
     :param cnfpath: path to config file
     """
     with fab.cd(REMOTE_PKG_ROOT):
         with fab.prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE):
-            fab.run('python %(remote_worker_py)s --config=%(cnfpath)s' % {
+            fab.run('python %(remote_worker_py)s --config=%(cnfpath)s --log=%(logpath)s' % {
                 'remote_worker_py' : REMOTE_WORKER_PY,
                 'cnfpath'          : cnfpath,
+                'logpath'          : logpath,
             })
 
 
