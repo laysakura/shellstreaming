@@ -18,7 +18,7 @@ def update_instances():
     logger = logging.getLogger('TerminalLogger')
 
     # instanciate newly-registered jobs
-    for job_id in ws.ASSIGNED_JOBS:
+    for job_id in set(ws.ASSIGNED_JOBS) - set(ws.finished_jobs):
         # launch not-yet-instanciated job
         if job_id not in ws.job_instances or ws.job_instances[job_id] == []:
             job_attr = ws.JOB_GRAPH.node[job_id]

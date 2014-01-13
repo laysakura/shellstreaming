@@ -52,7 +52,7 @@ def sched_loop(
         for worker in worker_hosts:
             job_registrar         = job_registrars[worker]
             worker_finished_jobs  = pickle.loads(job_registrar.finished_jobs())
-            finished_jobs         = finished_jobs or set(worker_finished_jobs)
+            finished_jobs         = finished_jobs | set(worker_finished_jobs)
         return finished_jobs
 
     def sleep_and_poll_finish():

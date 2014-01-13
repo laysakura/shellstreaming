@@ -59,6 +59,7 @@ def sched_loop(
                 ws.finished_jobs.append(job_id)
                 logger.debug('Job %s has finished!!' % (job_id))
                 map(lambda instance: instance.join(), ws.job_instances[job_id])
+                del ws.job_instances[job_id]
 
     # ** main loop **
     while True:
