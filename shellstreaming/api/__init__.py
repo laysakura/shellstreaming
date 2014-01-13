@@ -39,11 +39,11 @@ def Operator(in_stream, operator, *operator_args, **operator_kw):
     return streams
 
 
-def OStream(fixed_worker, in_stream, ostream, *ostream_args, **ostream_kw):
-    _reg_job('ostream', in_stream, ostream, ostream_args, ostream_kw, fixed_worker)
+def OStream(in_stream, ostream, *ostream_args, **ostream_kw):
+    _reg_job('ostream', in_stream, ostream, ostream_args, ostream_kw)
 
 
-def _reg_job(job_type, in_stream, job_class, job_class_args, job_class_kw, fixed_worker=None):
+def _reg_job(job_type, in_stream, job_class, job_class_args, job_class_kw):
     """Update :data:`_job_graph`
     """
     global _job_graph, _num_job_node, _num_stream_edge
@@ -51,7 +51,11 @@ def _reg_job(job_type, in_stream, job_class, job_class_args, job_class_kw, fixed
     # add node
     job_id = "%d: %s" % (_num_job_node, job_class.__name__)
     _num_job_node += 1
-    _job_graph.add_node(job_id, job_type, job_class, job_class_args, job_class_kw, fixed_worker)
+    fixed_to = None
+    if 'fixed_to' in job_class_kw:
+        fixed_to = job_class_kw['fixed_to']
+        del job_class_kw['fixed_to']
+    _job_graph.add_node(job_id, job_type, job_class, job_class_args, job_class_kw, fixed_to)
 
     if job_type in ('operator', 'ostream'):
         # edge from pred job to this job

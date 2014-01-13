@@ -9,17 +9,10 @@ OUTPUT_FILE = '/tmp/04_Sort.txt'
 
 
 def main():
-    randint_stream = api.IStream(RandInt, 0, 100, max_records=1000)
-    randint_win    = api.Operator(
-        randint_stream,
-        CountWindow,
-        3, slide_size=3
-    )
-    sorted_win = api.Operator(
-        randint_win,
-        Sort, 'num'
-    )
-    api.OStream('localhost', sorted_win, LocalFile, OUTPUT_FILE, output_format='json')
+    randint_stream = api.IStream(RandInt, 0, 100, max_records=1000, fixed_to=['cloko000'])
+    randint_win = api.Operator(randint_stream, CountWindow, 3, slide_size=3, fixed_to=['cloko000'])
+    sorted_win = api.Operator(randint_win, Sort, 'num')
+    api.OStream(sorted_win, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['cloko000'])
 
 
 def test():
