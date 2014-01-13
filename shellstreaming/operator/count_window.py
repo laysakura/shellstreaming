@@ -6,7 +6,6 @@
     :synopsis: Provides cout window
 """
 # standard module
-import cPickle as pickle
 from collections import deque
 
 # my module
@@ -50,7 +49,7 @@ class CountWindow(Base):  # [todo] - inherit common `Window` class?
         win       = deque(maxlen=self._sz)
         slide_cnt = 0  # output batch when `slide_cnt == self._slide_sz`
         while True:
-            batch = self.pop(self._in_q)
+            batch = self._in_q.pop()
             if batch is None:
                 self._out_q.push(None)  # [todo] - pushing `None` when finish op is not a bad idea.
                                         # [todo] - but sending 'punctuation' is more general.

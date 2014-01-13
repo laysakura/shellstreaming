@@ -27,6 +27,4 @@ class JobRegistrar(object):
 
     def exposed_finished_jobs(self):
         """Return list of finished jobs"""
-        finished = ws.finished_jobs[:]
-        del ws.finished_jobs[:]
-        return pickle.dumps(finished)
+        return pickle.dumps(ws.finished_jobs)

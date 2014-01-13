@@ -26,7 +26,7 @@ from shellstreaming.util.logger import setup_TerminalLogger
 from shellstreaming.util.importer import import_from_file
 from shellstreaming.worker.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.master_main import sched_loop
-from shellstreaming.util.comm import wait_worker_server, kill_worker_server
+from shellstreaming.util.comm import wait_worker_server, kill_worker_server, rpyc_namespace
 from shellstreaming.master.job_placement import JobPlacement
 import shellstreaming.master.master_struct as ms
 from shellstreaming import api
@@ -83,18 +83,13 @@ def main():
         for host in worker_hosts:
             ms.conn_pool[host] = rpyc.connect(host, worker_port)
         # set worker id to each worker
-        for host in worker_hosts:
-            conn = ms.conn_pool[host]
-            conn.root.set_worker_id(host)
+        map(lambda w: rpyc_namespace(w).set_worker_id(w), worker_hosts)
         # register job graph to each worker
         pickled_job_graph = pickle.dumps(job_graph)
-        for host in worker_hosts:
-            conn = ms.conn_pool[host]
-            conn.root.reg_job_graph(pickled_job_graph)
+        map(lambda w: rpyc_namespace(w).reg_job_graph(pickled_job_graph), worker_hosts)
         # launch worker-local scheduler on each worker
-        for host in worker_hosts:
-            conn = ms.conn_pool[host]
-            conn.root.start_worker_local_scheduler(
+        for w in worker_hosts:
+            rpyc_namespace(w).start_worker_local_scheduler(
                 config.get('shellstreaming', 'worker_scheduler_module'),
                 config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'))
         # start master's main loop.

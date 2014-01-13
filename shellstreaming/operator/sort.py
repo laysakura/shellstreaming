@@ -5,10 +5,6 @@
 
     :synopsis: Provides sort operators
 """
-# standard module
-import cPickle as pickle
-
-# my module
 from relshell.batch import Batch
 from shellstreaming.operator.base import Base
 
@@ -42,7 +38,7 @@ class Sort(Base):
         """Sort records
         """
         while True:
-            batch = self.pop(self._in_q)
+            batch = self._in_q.pop()
             if batch is None:
                 self._out_q.push(None)
                 break

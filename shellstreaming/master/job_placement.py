@@ -75,6 +75,10 @@ class JobPlacement(object):
             return []
         return self._job_place[job_id]
 
+    def assigned_jobs(self, worker_id):
+        """Return list of jobs which are are assigned to :param:`worker_id`"""
+        return filter(lambda j: worker_id in self.assigned_workers(j), self._job_place.keys())
+
     def copy(self):
         """Returns deep copy of `self`"""
         obj = JobPlacement(self._job_graph)
