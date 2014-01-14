@@ -18,12 +18,15 @@ import logging
 from ConfigParser import SafeConfigParser
 
 # 3rd party module
+import rpyc
 from rpyc.utils.server import ThreadedServer as Server
 
 # my module
 from shellstreaming.config import DEFAULT_CONFIG
-from shellstreaming.util.logger import setup_FileLogger, setup_TerminalLogger
+from shellstreaming.util.logger import setup_TerminalLogger
+from shellstreaming.util.comm import kill_worker_server, wait_worker_server
 from shellstreaming.scheduler.worker_main import start_sched_loop
+import shellstreaming.worker.worker_struct as ws
 from shellstreaming.worker.worker_server_service import WorkerServerService
 
 
@@ -34,31 +37,36 @@ def main(cnfpath):
 
     # setup logger
     loglevel = eval('logging.' + config.get('shellstreaming', 'log_level'))
-    logpath  = config.get('shellstreaming', 'worker_log_path')
-    setup_FileLogger(loglevel, logpath)
-    logger = logging.getLogger('FileLogger')
     setup_TerminalLogger(loglevel)
-    logging.getLogger('TerminalLogger').debug('Log is written in <%s> in `%s` level' % (logpath, loglevel))
+    logger = logging.getLogger('TerminalLogger')
 
     # start `WorkerServerService` thread
     port = config.getint('shellstreaming', 'worker_port')
     logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
     th_service = start_worker_server_thread(port, logger)
 
-    # start worker-local scheduling thread
-    logger.debug('Starting worker-local scheduler')
-    th_sched = start_sched_loop(config.get('shellstreaming', 'worker_scheduler_module'),
-                                config.get('shellstreaming', 'worker_reschedule_interval_sec'))
+    # make connection to other workers
+    for worker in config.get('shellstreaming', 'worker_hosts').split(','):
+        wait_worker_server(worker, port)
+        ws.conn_pool[worker] = rpyc.connect(worker, port)
 
-    while WorkerServerService.server:    # wait for `server` to be `close()`ed by master client.
+    # wait for `server` to be `close()`ed by master client.
+    while WorkerServerService.server:
         time.sleep(1.0)
 
     logger.debug('`WorkerServerService` has been closed.')
     th_service.join()
-    th_sched.join()
 
+    return 0
 
 def start_worker_server_thread(port, logger):
+    # attempt to kill already launched server (for avoiding `Address already in use`)
+    try:
+        kill_worker_server('localhost', port)
+    except IOError:
+        pass
+
+    # start new worker server
     WorkerServerService.server = Server(
         WorkerServerService, port=port,
         logger=logger,

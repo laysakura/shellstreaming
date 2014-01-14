@@ -6,6 +6,7 @@
     :synopsis: Provides master process's entry point
 """
 # standard module
+import time
 import argparse
 import os
 from os.path import abspath, dirname, join
@@ -25,7 +26,8 @@ from shellstreaming.util.logger import setup_TerminalLogger
 from shellstreaming.util.importer import import_from_file
 from shellstreaming.worker.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.master_main import sched_loop
-from shellstreaming.util.comm import wait_worker_server, kill_worker_server
+from shellstreaming.util.comm import wait_worker_server, kill_worker_server, rpyc_namespace
+from shellstreaming.master.job_placement import JobPlacement
 import shellstreaming.master.master_struct as ms
 from shellstreaming import api
 
@@ -47,20 +49,26 @@ def main():
     logger = logging.getLogger('TerminalLogger')
     logger.info('Used config file: %s' % (cnfpath))
 
+    # overwrite worker_hosts when localhost_debug
+    if config.getboolean('shellstreaming', 'localhost_debug'):
+        config.set('shellstreaming', 'worker_hosts', 'localhost')
+
     # launch worker servers
-    worker_hosts = config.get('shellstreaming', 'worker_hosts').split(',')
-    worker_port  = config.getint('shellstreaming', 'worker_port')
-    if config.getboolean('shellstreaming', 'single_process_debug'):
+    ms.WORKER_HOSTS = config.get('shellstreaming', 'worker_hosts').split(',')
+    worker_port     = config.getint('shellstreaming', 'worker_port')
+    if config.getboolean('shellstreaming', 'localhost_debug'):
         # launch a worker server on localhost
-        logger.debug('Entering single_process_debug mode')
+        logger.debug('Entering localhost_debug mode')
         th_service = start_worker_server_thread(worker_port, logger)
     else:
         # auto-deploy, launch worker server on worker hosts
         _launch_workers(
-            worker_hosts, worker_port,
+            ms.WORKER_HOSTS, worker_port,
             cnf_sent_to_worker=cnfpath,
+            worker_log_path=config.get('shellstreaming', 'worker_log_path'),
             parallel_deploy=config.getboolean('shellstreaming', 'parallel_deploy'),
             ssh_private_key=config.get('shellstreaming', 'ssh_private_key'),
+            send_latest_config_on_start=config.getboolean('shellstreaming', 'send_latest_config_on_start'),
             send_latest_codes_on_start=config.getboolean('shellstreaming', 'send_latest_codes_on_start'),
         )
 
@@ -71,35 +79,44 @@ def main():
         if config.get('shellstreaming', 'job_graph_path') != '':
             _draw_job_graph(job_graph, config.get('shellstreaming', 'job_graph_path'))
         # initialize :module:`master_struct`
-        for host in worker_hosts:
+        ms.job_placement = JobPlacement(job_graph)
+        for host in ms.WORKER_HOSTS:
             ms.conn_pool[host] = rpyc.connect(host, worker_port)
+        # set worker id to each worker
+        map(lambda w: rpyc_namespace(w).set_worker_id(w), ms.WORKER_HOSTS)
         # register job graph to each worker
         pickled_job_graph = pickle.dumps(job_graph)
-        for host in worker_hosts:
-            conn = ms.conn_pool[host]
-            conn.root.reg_job_graph(pickled_job_graph)
+        map(lambda w: rpyc_namespace(w).reg_job_graph(pickled_job_graph), ms.WORKER_HOSTS)
         # launch worker-local scheduler on each worker
-        if config.getboolean('shellstreaming', 'single_process_debug'):
-            conn = ms.conn_pool['localhost']
-            conn.root.start_worker_local_scheduler(
+        for w in ms.WORKER_HOSTS:
+            rpyc_namespace(w).start_worker_local_scheduler(
                 config.get('shellstreaming', 'worker_scheduler_module'),
-                config.getint('shellstreaming', 'worker_reschedule_interval_sec'),
-            )
-        else:
-            assert(False)  # [todo] - lauch worker-local scheduler on each worker
-        # start master's main loop
-        sched_loop(
-            job_graph, worker_hosts, worker_port,
-            config.get('shellstreaming', 'master_scheduler_module'),
-            config.getint('shellstreaming', 'master_reschedule_interval_sec'),
-        )
-        # run user's validation codes
-        _run_test(args.stream_py)
+                config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'))
+        # start master's main loop.
+        t_sched_loop_sec0 = time.time()
+        sched_loop(job_graph, ms.WORKER_HOSTS, worker_port,
+                   config.get('shellstreaming', 'master_scheduler_module'),
+                   config.getfloat('shellstreaming', 'master_reschedule_interval_sec'))
+        t_sched_loop_sec1 = time.time()
+        # kill workers after all jobs are finieshd
+        logger.debug('Finished all job execution. Killing worker servers...')
+        map(lambda w: kill_worker_server(w, worker_port), ms.WORKER_HOSTS)
     except KeyboardInterrupt as e:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
-        for host in worker_hosts:
-            kill_worker_server(host, worker_port)
+        map(lambda w: kill_worker_server(w, worker_port), ms.WORKER_HOSTS)
         logger.exception(e)
+        return 1
+
+    # run user's validation codes
+    _run_test(args.stream_py)
+
+    # message
+    logger.info('''
+Successfully finished all job execution.
+Execution time: %(t_sched_loop_sec)f sec.
+''' % {
+    't_sched_loop_sec': t_sched_loop_sec1 - t_sched_loop_sec0
+})
 
     return 0
 
@@ -140,8 +157,10 @@ def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIG_LOCATION):
 
 def _launch_workers(worker_hosts, worker_port,
                     cnf_sent_to_worker,
+                    worker_log_path,
                     parallel_deploy,
                     ssh_private_key,
+                    send_latest_config_on_start,
                     send_latest_codes_on_start,
     ):
     """Launch every worker server and return.
@@ -149,6 +168,7 @@ def _launch_workers(worker_hosts, worker_port,
     :param worker_hosts: worker hosts to launch worker servers
     :type worker_hosts:  list of hostname string
     :param worker_port:  worker servers' TCP port number
+    :param worker_log_path: worker servers' log path
     :param cnf_sent_to_worker: if not `None`, specified config file is sent to worker hosts and used by them
     :param parallel_deploy: If `True`, auto-deploy is done in parallel. Especially useful when you have
         many :param:`worker_hosts`.
@@ -160,13 +180,15 @@ def _launch_workers(worker_hosts, worker_port,
     logger = logging.getLogger('TerminalLogger')
 
     # deploy & start workers' server
-    scriptpath = join(abspath(dirname(__file__)), 'auto_deploy.py')
+    scriptpath = join(abspath(dirname(__file__)), '..', 'autodeploy', 'auto_deploy.py')
 
     fab_tasks = []
     if send_latest_codes_on_start:
         fab_tasks.append('pack')
-        fab_tasks.append('deploy:cnfpath=%s' % (cnf_sent_to_worker))
-    fab_tasks.append('start_worker:cnfpath=%s' % (cnf_sent_to_worker))
+        fab_tasks.append('deploy_codes')
+    if send_latest_config_on_start or send_latest_codes_on_start:  # config is removed for latter case
+        fab_tasks.append('deploy_config:cnfpath=%s' % (cnf_sent_to_worker))
+    fab_tasks.append('start_worker:cnfpath=%s,logpath=%s' % (cnf_sent_to_worker, worker_log_path))
 
     cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s %(parallel_deploy)s %(ssh_priv_key)s' % {
         'script'          : scriptpath,

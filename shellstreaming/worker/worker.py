@@ -18,28 +18,28 @@ from os.path import abspath, dirname, join
 from subprocess import Popen
 
 
-def main(cnfpath):
+def main(cnfpath, logpath):
     """Worker process's entry point.
 
     :param cnfpath: path to config file
+    :param logpath: path to log file
     :returns: exit status of worker process
     """
-    _run_worker_server(cnfpath)
+    _run_worker_server(cnfpath, logpath)
     return 0
 
 
-def _run_worker_server(cnfpath):
+def _run_worker_server(cnfpath, logpath):
     script     = join(dirname(abspath(__file__)), 'run_worker_server.py')
     deploy_dir = join(dirname(abspath(__file__)), '..', '..', '..')
     virtualenv_activator = join(deploy_dir, 'bin', 'activate')
-    cmd = 'nohup sh -c "[ -f %(virtualenv)s ] && . %(virtualenv)s ; python %(script)s --config=%(cnfpath)s" &' % {
+    cmd = 'nohup sh -c "[ -f %(virtualenv)s ] && . %(virtualenv)s ; python %(script)s --config=%(cnfpath)s >> %(logpath)s 2>&1" &' % {
         'virtualenv' : virtualenv_activator,
         'script'     : script,
         'cnfpath'    : cnfpath,
+        'logpath'    : logpath,
     }
     Popen(shlex.split(cmd), env=os.environ)
-
-    sys.stderr.write('Start new process: "%s"%s'  % (cmd, os.linesep))  # logger is not available here
 
 
 def _parse_args():
@@ -49,6 +49,10 @@ def _parse_args():
         '--config', '-c',
         required=True,
         help='Configuration file')
+    parser.add_argument(
+        '--log', '-l',
+        required=True,
+        help='Log file path')
 
     args = parser.parse_args()
     return args
@@ -56,4 +60,4 @@ def _parse_args():
 
 if __name__ == '__main__':
     args = _parse_args()
-    sys.exit(main(args.config))
+    sys.exit(main(args.config, args.log))

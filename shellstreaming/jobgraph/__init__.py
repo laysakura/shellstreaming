@@ -46,15 +46,16 @@ class JobGraph(nx.DiGraph):
         """
         return [n for n in self.nodes() if self.out_edges(n) == []]
 
-    def add_node(self, job_id, job_type, job_class, job_class_args, job_class_kw):
+    def add_node(self, job_id, job_type, job_class, job_class_args, job_class_kw, fixed_to):
         """Override :func:`Digraph.add_node` to force put necessary attributes to every node"""
         nx.DiGraph.add_node(
             self, job_id,
             attr_dict={
-                'class'  : job_class,
-                'args'   : job_class_args,
-                'kwargs' : job_class_kw,
-                'type'   : job_type,
+                'class'    : job_class,
+                'args'     : job_class_args,
+                'kwargs'   : job_class_kw,
+                'type'     : job_type,
+                'fixed_to' : fixed_to,
             }
         )
 
