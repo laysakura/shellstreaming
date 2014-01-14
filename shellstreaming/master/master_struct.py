@@ -7,6 +7,9 @@
 """
 
 
+WORKER_HOSTS = []
+"""List of worker ids"""
+
 job_placement = None
 """Instance of :class:`JobPlacement`"""
 

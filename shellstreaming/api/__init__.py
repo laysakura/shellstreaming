@@ -5,12 +5,18 @@
 
     :synopsis: Provides APIs users call for describing stream processings
 """
+# standard modules
+import logging
+
+# my modules
+import shellstreaming.master.master_struct as ms
 from shellstreaming.jobgraph import JobGraph, StreamEdge
 
 
 _job_graph       = JobGraph()  # api.* functions modify this graph structure
 _num_job_node    = 0           # used for unique job node id
 _num_stream_edge = 0           # used for unique stream edge id
+_num_istream     = 0           # used to decide which worker to launch non-fixed istream
 
 
 def IStream(istream, *istream_args, **istream_kw):
@@ -27,6 +33,16 @@ def IStream(istream, *istream_args, **istream_kw):
         randint_stream = Istream(RandInt, (0, 100))
         ...
     """
+    logger = logging.getLogger('TerminalLogger')
+
+    if 'fixed_to' not in istream_kw:
+        logger.info('When "fixed_to" parameter is not given to api.IStream(), istream is instanciated only on 1 node (not parallelised)')
+        # fix istream to a worker (round-robine)
+        global _num_istream
+        worker = ms.WORKER_HOSTS[_num_istream % len(ms.WORKER_HOSTS)]
+        istream_kw['fixed_to'] = [worker]
+        _num_istream += 1
+
     stream = _reg_job('istream', None, istream, istream_args, istream_kw)
     return stream
 
