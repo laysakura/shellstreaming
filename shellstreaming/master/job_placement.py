@@ -30,14 +30,14 @@ class JobPlacement(object):
 
         .. code-block:: python
             {
-                '<fixed job id>': <worker id>,
+                '<fixed job id>': [<worker id>, ...],
                 ...
             }
         """
         for job_id, job_attr in job_graph.nodes_iter(data=True):
-            fixed_worker = job_attr['fixed_worker']
-            if fixed_worker is not None:
-                self._fixed_job[job_id] = fixed_worker
+            fixed_workers = job_attr['fixed_to']
+            if fixed_workers is not None:
+                self._fixed_job[job_id] = fixed_workers
 
     def fixed_to(self, job_id):
         """Return worker_id which :param:`job_id` is fixed to"""
@@ -54,9 +54,9 @@ class JobPlacement(object):
     def assign(self, job_id, worker_id):
         """Assign :param:`job_id` to :param:`worker_id`
 
-        :raises: `ValueError` when :param:`job_id` is fixed to wther worker
+        :raises: `ValueError` when :param:`job_id` is fixed to other workers
         """
-        if self.fixed_to(job_id) and self.fixed_to(job_id) != worker_id:
+        if self.fixed_to(job_id) and worker_id not in self.fixed_to(job_id):
             raise ValueError('%s is fixed to %s' % (job_id, self.fixed_to(job_id)))
         assert(worker_id not in self.assigned_workers(job_id))
         if self.is_started(job_id):
@@ -74,6 +74,10 @@ class JobPlacement(object):
         if not self.is_started(job_id):
             return []
         return self._job_place[job_id]
+
+    def assigned_jobs(self, worker_id):
+        """Return list of jobs which are are assigned to :param:`worker_id`"""
+        return filter(lambda j: worker_id in self.assigned_workers(j), self._job_place.keys())
 
     def copy(self):
         """Returns deep copy of `self`"""

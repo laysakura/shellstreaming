@@ -22,6 +22,6 @@ def setup_TerminalLogger(log_level, logger_name='TerminalLogger'):
     """
     logger = logging.getLogger(logger_name)
     logger.setLevel(log_level)
-    handler = RainbowLoggingHandler(sys.stderr)
+    handler = RainbowLoggingHandler(sys.stderr, datefmt=None)
     handler.setFormatter(logging.Formatter("[%(asctime)s] %(filename)s %(funcName)s():%(lineno)d\t%(message)s"))
     logger.addHandler(handler)

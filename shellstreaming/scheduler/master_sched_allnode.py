@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-    shellstreaming.scheduler.master_sched_firstnode
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    shellstreaming.scheduler.master_sched_allnode
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :synopsis: Schedules all jobs to first worker in list (for testing purpose)
+    :synopsis: Schedules jobs to all workers, regardless of its ability to parallelize
 """
+import logging
 
 
 def calc_job_placement(job_graph, worker_hosts, prev_jobs_placement):
+    logger = logging.getLogger('TerminalLogger')
+
     next_jobs_placement = prev_jobs_placement.copy()
     for job_id in job_graph.nodes_iter():
         # start not started & finished job
@@ -18,5 +21,5 @@ def calc_job_placement(job_graph, worker_hosts, prev_jobs_placement):
                 map(lambda w: next_jobs_placement.assign(job_id, w), fixed_workers)
                 continue
             # normal job
-            next_jobs_placement.assign(job_id, worker_hosts[0])
+            map(lambda w: next_jobs_placement.assign(job_id, w), worker_hosts)
     return next_jobs_placement

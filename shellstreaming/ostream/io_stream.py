@@ -5,10 +5,6 @@
 
     :synopsis: Output records into IO stream (file, stdout, ...)
 """
-# standard module
-import cPickle as pickle
-
-# my module
 from shellstreaming.ostream.base import Base
 
 
@@ -33,8 +29,6 @@ class IoStream(Base):
             batch = self._batch_q.pop()
             if batch is None:
                 break
-            if type(batch) == str:
-                batch = pickle.loads(batch)
 
             self._io_stream.write(batch.formatted_str(self._output_format))
             self._io_stream.flush()

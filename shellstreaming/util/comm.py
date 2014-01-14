@@ -5,10 +5,13 @@
 
     :synopsis: Provides utility functions
 """
+# standard modules
 import rpyc
 import socket
 import time
 import logging
+
+# my modules
 
 
 def kill_worker_server(worker_host, worker_port):
@@ -56,3 +59,15 @@ def wait_worker_server(worker_host, worker_port, timeout_sec=None):
             continue
         except:
             raise
+
+
+def rpyc_namespace(worker_id):
+    """Return rpyc's root namespace of :param:`worker_id`"""
+    # [todo] - too ugly?
+    import shellstreaming.worker.worker_struct as ws
+    if ws.WORKER_ID:
+        conn = ws.conn_pool[worker_id]
+    else:
+        import shellstreaming.master.master_struct as ms
+        conn = ms.conn_pool[worker_id]
+    return conn.root
