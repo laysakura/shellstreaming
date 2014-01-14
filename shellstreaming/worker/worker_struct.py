@@ -17,8 +17,12 @@ JOB_GRAPH = None
 ASSIGNED_JOBS = []
 """Jobs to execute. Only :func:`exposd_register` and :func:`exposd_unregister` modify this"""
 
-REMOTE_QUEUE_PLACEMENT = None
-"""Remote queue to fetch batches. Only :func:`exposd_update_remote_queue_placement` modifies this"""
+QUEUE_GROUPS = {}
+"""{edge_id: QueueGroup()} structure. Only :func:`exposd_update_queue_groups` modifies this"""
+
+BLOCKED_BY_MASTER = False
+"""True only when master starts `stop the world` for changing job scheduling.
+Only :func:`exposd_block` & :func:`exposd_unblock` modifies this"""
 
 # for communicating information with master
 finished_jobs = []
@@ -46,6 +50,9 @@ job_instances = {}
         ...
     }
 """
+
+ack_blocked = False
+"""True when worker has finished blocking asked by worker"""
 
 # for communicating with other workers
 local_queues = {}
