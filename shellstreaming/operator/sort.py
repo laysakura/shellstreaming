@@ -5,7 +5,7 @@
 
     :synopsis: Provides sort operators
 """
-from shellstreaming.timed_batch import TimedBatch
+from relshell.batch import Batch
 from shellstreaming.operator.base import Base
 
 
@@ -13,29 +13,45 @@ from shellstreaming.operator.base import Base
 class Sort(Base):
     """Sort operator"""
 
-    def __init__(self, column_index, desc=False):
+    def __init__(self, column_name, desc=False, **kw):
         """Creates sort operators.
 
         Works like SQL's ``order by [desc] col_val``.
 
-        :param column_index: index of column to filter
-        :param desc:         sort in reverse order when `True`
+        :param column_name: name of column to be sort key
+        :param desc:      sort in reverse order when `True`
         """
-        self._col  = column_index
-        self._desc = desc
-        Base.__init__(self)
+        self._colname = column_name
+        self._desc    = desc
 
-    def execute(self, batch):
+        in_qs, out_qs = (kw['input_queues'], kw['output_queues'])
+        # input queue
+        assert(len(in_qs) == 1)
+        self._in_q = in_qs.values()[0]
+        # output queues
+        assert(len(out_qs) == 1)
+        self._out_q = out_qs.values()[0]
+
+        Base.__init__(self, **kw)
+
+    def run(self):
         """Sort records
-
-        :param batch: batch to sort
-        :returns:     sorted batch
         """
-        records = []
-        for rec in batch:
-            records.append(rec)
-        records.sort(
-            cmp=lambda rec_x, rec_y: cmp(rec_x[self._col], rec_y[self._col]),
-            reverse=self._desc
-        )  # [todo] - faster algorithm. E.g. keep sorted order when inserting
-        return TimedBatch(batch.timespan, tuple(records))  # [todo] - is it OK to always use timestamp from inputstream?
+        while True:
+            batch = self._in_q.pop()
+            if batch is None:
+                self._out_q.push(None)
+                break
+
+            rdef   = batch.record_def()
+            colidx = rdef.colindex_by_colname(self._colname)
+            sorted_rec = sorted(
+                batch._records, reverse=self._desc,
+                cmp=lambda rec_x, rec_y: cmp(rec_x[colidx], rec_y[colidx]),
+            )
+            out_batch = Batch(batch.record_def(), tuple(sorted_rec))
+            self._out_q.push(out_batch)
+
+    @staticmethod
+    def out_stream_edge_id_suffixes(args):
+        return ('sorted', )

@@ -7,7 +7,7 @@ InputStream
    :maxdepth: 1
    :hidden:
 
-   api/inputstream
+   api/istream
 
 :synopsis: Inputs relational data streams from various data sources.
 

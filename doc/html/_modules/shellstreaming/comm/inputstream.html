@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>shellstreaming.comm.inputstream &mdash; shellstreaming  documentation</title>
+    <title>shellstreaming.comm.istream &mdash; shellstreaming  documentation</title>
     
     <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -49,20 +49,20 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for shellstreaming.comm.inputstream</h1><div class="highlight"><pre>
+  <h1>Source code for shellstreaming.comm.istream</h1><div class="highlight"><pre>
 <span class="c"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    shellstreaming.comm.inputstream</span>
+<span class="sd">    shellstreaming.comm.istream</span>
 <span class="sd">    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</span>
 
-<span class="sd">    :synopsis: Dispatch | Execute inputstreams</span>
+<span class="sd">    :synopsis: Dispatch | Execute istreams</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">rpyc</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
 <span class="kn">from</span> <span class="nn">shellstreaming.config</span> <span class="kn">import</span> <span class="n">Config</span>
 
 
-<div class="viewcode-block" id="InputStreamExecutorService"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.inputstream.InputStreamExecutorService">[docs]</a><span class="k">class</span> <span class="nc">InputStreamExecutorService</span><span class="p">(</span><span class="n">rpyc</span><span class="o">.</span><span class="n">Service</span><span class="p">):</span>  <span class="c"># pragma: no cover</span>
+<div class="viewcode-block" id="InputStreamExecutorService"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.istream.InputStreamExecutorService">[docs]</a><span class="k">class</span> <span class="nc">InputStreamExecutorService</span><span class="p">(</span><span class="n">rpyc</span><span class="o">.</span><span class="n">Service</span><span class="p">):</span>  <span class="c"># pragma: no cover</span>
                                                  <span class="c"># Because this class is executed by separated process,</span>
                                                  <span class="c"># it&#39;s difficult to trace execution of statements inside it.</span>
                                                  <span class="c"># TODO: must be tested</span>
@@ -71,45 +71,45 @@
 <span class="sd">    .. note::</span>
 <span class="sd">        Any class &amp; functions in `InputStreamExecutorService` are executed by worker process.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="InputStreamExecutorService.exposed_InputStreamExecutor"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.inputstream.InputStreamExecutorService.exposed_InputStreamExecutor">[docs]</a>    <span class="k">class</span> <span class="nc">exposed_InputStreamExecutor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Asynchronous executor of inputstreams&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="InputStreamExecutorService.exposed_InputStreamExecutor.__init__"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.inputstream.InputStreamExecutorService.exposed_InputStreamExecutor.__init__">[docs]</a>        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">inputstream_name</span><span class="p">,</span> <span class="n">inputstream_args</span><span class="p">,</span> <span class="n">on_new_batch</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;Creates asynchronous executor of inputstreams</span>
+<div class="viewcode-block" id="InputStreamExecutorService.exposed_InputStreamExecutor"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.istream.InputStreamExecutorService.exposed_InputStreamExecutor">[docs]</a>    <span class="k">class</span> <span class="nc">exposed_InputStreamExecutor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Asynchronous executor of istreams&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="InputStreamExecutorService.exposed_InputStreamExecutor.__init__"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.istream.InputStreamExecutorService.exposed_InputStreamExecutor.__init__">[docs]</a>        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">istream_name</span><span class="p">,</span> <span class="n">istream_args</span><span class="p">,</span> <span class="n">on_new_batch</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Creates asynchronous executor of istreams</span>
 
 <span class="sd">            :param conn:             connection info</span>
 <span class="sd">            :type conn:              `(worker name, result of rpyc.connection(), connection thread)`</span>
-<span class="sd">            :param inputstream_name: class name of inputstreams</span>
-<span class="sd">            :param inputstream_args: arguments for specified inputstream</span>
-<span class="sd">            :type inputstream_args:  `tuple`</span>
+<span class="sd">            :param istream_name: class name of istreams</span>
+<span class="sd">            :param istream_args: arguments for specified istream</span>
+<span class="sd">            :type istream_args:  `tuple`</span>
 <span class="sd">            :param on_new_batch:     callback function called when new batch is created</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span>             <span class="o">=</span> <span class="n">conn</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_inputstream_name</span> <span class="o">=</span> <span class="n">inputstream_name</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_inputstream_args</span> <span class="o">=</span> <span class="n">inputstream_args</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_istream_name</span> <span class="o">=</span> <span class="n">istream_name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_istream_args</span> <span class="o">=</span> <span class="n">istream_args</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_on_new_batch</span>     <span class="o">=</span> <span class="n">on_new_batch</span>
 </div>
-<div class="viewcode-block" id="InputStreamExecutorService.exposed_InputStreamExecutor.exposed_execute"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.inputstream.InputStreamExecutorService.exposed_InputStreamExecutor.exposed_execute">[docs]</a>        <span class="k">def</span> <span class="nf">exposed_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="InputStreamExecutorService.exposed_InputStreamExecutor.exposed_execute"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.istream.InputStreamExecutorService.exposed_InputStreamExecutor.exposed_execute">[docs]</a>        <span class="k">def</span> <span class="nf">exposed_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;Start inputsream.</span>
 
 <span class="sd">            This function is supposed to be wrapped by `rpyc.async`</span>
 <span class="sd">            &quot;&quot;&quot;</span>
-            <span class="n">stream</span> <span class="o">=</span> <span class="n">InputStreamExecutorService</span><span class="o">.</span><span class="n">_create_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inputstream_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputstream_args</span><span class="p">)</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="n">InputStreamExecutorService</span><span class="o">.</span><span class="n">_create_stream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_istream_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_istream_args</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
                 <span class="n">InputStreamExecutorService</span><span class="o">.</span><span class="n">_store_new_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_on_new_batch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
 </div></div>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_create_stream</span><span class="p">(</span><span class="n">inputstream_name</span><span class="p">,</span> <span class="n">inputstream_args</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_create_stream</span><span class="p">(</span><span class="n">istream_name</span><span class="p">,</span> <span class="n">istream_args</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create stream object&quot;&quot;&quot;</span>
-        <span class="n">module</span>       <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">InputStreamExecutorService</span><span class="o">.</span><span class="n">_get_module_name</span><span class="p">(</span><span class="n">inputstream_name</span><span class="p">))</span>
-        <span class="n">stream_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">inputstream_name</span><span class="p">)</span>
-        <span class="n">stream</span>       <span class="o">=</span> <span class="n">stream_class</span><span class="p">(</span><span class="o">*</span><span class="n">inputstream_args</span><span class="p">)</span>
+        <span class="n">module</span>       <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">InputStreamExecutorService</span><span class="o">.</span><span class="n">_get_module_name</span><span class="p">(</span><span class="n">istream_name</span><span class="p">))</span>
+        <span class="n">stream_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">istream_name</span><span class="p">)</span>
+        <span class="n">stream</span>       <span class="o">=</span> <span class="n">stream_class</span><span class="p">(</span><span class="o">*</span><span class="n">istream_args</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">stream</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_get_module_name</span><span class="p">(</span><span class="n">inputstream_name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return full module path of `inputstream_name`&quot;&quot;&quot;</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="s">&#39;shellstreaming.inputstream.</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">inputstream_name</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="k">def</span> <span class="nf">_get_module_name</span><span class="p">(</span><span class="n">istream_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return full module path of `istream_name`&quot;&quot;&quot;</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="s">&#39;shellstreaming.istream.</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">istream_name</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">module</span>
 
     <span class="nd">@staticmethod</span>
@@ -120,22 +120,22 @@
         <span class="c"># TODO: put batch into worker&#39;s memory</span>
 
 </div>
-<div class="viewcode-block" id="InputStreamDispatcher"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.inputstream.InputStreamDispatcher">[docs]</a><span class="k">class</span> <span class="nc">InputStreamDispatcher</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Asynchronous inputstream dispatcher&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="InputStreamDispatcher.__init__"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.inputstream.InputStreamDispatcher.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker</span><span class="p">,</span> <span class="n">inputstream_name</span><span class="p">,</span> <span class="n">inputstream_args</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Create inputstream dispatcher</span>
+<div class="viewcode-block" id="InputStreamDispatcher"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.istream.InputStreamDispatcher">[docs]</a><span class="k">class</span> <span class="nc">InputStreamDispatcher</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asynchronous istream dispatcher&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="InputStreamDispatcher.__init__"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.istream.InputStreamDispatcher.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">worker</span><span class="p">,</span> <span class="n">istream_name</span><span class="p">,</span> <span class="n">istream_args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create istream dispatcher</span>
 
 <span class="sd">        :param worker:           worker&#39;s reachable hostname or IP address</span>
-<span class="sd">        :param inputstream_name: class name of inputstreams</span>
-<span class="sd">        :param inputstream_args: arguments for specified inputstream</span>
+<span class="sd">        :param istream_name: class name of istreams</span>
+<span class="sd">        :param istream_args: arguments for specified istream</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span> <span class="o">=</span> <span class="n">_connect</span><span class="p">(</span><span class="n">worker</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_async_res</span> <span class="o">=</span> <span class="n">_async_execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="p">,</span> <span class="n">inputstream_name</span><span class="p">,</span> <span class="n">inputstream_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_async_res</span> <span class="o">=</span> <span class="n">_async_execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="p">,</span> <span class="n">istream_name</span><span class="p">,</span> <span class="n">istream_args</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="InputStreamDispatcher.join"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.inputstream.InputStreamDispatcher.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Wait for inputstream to finish.</span>
+<div class="viewcode-block" id="InputStreamDispatcher.join"><a class="viewcode-back" href="../../../index.html#shellstreaming.comm.istream.InputStreamDispatcher.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Wait for istream to finish.</span>
 
-<span class="sd">        After inputstream finishes, connection to worker is closed.</span>
+<span class="sd">        After istream finishes, connection to worker is closed.</span>
 
 <span class="sd">        :raises: any exception raised from `_async_execute`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -155,12 +155,12 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">conn_thread</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_async_execute</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">inputstream_name</span><span class="p">,</span> <span class="n">inputstream_args</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Asynchronously execute inputstream on worker process&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_async_execute</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">istream_name</span><span class="p">,</span> <span class="n">istream_args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Asynchronously execute istream on worker process&quot;&quot;&quot;</span>
     <span class="p">(</span><span class="n">worker</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">conn_thread</span><span class="p">)</span> <span class="o">=</span> <span class="n">conn</span>
     <span class="n">executor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">InputStreamExecutor</span><span class="p">(</span>
         <span class="n">conn</span><span class="p">,</span>
-        <span class="n">inputstream_name</span><span class="p">,</span> <span class="n">inputstream_args</span><span class="p">,</span>
+        <span class="n">istream_name</span><span class="p">,</span> <span class="n">istream_args</span><span class="p">,</span>
         <span class="n">on_new_batch</span><span class="o">=</span><span class="n">_reg_new_batch</span>
     <span class="p">)</span>
 

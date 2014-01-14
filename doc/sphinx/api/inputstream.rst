@@ -3,7 +3,7 @@
 Tweet
 =====
 
-.. automodule:: shellstreaming.inputstream.tweet
+.. automodule:: shellstreaming.istream.tweet
    :members:
 
 .. _api-TextFile:
@@ -11,5 +11,5 @@ Tweet
 TextFile
 ========
 
-.. automodule:: shellstreaming.inputstream.textfile
+.. automodule:: shellstreaming.istream.textfile
    :members:
