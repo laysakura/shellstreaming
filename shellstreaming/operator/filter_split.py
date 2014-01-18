@@ -34,7 +34,7 @@ class FilterSplit(Base):
                 if edge_id.endswith(cond):
                     self._out_qs[cond] = q
 
-        Base.__init__(self, **kw)
+        Base.__init__(self)
 
     def run(self):
         """Filter batch according to :param:`*conditions`

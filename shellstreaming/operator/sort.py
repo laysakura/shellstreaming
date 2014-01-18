@@ -32,7 +32,7 @@ class Sort(Base):
         assert(len(out_qs) == 1)
         self._out_q = out_qs.values()[0]
 
-        Base.__init__(self, **kw)
+        Base.__init__(self)
 
     def run(self):
         """Sort records
