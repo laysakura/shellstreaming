@@ -6,7 +6,7 @@ from shellstreaming.operator import ShellCmd
 from shellstreaming.ostream import LocalFile
 
 
-OUTPUT_FILE = '/tmp/05_ShellOperator.txt'
+OUTPUT_FILE = '/tmp/05_ShellCmd.txt'
 NUM_RECORDS = 100000
 
 
