@@ -563,5 +563,5 @@ class RandSentence(Base):
             if self._interrupted():
                 break
             i        = random.randint(0, self._len_sentences - 1)
-            sentence = sentences[i].strip().replace('\n', ' ').replace('\r', ' ')
+            sentence = sentences[i].strip().replace('\n', ' ').replace('\r', ' ').lower()
             self.add(rdef, Record(sentence))
