@@ -15,8 +15,7 @@ WORD_COUNT     = SHELLCMD_DIR + '/shellcmd/word_count'      # input: word, outpu
 
 
 def main():
-    sentence_stream = api.IStream(RandSentence, seed=1, sleep_sec=1e-7, max_records=NUM_RECORDS,
-                                  fixed_to=['localhost'], records_in_batch=1)
+    sentence_stream = api.IStream(RandSentence, seed=1, sleep_sec=1e-7, max_records=NUM_RECORDS, fixed_to=['localhost'])
     word_stream = api.Operator(
         [sentence_stream], ShellCmd,
         '%s < IN_STREAM > OUT_STREAM' % (SPLIT_SENTENCE),
@@ -25,9 +24,6 @@ def main():
         out_col_patterns={'word': re.compile(r'^.+$', re.MULTILINE)},
         msg_to_cmd='extraordinarylongword\n',
         reply_from_cmd='extraordinarylongword\n')
-
-    # api.OStream(word_stream, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
-    # return
 
     word_stream.partition_by_key('word')
 
@@ -56,8 +52,9 @@ def test():
             record = json.loads(line)
             word, count = (record['word'], int(record['count']))
             wc_dict[word] = count
+
     print("%d lines" % (i + 1))
-    assert(i == 50459)
-    assert(wc_dict['from']     == 1070)
-    assert(wc_dict['november'] == 264)
-    assert(wc_dict['2009']     == 192)
+    assert(i == 50961)
+    assert(wc_dict['from']     == 552)
+    assert(wc_dict['november'] == 130)
+    assert(wc_dict['2009']     == 87)
