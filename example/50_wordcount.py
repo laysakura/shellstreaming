@@ -7,9 +7,9 @@ from shellstreaming.operator import ShellCmd
 from shellstreaming.ostream import LocalFile
 
 
-OUTPUT_FILE = '/tmp/50_wordcount.txt'
-NUM_RECORDS = 1890
-SHELLCMD_DIR = abspath(dirname(__file__))
+OUTPUT_FILE    = '/tmp/50_wordcount.txt'
+NUM_RECORDS    = 10000
+SHELLCMD_DIR   = abspath(dirname(__file__))
 SPLIT_SENTENCE = SHELLCMD_DIR + '/shellcmd/split_sentence'  # input: sentence, output: words
 WORD_COUNT     = SHELLCMD_DIR + '/shellcmd/word_count'      # input: word, output: occurence count of the word
 

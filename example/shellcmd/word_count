@@ -10,8 +10,6 @@ import sys
 
 
 if __name__ == '__main__':
-    f = open('/home/nakatani/git/shellstreaming/hoge.txt', 'w')
-
     worddict = {}  # {'word0': count0, 'word1': count1, ...}
     sys.stderr.write('input any word (Ctrl-D to finish)\n')
     while True:
@@ -23,7 +21,6 @@ if __name__ == '__main__':
             sys.stdout.write('single word is expected\n')
             sys.stdout.flush()
             continue
-        f.write(word + '\n')
         if word not in worddict:
             worddict[word] = 0
         worddict[word] += 1

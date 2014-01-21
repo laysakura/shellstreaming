@@ -17,5 +17,5 @@ if __name__ == '__main__':
             sys.exit(0)
         words = sentence.split(' ')
         for word in words:
-            sys.stdout.write(word.strip('.,;:()[]"\'') + '\n')
+            sys.stdout.write(word.strip('.,;:?!()[]"\'') + '\n')
             sys.stdout.flush()
