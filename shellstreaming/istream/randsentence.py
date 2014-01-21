@@ -546,14 +546,13 @@ Categories:
 
 class RandSentence(Base):
     """Infinite input stream which generates random integer sequence"""
-    def __init__(self, sleep_sec=1e-3, **kw):
+    def __init__(self, seed=None, sleep_sec=1e-3, **kw):
         """Constructor
-
-        :param min_int:       minimum integer to generate
-        :param max_int:       maximum integer to generate
         """
         self._sleep_sec     = sleep_sec
         self._len_sentences = len(sentences)
+        if seed:
+            random.seed(seed)
         Base.__init__(self, **kw)
 
     def run(self):

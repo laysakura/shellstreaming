@@ -73,11 +73,17 @@ class JobGraph(nx.DiGraph):
 
 
 class StreamEdge(object):
+    """"""
 
     def __init__(self, id, src_job_id, dest_job_id=None):
-        self.id          = id
-        self.src_job_id  = src_job_id
-        self.dest_job_id = dest_job_id
+        self.id            = id
+        self.src_job_id    = src_job_id
+        self.dest_job_id   = dest_job_id
+        self.partition_key = None
 
     def __str__(self):
         return self.id
+
+    def partition_by_key(self, column):
+        """Distribute records to downstream job instance by using hash of column value"""
+        self.partition_by_key = column
