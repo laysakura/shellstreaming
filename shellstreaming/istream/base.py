@@ -62,9 +62,6 @@ class Base(BaseJob):
 
         def _produce_next_batch():
             batch = Batch(rdef, tuple(self._next_batch))
-            import logging
-            logger = logging.getLogger('TerminalLogger')
-            logger.critical('batch size: %d' % (len(batch)))
             self._batch_q.push(batch)
 
         def _create_next_batch():
