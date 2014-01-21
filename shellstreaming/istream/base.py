@@ -5,13 +5,8 @@
 
     :synopsis: Provides abstract istream
 """
-# standard module
-from datetime import datetime
-
 # my module
 from relshell.batch import Batch
-from shellstreaming.core.timestamp import Timestamp
-from shellstreaming.core.timespan import Timespan
 from shellstreaming.core.base_job import BaseJob
 
 
@@ -19,15 +14,15 @@ class Base(BaseJob):
     """Base class for istream
     """
 
-    def __init__(self, output_queue, batch_span_ms=100, max_records=None):
+    def __init__(self, output_queue, records_in_batch, max_records=None):
         """Constructor
 
         :param output_queue:  queue to output batches
-        :param batch_span_ms: timespan to assemble records as batch
+        :param records_in_batch: to assemble records as batch
         :param max_input_records: istream finishes after outputting this number of records
         """
         self._batch_q       = output_queue
-        self._batch_span_ms = batch_span_ms
+        self._rec_in_batch  = records_in_batch
         self._max_records   = max_records
         self._num_records   = 0
 
@@ -67,11 +62,13 @@ class Base(BaseJob):
 
         def _produce_next_batch():
             batch = Batch(rdef, tuple(self._next_batch))
+            import logging
+            logger = logging.getLogger('TerminalLogger')
+            logger.critical('batch size: %d' % (len(batch)))
             self._batch_q.push(batch)
 
         def _create_next_batch():
-            self._next_batch      = []
-            self._next_batch_span = Timespan(Timestamp(datetime.now()), self._batch_span_ms)
+            self._next_batch = []
 
         # Finish istream after outputing enough records or data source has no more data.
         self._num_records += 1
@@ -82,7 +79,7 @@ class Base(BaseJob):
         if self._next_batch is None:
             _create_next_batch()
 
-        if Timestamp(datetime.now()).runoff_higher(self._next_batch_span):
+        if len(self._next_batch) == self._rec_in_batch:
             # this record is for 2nd batch
             _produce_next_batch()
             _create_next_batch()

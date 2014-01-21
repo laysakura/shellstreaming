@@ -6,7 +6,7 @@ from shellstreaming.istream.randsentence import RandSentence
 
 def test_randint_usage():
     q = BatchQueue()
-    t = RandSentence(output_queue=q, batch_span_ms=100, max_records=100)
+    t = RandSentence(output_queue=q, max_records=100)
 
     # consume batches
     num_records = 0

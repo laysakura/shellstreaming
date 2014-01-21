@@ -546,14 +546,14 @@ Categories:
 
 class RandSentence(Base):
     """Infinite input stream which generates random integer sequence"""
-    def __init__(self, seed=None, sleep_sec=1e-3, **kw):
+    def __init__(self, seed=None, sleep_sec=1e-3, records_in_batch=1000, **kw):
         """Constructor
         """
         self._sleep_sec     = sleep_sec
         self._len_sentences = len(sentences)
         if seed:
             random.seed(seed)
-        Base.__init__(self, **kw)
+        Base.__init__(self, records_in_batch=records_in_batch, **kw)
 
     def run(self):
         rdef = RecordDef([{'name': 'sentence', 'type': 'STRING'}])
