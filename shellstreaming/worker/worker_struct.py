@@ -11,6 +11,9 @@
 WORKER_ID = None
 """Worker's id. Got from config file's hostname.
 Only :func:`exposd_set_worker_id` modifies this
+
+.. code-block:: python
+    (<worker hostname>, <worker port number>)
 """
 
 WORKER_NUM_DICT = {}
@@ -45,7 +48,7 @@ conn_pool = {}
 
 .. code-block:: python
     {
-        '<worker id>': <rpyc.connection object>,
+        (<worker hostname>, <worker port number>): <rpyc.connection object>,
         ...
     }
 """

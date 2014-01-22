@@ -8,12 +8,17 @@
     Call this script from `fabric`.
     Refer to `test_auto_deploy.py` to see how to call this.
 """
-import fabric.api as fab
-from fabric.decorators import serial
+# standard moduels
 from os.path import abspath, dirname, join, basename
 import logging
 import tempfile
 import sys
+
+# 3rd party modules
+import fabric.api as fab
+from fabric.api import env
+from fabric.decorators import serial
+
 
 # use `../../shellstreaming` as package if it exists
 # (to reflect changes on `../../shellstreaming/**.py` quickly if using `<github-repo>/shellstreaming/autodeploy/auto_deploy.py`)
@@ -106,8 +111,9 @@ def start_worker(cnfpath, logpath):
     """
     with fab.cd(REMOTE_PKG_ROOT):
         with fab.prefix('source %s' % REMOTE_VIRTUALENV_ACTIVATE):
-            fab.run('python %(remote_worker_py)s --config=%(cnfpath)s --log=%(logpath)s' % {
+            fab.run('python %(remote_worker_py)s --hostname=%(hostname)s --config=%(cnfpath)s --log=%(logpath)s' % {
                 'remote_worker_py' : REMOTE_WORKER_PY,
+                'hostname'         : env.host,
                 'cnfpath'          : cnfpath,
                 'logpath'          : logpath,
             })
