@@ -48,16 +48,18 @@ class QueueGroup(object):
             # select a queue
             if ws.WORKER_ID in self._workers_to_pop:
                 # optimization: local queue first
-                worker = ws.WORKER_ID
-                q      = ws.local_queues[self._edge]
+                worker  = ws.WORKER_ID
+                q       = ws.local_queues[self._edge]
+                q_class = q.__class__.__name__
             else:
-                worker = select_remote_worker_to_pop(self._edge, self._workers_to_pop)  # [fix] - make this function replacable
-                q      = rpyc_namespace(worker).queue_netref(self._edge)
+                worker  = select_remote_worker_to_pop(self._edge, self._workers_to_pop)  # [fix] - make this function replacable
+                q       = rpyc_namespace(worker).queue_netref(self._edge)
+                q_class = q.internal_queue_class()
 
             # pop batch from BatchQueue or PartitionedBatchQueue
-            if q.__class__.__name__ == 'BatchQueue':
+            if q_class == 'BatchQueue':
                 batch = q.pop()
-            elif q.__class__.__name__ == 'PartitionedBatchQueue':
+            elif q_class == 'PartitionedBatchQueue':
                 batch = q.pop(pop_from=ws.WORKER_NUM_DICT[ws.WORKER_ID])
             else:
                 assert(False)

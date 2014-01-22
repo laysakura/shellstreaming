@@ -15,12 +15,12 @@ WORD_COUNT     = SHELLCMD_DIR + '/shellcmd/word_count'      # input: word, outpu
 
 
 def main():
-    sentence_stream = api.IStream(RandSentence, seed=1, sleep_sec=1e-7, max_records=NUM_RECORDS, fixed_to=['localhost'])
+    sentence_stream = api.IStream(RandSentence, seed=1, sleep_sec=1e-7, max_records=NUM_RECORDS, fixed_to=['cloko000'])
     word_stream = api.Operator(
         [sentence_stream], ShellCmd,
         '%s < IN_STREAM > OUT_STREAM' % (SPLIT_SENTENCE),
         daemon=True,
-        migratable=True,  # まだこの中身を実装していないので，スケジューラを工夫しだすとコマンド内状態を保持できずにバグる
+        migratable=True,
         out_record_def=api.RecordDef([{'name': 'word', 'type': 'STRING'}]),
         out_col_patterns={'word': re.compile(r'^.+$', re.MULTILINE)},
         msg_to_cmd='extraordinarylongword\n',
@@ -40,7 +40,7 @@ def main():
         msg_to_cmd='not word\n',
         reply_from_cmd='single word is expected\n')
 
-    api.OStream(wc_stream, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
+    api.OStream(wc_stream, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['cloko000'])
 
 
 def test():
@@ -53,6 +53,7 @@ def test():
             word, count = (record['word'], int(record['count']))
             wc_dict[word] = count
 
+    print("%d lines" % (i + 1))
     assert(i == 50961)
     assert(wc_dict['from']     == 552)
     assert(wc_dict['november'] == 130)
