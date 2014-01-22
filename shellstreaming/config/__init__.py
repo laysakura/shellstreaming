@@ -19,7 +19,7 @@ DEFAULT_CONFIG = {
     'master_reschedule_interval_sec' : '3',
 
     # worker
-    'worker_port'                    : '18871',
+    'worker_default_port'            : '18871',
     'worker_log_path'                : join(gettempdir(), 'shellstreaming-worker.log'),
     'worker_scheduler_module'        : 'shellstreaming.scheduler.worker_sched_single_thread',
     'worker_reschedule_interval_sec' : '1',

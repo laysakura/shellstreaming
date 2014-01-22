@@ -10,10 +10,12 @@ import logging
 
 # my modules
 from relshell.recorddef import RecordDef
+from shellstreaming.util.parse import parse_hostname_port
 import shellstreaming.master.master_struct as ms
 from shellstreaming.jobgraph import JobGraph, StreamEdge
 
 
+DEFAULT_PORT     = None        # master sets this
 _job_graph       = JobGraph()  # api.* functions modify this graph structure
 _num_job_node    = 0           # used for unique job node id
 _num_stream_edge = 0           # used for unique stream edge id
@@ -40,8 +42,8 @@ def IStream(istream, *istream_args, **istream_kw):
         logger.info('When "fixed_to" parameter is not given to api.IStream(), istream is instanciated only on 1 node (not parallelised)')
         # fix istream to a worker (round-robine)
         global _num_istream
-        worker = ms.WORKER_HOSTS[_num_istream % len(ms.WORKER_HOSTS)]
-        istream_kw['fixed_to'] = [worker]
+        worker = ms.WORKER_IDS[_num_istream % len(ms.WORKER_IDS)]
+        istream_kw['fixed_to'] = ['%s:%d' % (worker[0], worker[1])]
         _num_istream += 1
 
     stream = _reg_job('istream', None, istream, istream_args, istream_kw)
@@ -74,7 +76,7 @@ def _reg_job(job_type, in_stream, job_class, job_class_args, job_class_kw):
     _num_job_node += 1
     fixed_to = None
     if 'fixed_to' in job_class_kw:
-        fixed_to = job_class_kw['fixed_to']
+        fixed_to = [parse_hostname_port(w, DEFAULT_PORT) for w in job_class_kw['fixed_to']]
         del job_class_kw['fixed_to']
     _job_graph.add_node(job_id, job_type, job_class, job_class_args, job_class_kw, fixed_to)
 

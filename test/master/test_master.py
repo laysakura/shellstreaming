@@ -11,12 +11,12 @@ from shellstreaming.master.master import _launch_workers
 
 basedir        = join(abspath(dirname(__file__)), '..', '..')
 AUTO_DEPLOY_PY = join(basedir, 'comm', 'auto_deploy.py')
-WORKER_HOSTS   = ['localhost']
+WORKER_IDS   = ['localhost']
 WORKER_PORT    = 20001
 SSH_PRIV_KEY   = join(os.environ['HOME'], '.ssh', 'id_rsa')
 
 
 def test__launch_workers():
-    _launch_workers(WORKER_HOSTS, WORKER_PORT, ssh_priv_key=SSH_PRIV_KEY)
-    for host in WORKER_HOSTS:
+    _launch_workers(WORKER_IDS, WORKER_PORT, ssh_priv_key=SSH_PRIV_KEY)
+    for host in WORKER_IDS:
         kill_worker_server(host, WORKER_PORT)

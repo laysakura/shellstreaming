@@ -61,13 +61,13 @@ def wait_worker_server(worker_host, worker_port, timeout_sec=None):
             raise
 
 
-def rpyc_namespace(worker_id):
-    """Return rpyc's root namespace of :param:`worker_id`"""
+def rpyc_namespace(host_port):
+    """Return rpyc's root namespace of :param:`host_port`"""
     # [todo] - too ugly?
     import shellstreaming.worker.worker_struct as ws
-    if worker_id in ws.conn_pool:  # worker
-        conn = ws.conn_pool[worker_id]
+    if host_port in ws.conn_pool:  # worker
+        conn = ws.conn_pool[host_port]
     else:                          # master
         import shellstreaming.master.master_struct as ms
-        conn = ms.conn_pool[worker_id]
+        conn = ms.conn_pool[host_port]
     return conn.root

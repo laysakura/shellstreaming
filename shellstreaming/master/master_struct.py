@@ -7,8 +7,15 @@
 """
 
 
-WORKER_HOSTS = []
-"""List of worker ids"""
+WORKER_IDS = []
+"""List of worker host-port pairs
+
+.. code-block:: python
+    [
+        ('node00', 12345),
+        ...
+    ]
+"""
 
 job_placement = None
 """Instance of :class:`JobPlacement`"""
@@ -18,7 +25,7 @@ conn_pool = {}
 
 .. code-block:: python
     {
-        '<worker id>': <rpyc.connection object>,
+        (<worker hostname>, <worker port number>): <rpyc.connection object>,
         ...
     }
 """
