@@ -19,9 +19,8 @@ from shellstreaming.util.comm import rpyc_namespace
 
 def sched_loop(
     job_graph,
-    worker_hosts,  # [todo] - not only worker's hostname but also
-                   # [todo] - worker's resource info is important for scheduling decision.
-    worker_port,
+    workers,  # [todo] - not only worker's hostname but also
+              # [todo] - worker's resource info is important for scheduling decision.
 
     sched_module_name,
     reschedule_interval_sec,
@@ -32,27 +31,27 @@ def sched_loop(
 
     # prepare each worker's JobRegistrar
     job_registrars = {}
-    for worker in worker_hosts:
-        job_registrars[worker] = ms.conn_pool[worker].root.JobRegistrar()
+    for w in workers:
+        job_registrars[w] = ms.conn_pool[w].root.JobRegistrar()
     # prepare scheduler module
     sched_module = import_module(sched_module_name)
 
     # ** sub modules **
     def pause_all_workers():
-        map(lambda w: rpyc_namespace(w).block(), worker_hosts)
+        map(lambda w: rpyc_namespace(w).block(), workers)
 
     def resume_all_workers():
-        map(lambda w: rpyc_namespace(w).unblock(), worker_hosts)
+        map(lambda w: rpyc_namespace(w).unblock(), workers)
 
     def collect_finished_jobs():
         # if at least 1 worker finishes `job_id`,
         # it means other workers also finish the `job_id` since
         # all workers share the same `QueueGroup` and they determine `finish` by asking `QueueGroup`
         finished_jobs = set()
-        for worker in worker_hosts:
-            job_registrar         = job_registrars[worker]
-            worker_finished_jobs  = pickle.loads(job_registrar.finished_jobs())
-            finished_jobs         = finished_jobs | set(worker_finished_jobs)
+        for worker in workers:
+            job_registrar        = job_registrars[worker]
+            worker_finished_jobs = pickle.loads(job_registrar.finished_jobs())
+            finished_jobs        = finished_jobs | set(worker_finished_jobs)
         return finished_jobs
 
     def sleep_and_poll_finish():
@@ -68,8 +67,7 @@ def sched_loop(
             time.sleep(0.1)
 
     def create_local_queues_if_necessary(job_placement):
-        q_req = {}  # {'worker id': ['edge id to create', ...]}
-        for worker in worker_hosts:
+        for worker in workers:
             out_edges = []
             for job in job_placement.assigned_jobs(worker):
                 out_edges += job_graph.out_stream_edge_ids(job)
@@ -86,7 +84,7 @@ def sched_loop(
     def update_queue_groups(job_placement):
         create_local_queues_if_necessary(job_placement)
         queue_groups = create_queue_groups(job_placement)
-        map(lambda w: rpyc_namespace(w).update_queue_groups(pickle.dumps(queue_groups)), worker_hosts)
+        map(lambda w: rpyc_namespace(w).update_queue_groups(pickle.dumps(queue_groups)), workers)
 
     def remove_finished_jobs(job_placement):
         for job_id in collect_finished_jobs():
@@ -116,7 +114,7 @@ def sched_loop(
         remove_finished_jobs(ms.job_placement)
 
         next_job_placement = sched_module.calc_job_placement(
-            job_graph, worker_hosts, ms.job_placement,
+            job_graph, workers, ms.job_placement,
             # machine resource, ...
         )   # [todo] - most important part in scheduling
         logger.debug('New job assignment is calculated: %s' % (next_job_placement))

@@ -22,6 +22,7 @@ import rpyc
 
 # my module
 from shellstreaming.config import DEFAULT_CONFIG, DEFAULT_CONFIG_LOCATION
+from shellstreaming.config.parse import parse_worker_hosts
 from shellstreaming.util.logger import setup_TerminalLogger
 from shellstreaming.util.importer import import_from_file
 from shellstreaming.worker.run_worker_server import start_worker_server_thread
@@ -54,16 +55,17 @@ def main():
         config.set('shellstreaming', 'worker_hosts', 'localhost')
 
     # launch worker servers
-    ms.WORKER_HOSTS = config.get('shellstreaming', 'worker_hosts').split(',')
-    worker_port     = config.getint('shellstreaming', 'worker_port')
+    ms.WORKER_IDS = parse_worker_hosts(config.get('shellstreaming', 'worker_hosts'),
+                                       config.getint('shellstreaming', 'worker_default_port'))
     if config.getboolean('shellstreaming', 'localhost_debug'):
         # launch a worker server on localhost
-        logger.debug('Entering localhost_debug mode')
-        th_service = start_worker_server_thread(worker_port, logger)
+        logger.debug('Entering localhost_debug mode (launching worker on localhost:%s)' %
+                     (config.getint('shellstreaming', 'worker_default_port')))
+        th_service = start_worker_server_thread(config.getint('shellstreaming', 'worker_default_port'), logger)
     else:
         # auto-deploy, launch worker server on worker hosts
         _launch_workers(
-            ms.WORKER_HOSTS, worker_port,
+            ms.WORKER_IDS,
             cnf_sent_to_worker=cnfpath,
             worker_log_path=config.get('shellstreaming', 'worker_log_path'),
             parallel_deploy=config.getboolean('shellstreaming', 'parallel_deploy'),
@@ -74,41 +76,44 @@ def main():
 
     try:
         # make job graph from user's stream app description
+        api.DEFAULT_PORT = config.getint('shellstreaming', 'worker_default_port')
         job_graph = _parse_stream_py(args.stream_py)
         # draw job graph
         if config.get('shellstreaming', 'job_graph_path') != '':
             _draw_job_graph(job_graph, config.get('shellstreaming', 'job_graph_path'))
         # initialize :module:`master_struct`
         ms.job_placement = JobPlacement(job_graph)
-        for host in ms.WORKER_HOSTS:
-            ms.conn_pool[host] = rpyc.connect(host, worker_port)
+        for host_port in ms.WORKER_IDS:
+            ms.conn_pool[host_port] = rpyc.connect(*host_port)
         # set worker id to each worker
-        map(lambda w: rpyc_namespace(w).set_worker_id(w), ms.WORKER_HOSTS)
+        map(lambda w: rpyc_namespace(w).set_worker_id(w), ms.WORKER_IDS)
         # set worker num dict for each worker
-        worker_num_dict = {w: num for num, w in enumerate(ms.WORKER_HOSTS)}
-        map(lambda w: rpyc_namespace(w).set_worker_num_dict(worker_num_dict), ms.WORKER_HOSTS)
+        worker_num_dict = {w: num for num, w in enumerate(ms.WORKER_IDS)}
+        map(lambda w: rpyc_namespace(w).set_worker_num_dict(worker_num_dict), ms.WORKER_IDS)
         # register job graph to each worker
         pickled_job_graph = pickle.dumps(job_graph)
-        map(lambda w: rpyc_namespace(w).reg_job_graph(pickled_job_graph), ms.WORKER_HOSTS)
+        map(lambda w: rpyc_namespace(w).reg_job_graph(pickled_job_graph), ms.WORKER_IDS)
         # launch worker-local scheduler on each worker
-        for w in ms.WORKER_HOSTS:
+        for w in ms.WORKER_IDS:
             rpyc_namespace(w).start_worker_local_scheduler(
                 config.get('shellstreaming', 'worker_scheduler_module'),
                 config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'))
         # start master's main loop.
         t_sched_loop_sec0 = time.time()
-        sched_loop(job_graph, ms.WORKER_HOSTS, worker_port,
+        sched_loop(job_graph, ms.WORKER_IDS,
                    config.get('shellstreaming', 'master_scheduler_module'),
                    config.getfloat('shellstreaming', 'master_reschedule_interval_sec'))
         t_sched_loop_sec1 = time.time()
         # kill workers after all jobs are finieshd
         logger.debug('Finished all job execution. Killing worker servers...')
-        map(lambda w: kill_worker_server(w, worker_port), ms.WORKER_HOSTS)
-    except KeyboardInterrupt as e:
+        map(lambda w: kill_worker_server(*w), ms.WORKER_IDS)
+    except KeyboardInterrupt:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
-        map(lambda w: kill_worker_server(w, worker_port), ms.WORKER_HOSTS)
-        logger.exception(e)
+        map(lambda w: kill_worker_server(*w), ms.WORKER_IDS)
         return 1
+    except:
+        map(lambda w: kill_worker_server(*w), ms.WORKER_IDS)
+        raise
 
     # run user's validation codes
     _run_test(args.stream_py)
@@ -158,7 +163,7 @@ def _get_existing_cnf(cnf_candidates=DEFAULT_CONFIG_LOCATION):
     return None
 
 
-def _launch_workers(worker_hosts, worker_port,
+def _launch_workers(workers,
                     cnf_sent_to_worker,
                     worker_log_path,
                     parallel_deploy,
@@ -195,7 +200,7 @@ def _launch_workers(worker_hosts, worker_port,
 
     cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s %(parallel_deploy)s %(ssh_priv_key)s' % {
         'script'          : scriptpath,
-        'hosts'           : ','.join(worker_hosts),
+        'hosts'           : ','.join([w[0] for w in workers]),
         'tasks'           : ' '.join(fab_tasks),
         'parallel_deploy' : '-P' if parallel_deploy else '',
         'ssh_priv_key'    : '-i ' + ssh_private_key if ssh_private_key else '',
@@ -208,9 +213,9 @@ def _launch_workers(worker_hosts, worker_port,
 
     # wait for all workers' server to start
     # [todo] - parallel wait
-    for host in worker_hosts:
-        wait_worker_server(host, worker_port)
-        logger.debug('connected to %s:%s' % (host, worker_port))
+    for w in workers:
+        wait_worker_server(*w)
+        logger.debug('connected to %s:%d' % (w[0], w[1]))
 
 
 def _parse_stream_py(stream_py):
