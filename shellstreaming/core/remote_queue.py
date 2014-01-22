@@ -23,6 +23,7 @@ class RemoteQueue(object):
             return None  # no batch_queue access if it already emits None
 
         batch = self._q.pop()
+
         if batch is None:  # empty for the first time
             self._empty = True
             return None

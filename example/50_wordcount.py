@@ -20,7 +20,7 @@ def main():
         [sentence_stream], ShellCmd,
         '%s < IN_STREAM > OUT_STREAM' % (SPLIT_SENTENCE),
         daemon=True,
-        migratable=True,
+        migratable=True,  # まだこの中身を実装していないので，スケジューラを工夫しだすとコマンド内状態を保持できずにバグる
         out_record_def=api.RecordDef([{'name': 'word', 'type': 'STRING'}]),
         out_col_patterns={'word': re.compile(r'^.+$', re.MULTILINE)},
         msg_to_cmd='extraordinarylongword\n',
@@ -53,7 +53,6 @@ def test():
             word, count = (record['word'], int(record['count']))
             wc_dict[word] = count
 
-    print("%d lines" % (i + 1))
     assert(i == 50961)
     assert(wc_dict['from']     == 552)
     assert(wc_dict['november'] == 130)
