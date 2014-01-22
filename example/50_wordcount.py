@@ -20,6 +20,7 @@ def main():
         [sentence_stream], ShellCmd,
         '%s < IN_STREAM > OUT_STREAM' % (SPLIT_SENTENCE),
         daemon=True,
+        migratable=True,
         out_record_def=api.RecordDef([{'name': 'word', 'type': 'STRING'}]),
         out_col_patterns={'word': re.compile(r'^.+$', re.MULTILINE)},
         msg_to_cmd='extraordinarylongword\n',
@@ -31,7 +32,6 @@ def main():
         [word_stream], ShellCmd,
         '%s < IN_STREAM > OUT_STREAM' % (WORD_COUNT),
         daemon=True,
-        migratable=False,
         out_record_def=api.RecordDef([{'name': 'word', 'type': 'STRING'}, {'name': 'count', 'type': 'INT'}]),
         out_col_patterns={
             'word'  : re.compile(r'^.+(?= )', re.MULTILINE),
