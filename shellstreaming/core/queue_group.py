@@ -39,18 +39,31 @@ class QueueGroup(object):
 
         Blocks while ws.BLOCKED_BY_MASTER flag is True.
         This is for `stop the world` implementation.
+
+        :param pop_from: worker name used for popping from :class:`PartitionedBatchQueue`.
+            None is allowed when popping from :class:`BatchQueue`
         """
         # pop a batch, or return None when no batch is available
         while True:
             # select a queue
             if ws.WORKER_ID in self._workers_to_pop:
                 # optimization: local queue first
-                worker = ws.WORKER_ID
-                q      = ws.local_queues[self._edge]
+                worker  = ws.WORKER_ID
+                q       = ws.local_queues[self._edge]
+                q_class = q.__class__.__name__
             else:
-                worker = select_remote_worker_to_pop(self._edge, self._workers_to_pop)  # [fix] - make this function replacable
-                q      = rpyc_namespace(worker).queue_netref(self._edge)
-            batch = q.pop()
+                worker  = select_remote_worker_to_pop(self._edge, self._workers_to_pop)  # [fix] - make this function replacable
+                q       = rpyc_namespace(worker).queue_netref(self._edge)
+                q_class = q.internal_queue_class()
+
+            # pop batch from BatchQueue or PartitionedBatchQueue
+            if q_class == 'BatchQueue':
+                batch = q.pop()
+            elif q_class == 'PartitionedBatchQueue':
+                batch = q.pop(pop_from=ws.WORKER_NUM_DICT[ws.WORKER_ID])
+            else:
+                assert(False)
+
             if batch is not None:
                 break
             # edge corresponding to this `worker` is already closed at least on selected worker

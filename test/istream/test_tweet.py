@@ -32,7 +32,6 @@ def test_tweet_usage():
         access_token_secret=config.get('istream.tweet', 'access_token_secret'),
 
         output_queue=q,
-        batch_span_ms=1000,
     )
 
     n_batches = 5

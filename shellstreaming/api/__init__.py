@@ -82,7 +82,7 @@ def _reg_job(job_type, in_stream, job_class, job_class_args, job_class_kw):
         # edge from pred job to this job
         assert(in_stream is not None)
         to_from = (in_stream.src_job_id, job_id)
-        _job_graph.add_edge(*to_from, stream_edge_id=in_stream.id)
+        _job_graph.add_edge(*to_from, stream_edge_id=in_stream.id, partition_key=in_stream.partition_key)
         _job_graph.edge_labels[to_from] = in_stream.id
         return
     elif job_type == 'istream':
@@ -96,7 +96,7 @@ def _reg_job(job_type, in_stream, job_class, job_class_args, job_class_kw):
         # input: some operators have multiple input streams
         for s in in_stream:
             to_from = (s.src_job_id, job_id)
-            _job_graph.add_edge(*to_from, stream_edge_id=s.id)
+            _job_graph.add_edge(*to_from, stream_edge_id=s.id, partition_key=s.partition_key)
             _job_graph.edge_labels[to_from] = s.id
         # output: some operators have multiple output streams
         streams = []

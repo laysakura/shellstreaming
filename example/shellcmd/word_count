@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+    word_count
+    ~~~~~~~~~~
+
+    :synopsis: input: word, output: occurence count of the word
+"""
+import sys
+
+
+if __name__ == '__main__':
+    worddict = {}  # {'word0': count0, 'word1': count1, ...}
+    sys.stderr.write('input any word (Ctrl-D to finish)\n')
+    while True:
+        word = sys.stdin.readline()
+        if word == '':  # EOF
+            sys.exit(0)
+        word = word.strip()
+        if ' ' in word:
+            sys.stdout.write('single word is expected\n')
+            sys.stdout.flush()
+            continue
+        if word not in worddict:
+            worddict[word] = 0
+        worddict[word] += 1
+        sys.stdout.write('%s %d\n' % (word, worddict[word]))
+        sys.stdout.flush()

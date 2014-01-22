@@ -6,7 +6,7 @@ from shellstreaming.istream.stdin import Stdin
 
 def test_stdin_usage():
     pass
-    # stream = Stdin(batch_span_ms=1000)
+    # stream = Stdin()
     # for batch in stream:
     #     print('a batch contents ----')
     #     for record in batch:

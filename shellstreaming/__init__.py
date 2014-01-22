@@ -17,6 +17,7 @@ install_requires = [
     'argparse'  if version_info < (2, 7, 0) else '',
     'rpyc',
     'networkx',
+    'pyhashxx',
     'requests',
     'requests_oauthlib',
 ]
