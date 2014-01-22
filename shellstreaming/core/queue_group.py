@@ -7,7 +7,6 @@
 """
 # standard modules
 import time
-import random
 import cPickle as pickle
 
 # my modules
@@ -40,27 +39,36 @@ class QueueGroup(object):
 
         Blocks while ws.BLOCKED_BY_MASTER flag is True.
         This is for `stop the world` implementation.
-        """
-        import logging
-        logger = logging.getLogger('TerminalLogger')
 
+        :param pop_from: worker name used for popping from :class:`PartitionedBatchQueue`.
+            None is allowed when popping from :class:`BatchQueue`
+        """
         # pop a batch, or return None when no batch is available
         while True:
             # select a queue
             if ws.WORKER_ID in self._workers_to_pop:
                 # optimization: local queue first
-                worker = ws.WORKER_ID
-                q      = ws.local_queues[self._edge]
+                worker  = ws.WORKER_ID
+                q       = ws.local_queues[self._edge]
+                q_class = q.__class__.__name__
             else:
-                worker = select_remote_worker_to_pop(self._edge, self._workers_to_pop)  # [fix] - make this function replacable
-                q      = rpyc_namespace(worker).queue_netref(self._edge)
-            batch = q.pop()
+                worker  = select_remote_worker_to_pop(self._edge, self._workers_to_pop)  # [fix] - make this function replacable
+                q       = rpyc_namespace(worker).queue_netref(self._edge)
+                q_class = q.internal_queue_class()
+
+            # pop batch from BatchQueue or PartitionedBatchQueue
+            if q_class == 'BatchQueue':
+                batch = q.pop()
+            elif q_class == 'PartitionedBatchQueue':
+                batch = q.pop(pop_from=ws.WORKER_NUM_DICT[ws.WORKER_ID])
+            else:
+                assert(False)
+
             if batch is not None:
                 break
             # edge corresponding to this `worker` is already closed at least on selected worker
             self._workers_to_pop.remove(worker)
             if self._workers_to_pop == []:
-                logger.error('[%s] finished (got None from all queues in queue group)' % (self._edge))
                 break
 
         if type(batch) == str:
@@ -73,7 +81,6 @@ class QueueGroup(object):
         self._block_if_necessary()
         self._working = False
 
-        logger.error('[%s] popping batch from local queue of %s' % (self._edge, worker))
         return batch
 
     def is_working(self):

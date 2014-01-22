@@ -24,7 +24,7 @@ class JobGraph(nx.DiGraph):
             >>> G.add_path([0,1,2])
             >>> G.begin_nodes()
             [0]
-            >>> G.add_edge(3, 1, stream_edge_id='')
+            >>> G.add_edge(3, 1, stream_edge_id='', partition_key='')
             >>> G.begin_nodes()
             [0, 3]
         """
@@ -40,7 +40,7 @@ class JobGraph(nx.DiGraph):
             >>> G.add_path([0,1,2])
             >>> G.end_nodes()
             [2]
-            >>> G.add_edge(1, 3, stream_edge_id='')
+            >>> G.add_edge(1, 3, stream_edge_id='', partition_key='')
             >>> G.end_nodes()
             [2, 3]
         """
@@ -59,9 +59,24 @@ class JobGraph(nx.DiGraph):
             }
         )
 
-    def add_edge(self, src_job_id, dest_job_id, stream_edge_id):
-        """Override :func:`Digraph.add_edge` to force put necessary attributes to every edge"""
-        nx.DiGraph.add_edge(self, src_job_id, dest_job_id, attr_dict={'stream_edge_id': stream_edge_id})
+    def add_edge(self, src_job_id, dest_job_id, stream_edge_id, partition_key):
+        """Override :func:`Digraph.add_edge` to force put necessary attributes to every edge
+
+        :param partition_key: support :func:`StreamEdge.partition_by_key`.
+            If None, edge queue is not partitioned (shared by every downstream job instance)
+        """
+        nx.DiGraph.add_edge(self, src_job_id, dest_job_id, attr_dict={
+            'stream_edge_id': stream_edge_id,
+            'partition_key' : partition_key,
+        })
+
+    def edgeattr_from_edgeid(self, edge_id):
+        """Return edge attr dict of :param:`edge_id`"""
+        for e in self.edges_iter(data=True):
+            src, dest, attr = e
+            if attr['stream_edge_id'] == edge_id:
+                return attr
+        raise KeyError('"%s" is not in this JobGraph' % (edge_id))
 
     def out_stream_edge_ids(self, job_id):
         """Return :class:`StreamEdge` id of each outcomming edge"""
@@ -73,11 +88,17 @@ class JobGraph(nx.DiGraph):
 
 
 class StreamEdge(object):
+    """"""
 
     def __init__(self, id, src_job_id, dest_job_id=None):
-        self.id          = id
-        self.src_job_id  = src_job_id
-        self.dest_job_id = dest_job_id
+        self.id            = id
+        self.src_job_id    = src_job_id
+        self.dest_job_id   = dest_job_id
+        self.partition_key = None
 
     def __str__(self):
         return self.id
+
+    def partition_by_key(self, column):
+        """Distribute records to downstream job instance by using hash of column value"""
+        self.partition_key = column

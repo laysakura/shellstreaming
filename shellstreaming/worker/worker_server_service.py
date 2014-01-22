@@ -15,6 +15,7 @@ import rpyc
 # my module
 from shellstreaming.worker import worker_struct as ws
 from shellstreaming.core.batch_queue import BatchQueue
+from shellstreaming.core.partitioned_batch_queue import PartitionedBatchQueue
 from shellstreaming.core.remote_queue import RemoteQueue
 from shellstreaming.scheduler.worker_main import start_sched_loop
 from shellstreaming.worker.job_registrar import JobRegistrar
@@ -49,6 +50,10 @@ class WorkerServerService(rpyc.Service):
         """Set worker_id from master"""
         ws.WORKER_ID = worker_id
 
+    def exposed_set_worker_num_dict(self, worker_num_dict):
+        """Set worker_id from master"""
+        ws.WORKER_NUM_DICT = worker_num_dict
+
     def exposed_reg_job_graph(self, pickled_job_graph):
         """Register job graph"""
         job_graph = pickle.loads(pickled_job_graph)
@@ -75,7 +80,12 @@ class WorkerServerService(rpyc.Service):
         logger = logging.getLogger('TerminalLogger')
         for e in edge_ids:
             if e not in ws.local_queues.keys():
-                ws.local_queues[e] = BatchQueue()
+                # create BatchQueue or PartitionedBatchQueue
+                partition_key = ws.JOB_GRAPH.edgeattr_from_edgeid(e)['partition_key']
+                if partition_key is None:
+                    ws.local_queues[e] = BatchQueue()
+                else:
+                    ws.local_queues[e] = PartitionedBatchQueue(len(ws.WORKER_NUM_DICT), partition_key)
                 logger.debug('Local queue for %s is created' % (e))
 
     # APIs for workers

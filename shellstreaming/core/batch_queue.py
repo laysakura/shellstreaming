@@ -29,7 +29,3 @@ class BatchQueue(object):
         if batch is None:
             self.push(None)  # supply `None` again in case other consumers are informed `empty`
         return batch
-
-    def empty(self):
-        """"""
-        return self._q.qsize() == 0

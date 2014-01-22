@@ -9,7 +9,6 @@
 from threading import Thread
 import time
 from importlib import import_module
-import cPickle as pickle
 import logging
 
 # my module
@@ -38,8 +37,6 @@ def sched_loop(
         return is_blocking_all_q
 
     def block_until_master_permits():
-        import logging
-        logger = logging.getLogger('TerminalLogger')
         while ws.BLOCKED_BY_MASTER:
             is_worker_blocked = True
             for job_id in set(ws.ASSIGNED_JOBS) - set(ws.finished_jobs):

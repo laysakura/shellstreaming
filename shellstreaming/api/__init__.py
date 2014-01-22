@@ -9,6 +9,7 @@
 import logging
 
 # my modules
+from relshell.recorddef import RecordDef
 import shellstreaming.master.master_struct as ms
 from shellstreaming.jobgraph import JobGraph, StreamEdge
 
@@ -47,8 +48,12 @@ def IStream(istream, *istream_args, **istream_kw):
     return stream
 
 
-def Operator(in_stream, operator, *operator_args, **operator_kw):
-    streams = _reg_job('operator', in_stream, operator, operator_args, operator_kw)
+def Operator(in_streams, operator, *operator_args, **operator_kw):
+    """Create an operator.
+
+    :param istreams: list of streams
+    """
+    streams = _reg_job('operator', in_streams, operator, operator_args, operator_kw)
     assert(len(streams) >= 1)
     if len(streams) == 1:
         streams = streams[0]
@@ -73,24 +78,27 @@ def _reg_job(job_type, in_stream, job_class, job_class_args, job_class_kw):
         del job_class_kw['fixed_to']
     _job_graph.add_node(job_id, job_type, job_class, job_class_args, job_class_kw, fixed_to)
 
-    if job_type in ('operator', 'ostream'):
+    if job_type == 'ostream':
         # edge from pred job to this job
         assert(in_stream is not None)
         to_from = (in_stream.src_job_id, job_id)
-        _job_graph.add_edge(*to_from, stream_edge_id=in_stream.id)
+        _job_graph.add_edge(*to_from, stream_edge_id=in_stream.id, partition_key=in_stream.partition_key)
         _job_graph.edge_labels[to_from] = in_stream.id
-
-    if job_type == 'ostream':
         return
-
-    # prepare edge from this job
-    if job_type == 'istream':
+    elif job_type == 'istream':
+        # prepare edge from this job
         stream_id = "%d: %s" % (_num_stream_edge, '')
         _num_stream_edge += 1
         return StreamEdge(stream_id, src_job_id=job_id)
     else:
-        # some operator has multiple output streams
         assert(job_type == 'operator')
+        assert(type(in_stream) in (list, tuple))
+        # input: some operators have multiple input streams
+        for s in in_stream:
+            to_from = (s.src_job_id, job_id)
+            _job_graph.add_edge(*to_from, stream_edge_id=s.id, partition_key=s.partition_key)
+            _job_graph.edge_labels[to_from] = s.id
+        # output: some operators have multiple output streams
         streams = []
         for s in job_class.out_stream_edge_id_suffixes(job_class_args):
             stream_id = "%d: %s" % (_num_stream_edge, s)

@@ -9,7 +9,16 @@
 
 # information master passes. used especially for worker local scheduling
 WORKER_ID = None
-"""Worker's id. Only :func:`exposd_set_worker_id` modifies this"""
+"""Worker's id. Got from config file's hostname.
+Only :func:`exposd_set_worker_id` modifies this
+"""
+
+WORKER_NUM_DICT = {}
+"""Provides integer unique number for each worker.
+
+{worker_id: worker_num, ...}
+Only :func:`exposd_set_worker_num_dict` modifies this
+"""
 
 JOB_GRAPH = None
 """Job graph to refer. Only :func:`exposd_reg_job_graph` modifies this"""

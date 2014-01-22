@@ -65,9 +65,9 @@ def rpyc_namespace(worker_id):
     """Return rpyc's root namespace of :param:`worker_id`"""
     # [todo] - too ugly?
     import shellstreaming.worker.worker_struct as ws
-    if ws.WORKER_ID:
+    if worker_id in ws.conn_pool:  # worker
         conn = ws.conn_pool[worker_id]
-    else:
+    else:                          # master
         import shellstreaming.master.master_struct as ms
         conn = ms.conn_pool[worker_id]
     return conn.root

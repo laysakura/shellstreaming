@@ -7,7 +7,7 @@ from shellstreaming.istream.randint import RandInt
 
 def test_randint_usage():
     q       = BatchQueue()
-    istream = RandInt(0, 10, output_queue=q, batch_span_ms=100)
+    istream = RandInt(0, 10, output_queue=q)
     time.sleep(1.0)  # wait for istream thread to produce batches
     istream.interrupt()    # kill istream thread
 
@@ -23,7 +23,7 @@ def test_randint_usage():
 
 def test_max_records():
     q       = BatchQueue()
-    istream = RandInt(0, 10, output_queue=q, batch_span_ms=100, max_records=1000)
+    istream = RandInt(0, 10, output_queue=q, max_records=1000)
 
     # consume batches
     num_records = 0
