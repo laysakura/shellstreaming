@@ -34,7 +34,7 @@ class QueueGroup(object):
         self._workers_to_pop = worker_ids[:]  # workers who have non-empty queue
         self._working        = False
 
-    def pop(self, pop_from=None):
+    def pop(self):
         """Pop batch from (local|remote) queue.
 
         Blocks while ws.BLOCKED_BY_MASTER flag is True.
@@ -58,8 +58,7 @@ class QueueGroup(object):
             if q.__class__.__name__ == 'BatchQueue':
                 batch = q.pop()
             elif q.__class__.__name__ == 'PartitionedBatchQueue':
-                assert(pop_from is not None)
-                batch = q.pop(pop_from)
+                batch = q.pop(pop_from=ws.WORKER_NUM_DICT[ws.WORKER_ID])
             else:
                 assert(False)
 

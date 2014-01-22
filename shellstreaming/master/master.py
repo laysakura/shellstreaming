@@ -84,6 +84,9 @@ def main():
             ms.conn_pool[host] = rpyc.connect(host, worker_port)
         # set worker id to each worker
         map(lambda w: rpyc_namespace(w).set_worker_id(w), ms.WORKER_HOSTS)
+        # set worker num dict for each worker
+        worker_num_dict = {w: num for num, w in enumerate(ms.WORKER_HOSTS)}
+        map(lambda w: rpyc_namespace(w).set_worker_num_dict(worker_num_dict), ms.WORKER_HOSTS)
         # register job graph to each worker
         pickled_job_graph = pickle.dumps(job_graph)
         map(lambda w: rpyc_namespace(w).reg_job_graph(pickled_job_graph), ms.WORKER_HOSTS)
