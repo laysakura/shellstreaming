@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
+from os.path import join, abspath, dirname
 import re
 from shellstreaming import api
-from shellstreaming.istream import TextFileTail, TextFile
+from shellstreaming.istream import TextFileTail
 from shellstreaming.operator import ShellCmd, ExternalTimeWindow
 from shellstreaming.ostream import LocalFile
 
 
-APACHE_LOG     = '/home/nakatani/git/shellstreaming/example/access.log'
-OUTPUT_FILE    = '/tmp/51_apache_log_analysis.txt'
+APACHE_LOG   = join(abspath(dirname(__file__)), '51_apache_log_analysis_access.log')
+DAILY_ACCESS = '/tmp/51_apache_log_analysis_daily.txt'
+STATUS_CODES = '/tmp/51_apache_log_analysis_statuscode.txt'
 
 
 def main():
-    # log_stream = api.IStream(TextFileTail, APACHE_LOG,
-    #                          read_existing_lines=True,
-    #                          # sleep_sec=1.0,
-    #                          fixed_to=['localhost'])  # webサーバが立ってるところを指定
-    log_stream = api.IStream(TextFile, APACHE_LOG,
-                             fixed_to=['localhost'])  # webサーバが立ってるところを指定
+    log_stream = api.IStream(TextFileTail, APACHE_LOG, read_existing_lines=True,
+                             fixed_to=['localhost'])  # specify nodes where apache log exists
 
     # filter lines in which '/' is 'GET' accessed
     access_stream = api.Operator(
         [log_stream], ShellCmd,
-        r'''grep -E "GET / HTTP/[.0-9]+" < IN_STREAM > OUT_STREAM''',
+        r'''grep -E '"GET / HTTP/[.0-9]+"' < IN_STREAM > OUT_STREAM''',
+        success_exitcodes=(0, 1),
         out_record_def=api.RecordDef([
             {'name': 'ipaddr'     , 'type': 'STRING'},
             {'name': 'timestamp'  , 'type': 'STRING'},
@@ -94,7 +93,7 @@ def main():
             'date': re.compile(r'\d{4}-\d{2}-\d{2}', re.MULTILINE),
         })
 
-    api.OStream(count_group_by_date, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
+    api.OStream(count_group_by_date, LocalFile, DAILY_ACCESS, output_format='json', fixed_to=['localhost'])
 
 
 def test():

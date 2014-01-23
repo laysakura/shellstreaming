@@ -30,6 +30,9 @@ class TextFileTail(Base):
     def run(self):
         """Reads a text file line-by-line until EOF"""
         with open(self._path) as f:
+            print('%s contants: %s' % (self._path, f.read()))
+
+        with open(self._path) as f:
             rdef = RecordDef([{'name': 'line', 'type': 'STRING'}])
 
             if not self._read_existing_lines:  # go to the end of file
