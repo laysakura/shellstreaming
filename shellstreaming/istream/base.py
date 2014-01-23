@@ -75,12 +75,12 @@ class Base(BaseJob):
         if self._next_batch is None:
             _create_next_batch()
 
+        self._next_batch.append(record)
+
         if len(self._next_batch) == self._rec_in_batch:
             # this record is for 2nd batch
             _produce_next_batch()
             _create_next_batch()
-
-        self._next_batch.append(record)
 
         # Finish istream after outputing enough records or data source has no more data.
         self._num_records += 1
