@@ -65,7 +65,36 @@ def main():
         timestamp_column='timestamp',
         size_days=4, latest_timestamp=api.Timestamp('2014-01-04 23:59:59'))
 
-    api.OStream(access_win, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
+    # こっからコピーして分岐
+
+    # projection: get timestamp column & retrieve date
+    date_win = api.Operator(
+        [access_win], ShellCmd,
+        r'''awk '{print $2}' < IN_STREAM > OUT_STREAM''',
+        out_record_def=api.RecordDef([{'name': 'date'  , 'type': 'STRING'}]),
+        out_col_patterns={'date': re.compile(r'^.+$', re.MULTILINE)})
+
+    # sort date for `uniq -c` command
+    sorted_date_win = api.Operator(
+        [date_win], ShellCmd,
+        r'''sort < IN_STREAM > OUT_STREAM''',
+        out_record_def=api.RecordDef([{'name': 'date'  , 'type': 'STRING'}]),
+        out_col_patterns={'date': re.compile(r'^.+$', re.MULTILINE)})
+
+    # group by date
+    count_group_by_date = api.Operator(
+        [sorted_date_win], ShellCmd,
+        r'''uniq -c < IN_STREAM > OUT_STREAM''',
+        out_record_def=api.RecordDef([
+            {'name': 'count'  , 'type': 'INT'},
+            {'name': 'date'  , 'type': 'STRING'},
+        ]),
+        out_col_patterns={
+            'count': re.compile(r'\d+', re.MULTILINE),
+            'date': re.compile(r'\d{4}-\d{2}-\d{2}', re.MULTILINE),
+        })
+
+    api.OStream(count_group_by_date, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
 
 
 def test():
