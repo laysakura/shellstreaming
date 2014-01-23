@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import nose.tools as ns
-import datetime as dt
 from relshell.batch import Batch
 from relshell.recorddef import RecordDef
 from relshell.record import Record
@@ -17,13 +16,13 @@ def test_external_time_window_usage():
 
     # prepare batch
     batch = Batch(RDEF, (
-        Record(Timestamp(dt.datetime(2014,  1,  3            )), 'x'),  # ok
-        Record(Timestamp(dt.datetime(2014,  1,  4            )), 'x'),  # ng: too new timestamp
-        Record(Timestamp(dt.datetime(2013, 12, 24            )), 'x'),  # ng: too old timestamp
-        Record(Timestamp(dt.datetime(2014,  1,  3, 12,  0,  0)), 'x'),  # ok
-        Record(Timestamp(dt.datetime(2013, 12, 24, 12,  0,  0)), 'x'),  # ok
-        Record(Timestamp(dt.datetime(2014,  1,  3, 12,  0,  1)), 'x'),  # ng
-        Record(Timestamp(dt.datetime(2013, 12, 24, 11, 59, 59)), 'x'),  # ng
+        Record(Timestamp('2014-01-03')         , 'x'),  # ok
+        Record(Timestamp('2014-01-04')         , 'x'),  # ng: too new timestamp
+        Record(Timestamp('2013-12-24')         , 'x'),  # ng: too old timestamp
+        Record(Timestamp('2014-01-03 12:00:00'), 'x'),  # ok
+        Record(Timestamp('2013-12-24 12:00:00'), 'x'),  # ok
+        Record(Timestamp('2014-01-03 12:00:01'), 'x'),  # ng
+        Record(Timestamp('2013-12-24 11:59:59'), 'x'),  # ng
     ))
 
     # prepare input/output queue
@@ -33,20 +32,20 @@ def test_external_time_window_usage():
 
     win = ExternalTimeWindow(
         timestamp_column='timestamp',
-        size_days=10, latest_timestamp=Timestamp(dt.datetime(2014, 1, 3, 12, 0, 0)), output_per_records=1,
+        size_days=10, latest_timestamp=Timestamp('2014-01-03 12:00:00'), output_per_records=1,
         input_queues={'a': in_q}, output_queues={'b': out_q})
     win.join()
 
     ns.eq_(out_q.pop(), Batch(RDEF, (
-        Record(Timestamp(dt.datetime(2014,  1,  3            )), 'x'),
+        Record(Timestamp('2014-01-03')         , 'x'),
     )))
     ns.eq_(out_q.pop(), Batch(RDEF, (
-        Record(Timestamp(dt.datetime(2014,  1,  3            )), 'x'),
-        Record(Timestamp(dt.datetime(2014,  1,  3, 12,  0,  0)), 'x'),
+        Record(Timestamp('2014-01-03')         , 'x'),
+        Record(Timestamp('2014-01-03 12:00:00'), 'x'),
     )))
     ns.eq_(out_q.pop(), Batch(RDEF, (
-        Record(Timestamp(dt.datetime(2014,  1,  3            )), 'x'),
-        Record(Timestamp(dt.datetime(2014,  1,  3, 12,  0,  0)), 'x'),
-        Record(Timestamp(dt.datetime(2013, 12, 24, 12,  0,  0)), 'x'),
+        Record(Timestamp('2014-01-03')         , 'x'),
+        Record(Timestamp('2014-01-03 12:00:00'), 'x'),
+        Record(Timestamp('2013-12-24 12:00:00'), 'x'),
     )))
     ns.ok_(out_q.pop() is None)
