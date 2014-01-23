@@ -2,7 +2,7 @@
 import re
 from shellstreaming import api
 from shellstreaming.istream import TextFileTail, TextFile
-from shellstreaming.operator import ShellCmd
+from shellstreaming.operator import ShellCmd, ExternalTimeWindow
 from shellstreaming.ostream import LocalFile
 
 
@@ -12,15 +12,16 @@ OUTPUT_FILE    = '/tmp/51_apache_log_analysis.txt'
 
 def main():
     # log_stream = api.IStream(TextFileTail, APACHE_LOG,
-    #                          read_existing_lines=False,
+    #                          read_existing_lines=True,
     #                          # sleep_sec=1.0,
     #                          fixed_to=['localhost'])  # webサーバが立ってるところを指定
     log_stream = api.IStream(TextFile, APACHE_LOG,
                              fixed_to=['localhost'])  # webサーバが立ってるところを指定
+
     # filter lines in which '/' is 'GET' accessed
     access_stream = api.Operator(
         [log_stream], ShellCmd,
-        'grep -E \'"GET / HTTP/[.0-9]+"\' < IN_STREAM > OUT_STREAM',
+        r'''grep -E "GET / HTTP/[.0-9]+" < IN_STREAM > OUT_STREAM''',
         out_record_def=api.RecordDef([
             {'name': 'ipaddr'     , 'type': 'STRING'},
             {'name': 'timestamp'  , 'type': 'STRING'},
@@ -58,11 +59,13 @@ def main():
         },
     )
 
-    # ShellCmdじゃなければちゃんと上流のを全部とれてる
-    # from shellstreaming.operator import FilterSplit
-    # ts_access_stream = api.Operator([access_stream], FilterSplit, 'True')
+    # make window within 2014/01/01 - 2014/01/04
+    access_win = api.Operator(
+        [ts_access_stream], ExternalTimeWindow,
+        timestamp_column='timestamp',
+        size_days=4, latest_timestamp=api.Timestamp('2014-01-04 23:59:59'))
 
-    api.OStream(ts_access_stream, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
+    api.OStream(access_win, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
 
 
 def test():

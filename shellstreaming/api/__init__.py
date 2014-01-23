@@ -10,6 +10,7 @@ import logging
 
 # my modules
 from relshell.recorddef import RecordDef
+from relshell.timestamp import Timestamp
 from shellstreaming.util.parse import parse_hostname_port
 import shellstreaming.master.master_struct as ms
 from shellstreaming.jobgraph import JobGraph, StreamEdge
