@@ -110,7 +110,7 @@ def main():
     except KeyboardInterrupt:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
         map(lambda w: kill_worker_server(*w), ms.WORKER_IDS)
-        return 1
+        raise
     except:
         map(lambda w: kill_worker_server(*w), ms.WORKER_IDS)
         raise

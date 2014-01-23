@@ -17,7 +17,7 @@ from shellstreaming.istream.base import Base
 class TextFileTail(Base):
     """FiniteStream for text files"""
     def __init__(self, path, read_existing_lines=False, sleep_sec=1e-3,
-                 records_in_batch=100, **kw):
+                 records_in_batch=1, **kw):
         """Constructor
 
         :param path:          path to text file

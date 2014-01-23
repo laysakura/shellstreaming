@@ -32,8 +32,8 @@ class ExternalTimeWindow(Base):  # [todo] - inherit common `Window` class?
 
         self._ts_col = timestamp_column
 
-        size_ms     = long(size_days * 24 * 60 * 60 * 1000)
-        self._tspan = Timespan(latest_timestamp - size_ms, size_ms)
+        size_sec    = long(size_days * 24 * 60 * 60)
+        self._tspan = Timespan(latest_timestamp - size_sec, size_sec)
 
         self._output_per_rec = output_per_records
 
