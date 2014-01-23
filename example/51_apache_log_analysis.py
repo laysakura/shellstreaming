@@ -64,7 +64,8 @@ def main():
         timestamp_column='timestamp',
         size_days=4, latest_timestamp=api.Timestamp('2014-01-04 23:59:59'))
 
-    # こっからコピーして分岐
+    access_win0, access_win1 = api.Operator(
+        [ts_access_stream], CopySplit, 2)
 
     # projection: get timestamp column & retrieve date
     date_win = api.Operator(
