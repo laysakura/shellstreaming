@@ -2,8 +2,8 @@
 from os.path import join, abspath, dirname
 import re
 from shellstreaming import api
-from shellstreaming.istream import TextFileTail
-from shellstreaming.operator import ShellCmd, ExternalTimeWindow
+from shellstreaming.istream import TextFileTail, TextFile
+from shellstreaming.operator import ShellCmd, ExternalTimeWindow, CopySplit
 from shellstreaming.ostream import LocalFile
 
 
@@ -13,8 +13,10 @@ STATUS_CODES = '/tmp/51_apache_log_analysis_statuscode.txt'
 
 
 def main():
-    log_stream = api.IStream(TextFileTail, APACHE_LOG, read_existing_lines=True,
+    log_stream = api.IStream(TextFile, APACHE_LOG,
                              fixed_to=['localhost'])  # specify nodes where apache log exists
+    # log_stream = api.IStream(TextFileTail, APACHE_LOG, read_existing_lines=True,
+    #                          fixed_to=['localhost'])  # specify nodes where apache log exists
 
     # filter lines in which '/' is 'GET' accessed
     access_stream = api.Operator(
@@ -64,12 +66,16 @@ def main():
         timestamp_column='timestamp',
         size_days=4, latest_timestamp=api.Timestamp('2014-01-04 23:59:59'))
 
-    access_win0, access_win1 = api.Operator(
-        [ts_access_stream], CopySplit, 2)
+    # copy 2 way
+    access_win0, access_win1 = api.Operator([access_win], CopySplit, 2)
+
+    ########################################
+    # path 1: group by date
+    ########################################
 
     # projection: get timestamp column & retrieve date
     date_win = api.Operator(
-        [access_win], ShellCmd,
+        [access_win0], ShellCmd,
         r'''awk '{print $2}' < IN_STREAM > OUT_STREAM''',
         out_record_def=api.RecordDef([{'name': 'date'  , 'type': 'STRING'}]),
         out_col_patterns={'date': re.compile(r'^.+$', re.MULTILINE)})
@@ -95,6 +101,40 @@ def main():
         })
 
     api.OStream(count_group_by_date, LocalFile, DAILY_ACCESS, output_format='json', fixed_to=['localhost'])
+
+    ########################################
+    # path 2: group by status code
+    ########################################
+
+    # projection: get status code
+    statuscode_win = api.Operator(
+        [access_win1], ShellCmd,
+        r'''awk -F "|" '{print $3}' < IN_STREAM > OUT_STREAM''',
+        in_column_sep='|',
+        out_record_def=api.RecordDef([{'name': 'statuscode', 'type': 'INT'}]),
+        out_col_patterns={'statuscode': re.compile(r'^.+$', re.MULTILINE)})
+
+    # sort date for `uniq -c` command
+    sorted_statuscode_win = api.Operator(
+        [statuscode_win], ShellCmd,
+        r'''sort < IN_STREAM > OUT_STREAM''',
+        out_record_def=api.RecordDef([{'name': 'statuscode', 'type': 'INT'}]),
+        out_col_patterns={'statuscode': re.compile(r'^.+$', re.MULTILINE)})
+
+    # group by date
+    count_group_by_statuscode = api.Operator(
+        [sorted_statuscode_win], ShellCmd,
+        r'''uniq -c < IN_STREAM > OUT_STREAM''',
+        out_record_def=api.RecordDef([
+            {'name': 'count'     , 'type': 'INT'},
+            {'name': 'statuscode', 'type': 'INT'},
+        ]),
+        out_col_patterns={
+            'count': re.compile(r'\d+', re.MULTILINE),
+            'statuscode': re.compile(r'\d{3}', re.MULTILINE),
+        })
+
+    api.OStream(count_group_by_statuscode, LocalFile, STATUS_CODES, output_format='json', fixed_to=['localhost'])
 
 
 def test():
