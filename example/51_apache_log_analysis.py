@@ -13,10 +13,10 @@ STATUS_CODES = '/tmp/51_apache_log_analysis_statuscode.txt'
 
 
 def main():
-    log_stream = api.IStream(TextFile, APACHE_LOG,
-                             fixed_to=['localhost'])  # specify nodes where apache log exists
-    # log_stream = api.IStream(TextFileTail, APACHE_LOG, read_existing_lines=True,
+    # log_stream = api.IStream(TextFile, APACHE_LOG,
     #                          fixed_to=['localhost'])  # specify nodes where apache log exists
+    log_stream = api.IStream(TextFileTail, APACHE_LOG, read_existing_lines=True,
+                             fixed_to=['localhost'])  # specify nodes where apache log exists
 
     # filter lines in which '/' is 'GET' accessed
     access_stream = api.Operator(
