@@ -2,7 +2,7 @@
 from os.path import join, abspath, dirname
 import re
 from shellstreaming import api
-from shellstreaming.istream import TextFileTail, TextFile
+from shellstreaming.istream import TextFileTail
 from shellstreaming.operator import ShellCmd, ExternalTimeWindow, CopySplit
 from shellstreaming.ostream import LocalFile
 
@@ -13,8 +13,6 @@ STATUS_CODES = '/tmp/51_apache_log_analysis_statuscode.txt'
 
 
 def main():
-    # log_stream = api.IStream(TextFile, APACHE_LOG,
-    #                          fixed_to=['localhost'])  # specify nodes where apache log exists
     log_stream = api.IStream(TextFileTail, APACHE_LOG, read_existing_lines=True,
                              fixed_to=['localhost'])  # specify nodes where apache log exists
 
@@ -130,12 +128,14 @@ def main():
             {'name': 'statuscode', 'type': 'INT'},
         ]),
         out_col_patterns={
-            'count': re.compile(r'\d+', re.MULTILINE),
-            'statuscode': re.compile(r'\d{3}', re.MULTILINE),
+            'count'      : re.compile(r'\d+', re.MULTILINE),
+            'statuscode' : re.compile(r'\d{3}', re.MULTILINE),
         })
 
     api.OStream(count_group_by_statuscode, LocalFile, STATUS_CODES, output_format='json', fixed_to=['localhost'])
 
 
 def test():
+    # check DAILY_ACCESS & STATUS_CODES files.
+    # also, do `$ echo 151.217.31.218 - - [04/01/2014:16:09:00 +0900] \"GET / HTTP/1.1\" 500 265 - -` and check again
     pass
