@@ -5,6 +5,10 @@
 
     :synopsis:
 """
+# standard modules
+import cPickle as pickle
+
+# my modules
 from shellstreaming.operator.base import Base
 
 
@@ -37,7 +41,12 @@ class CopySplit(Base):
             if batch is None:
                 map(lambda q: q.push(None), self._out_qs)
                 break
-            map(lambda q: q.push(batch), self._out_qs)  # copy
+
+            # create batch's deep-copy and push to all
+            for q in self._out_qs:
+                cp = pickle.dumps(batch)
+                cp = pickle.loads(cp)
+                q.push(cp)
 
     @staticmethod
     def out_stream_edge_id_suffixes(num_copies):

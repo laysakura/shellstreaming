@@ -264,7 +264,7 @@ def _draw_job_graph(job_graph, path):
         node_color='w')
     # edge label
     nx.draw_networkx_edge_labels(job_graph, pos, job_graph.edge_labels)
-    plt.savefig(path)
+    plt.savefig(path, dpi=600)
 
     logger = logging.getLogger('TerminalLogger')
     logger.info('Job graph figure is generated on: %s' % (path))
