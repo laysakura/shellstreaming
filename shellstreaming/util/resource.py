@@ -36,7 +36,3 @@ def avail_memory_byte():
     # [todo] - after implementing memory controller (which evicts data into disk sometimes),
     # [todo] - file cache would be important. Then `free` is better to use than `available`
     return psutil.virtual_memory().available
-
-
-if __name__ == '__main__':
-    print(avail_memory_byte(), )
