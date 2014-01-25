@@ -82,9 +82,15 @@ def sched_loop(
         return queue_groups
 
     def update_queue_groups(job_placement):
+        t0 = time.time()
         create_local_queues_if_necessary(job_placement)
+        logger.error('create_local_queues_if_necessary: %f sec' % (time.time() - t0))
+        t0 = time.time()
         queue_groups = create_queue_groups(job_placement)
+        logger.error('create_queue_groups: %f sec' % (time.time() - t0))
+        t0 = time.time()
         map(lambda w: rpyc_namespace(w).update_queue_groups(pickle.dumps(queue_groups)), workers)
+        logger.error('rpyc.update_queue_groups: %f sec' % (time.time() - t0))
 
     def remove_finished_jobs(job_placement):
         for job_id in collect_finished_jobs():
@@ -131,7 +137,9 @@ def sched_loop(
         ms.job_placement = next_job_placement
 
         # update queue_groups in each worker
+        t0 = time.time()
         update_queue_groups(ms.job_placement)
+        logger.critical('update_queue_groups: %f sec' % (time.time() - t0))
 
         t0 = time.time()
         resume_all_workers()  # start again all workers' activity

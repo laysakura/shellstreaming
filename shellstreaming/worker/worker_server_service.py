@@ -67,7 +67,6 @@ class WorkerServerService(rpyc.Service):
 
     def exposed_create_local_queues_if_not_exist(self, edge_ids):
         """Create local queues corresponding to :param:`edge_ids` if it is not yet created"""
-        import logging
         logger = logging.getLogger('TerminalLogger')
         for e in edge_ids:
             if e not in ws.local_queues.keys():
