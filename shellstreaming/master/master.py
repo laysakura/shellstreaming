@@ -90,7 +90,8 @@ def main():
         pickled_job_graph       = pickle.dumps(job_graph)
         map(lambda w: rpyc_namespace(w).init(w, pickled_worker_num_dict, pickled_job_graph,
                                              config.get('shellstreaming', 'worker_scheduler_module'),
-                                             config.getfloat('shellstreaming', 'worker_reschedule_interval_sec')),
+                                             config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'),
+                                             config.getboolean('shellstreaming', 'check_datatype')),
             ms.WORKER_IDS)
         # start master's main loop.
         t_sched_loop_sec0 = time.time()

@@ -9,7 +9,7 @@
 import pyhashxx
 
 # my modules
-from relshell.batch import Batch
+from shellstreaming.core.batch import Batch
 from shellstreaming.core.batch_queue import BatchQueue
 
 

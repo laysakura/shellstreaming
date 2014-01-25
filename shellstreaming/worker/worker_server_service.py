@@ -16,6 +16,7 @@ import rpyc
 import psutil
 
 # my module
+from shellstreaming.core.batch import Batch
 from shellstreaming.worker import worker_struct as ws
 from shellstreaming.core.batch_queue import BatchQueue
 from shellstreaming.core.partitioned_batch_queue import PartitionedBatchQueue
@@ -39,10 +40,12 @@ class WorkerServerService(rpyc.Service):
         WorkerServerService.server = None
 
     def exposed_init(self, worker_id, pickled_worker_num_dict, pickled_job_graph,
-                     sched_module_name, reschedule_interval_sec):
-        ws.WORKER_ID       = worker_id
-        ws.WORKER_NUM_DICT = pickle.loads(pickled_worker_num_dict)
-        ws.JOB_GRAPH       = pickle.loads(pickled_job_graph)
+                     sched_module_name, reschedule_interval_sec,
+                     check_datatype):
+        ws.WORKER_ID         = worker_id
+        ws.WORKER_NUM_DICT   = pickle.loads(pickled_worker_num_dict)
+        ws.JOB_GRAPH         = pickle.loads(pickled_job_graph)
+        Batch.check_datatype = check_datatype
         set_affinity(ws.WORKER_ID, ws.WORKER_NUM_DICT)
         start_sched_loop(sched_module_name, reschedule_interval_sec)
 

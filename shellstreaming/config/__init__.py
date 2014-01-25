@@ -34,5 +34,6 @@ DEFAULT_CONFIG = {
     # debug
     'log_level'       : 'DEBUG',
     'localhost_debug' : 'False',
+    'check_datatype'  : 'True',
 }
 """Default config values"""
