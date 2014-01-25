@@ -106,6 +106,7 @@ def sched_loop(
 
     # ** main loop **
     while True:
+        t_stop_the_world_sec0 = time.time()
         logger.debug('pausing all workers ...')
         pause_all_workers()  # sychnronous call. stop all workers' activity
         logger.debug('paused!')
@@ -127,7 +128,9 @@ def sched_loop(
         update_queue_groups(ms.job_placement)
 
         resume_all_workers()  # start again all workers' activity
-        logger.debug('resumed workers activity')
+        t_stop_the_world_sec1 = time.time()
+        logger.debug('resumed workers activity, %f sec stop-the-world' % (t_stop_the_world_sec1 - t_stop_the_world_sec0))
+        # [todo] - shorter stop-the-world for performance
 
         # sleep & poll all workers whether they finished their jobs.
         # if all jobs in job graph are finished, scheduler loop can be safely finished here since
