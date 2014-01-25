@@ -8,6 +8,7 @@
 # standard modules
 import time
 import cPickle as pickle
+from collections import deque
 
 # my modules
 import shellstreaming.worker.worker_struct as ws
@@ -30,9 +31,10 @@ class QueueGroup(object):
         :param edge_id: edge corresponding to this QueueGroup
         :param worker_ids: workers who have `param`:edge_id:'s queue
         """
-        self._edge           = edge_id
-        self._workers_to_pop = worker_ids[:]  # workers who have non-empty queue
-        self._working        = False
+        self._edge             = edge_id
+        self._workers_to_pop   = worker_ids[:]  # workers who have non-empty queue
+        self._working          = False
+        self._batch_local_repo = deque()        # cache aggregated batches locally
 
     def pop(self):
         """Pop batch from (local|remote) queue.
@@ -45,6 +47,11 @@ class QueueGroup(object):
         """
         # pop a batch, or return None when no batch is available
         while True:
+            # return batch from aggregated batch local cache if exists
+            if len(self._batch_local_repo) > 0:
+                batch = self._batch_local_repo.popleft()
+                return batch
+
             # select a queue
             if ws.WORKER_ID in self._workers_to_pop:
                 # optimization: local queue first
@@ -72,7 +79,10 @@ class QueueGroup(object):
                 break
 
         if type(batch) == str:
-            batch = pickle.loads(batch)
+            batches = pickle.loads(batch)  # batch from remote queue is aggregated
+            for b in batches:              # cache locally
+                self._batch_local_repo.append(b)
+            batch = self._batch_local_repo.popleft()
 
         # when comming to this code path (just before returning batch, or changing state),
         # it means job instance thread is working.
