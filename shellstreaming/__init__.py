@@ -18,6 +18,7 @@ install_requires = [
     'rpyc',
     'networkx',
     'pyhashxx',
+    'psutil',
     'requests',
     'requests_oauthlib',
 ]
