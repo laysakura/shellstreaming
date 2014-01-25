@@ -35,29 +35,15 @@ class WorkerServerService(rpyc.Service):
         WorkerServerService.server.close()
         WorkerServerService.server = None
 
+    def exposed_init(self, worker_id, worker_num_dict, pickled_job_graph, sched_module_name, reschedule_interval_sec):
+        ws.WORKER_ID = worker_id
+        ws.WORKER_NUM_DICT = worker_num_dict
+        ws.JOB_GRAPH = pickle.loads(pickled_job_graph)
+        start_sched_loop(sched_module_name, reschedule_interval_sec)
+
     def exposed_update_queue_groups(self, pickled_queue_groups):
         """Updates ws.QUEUE_GROUPS"""
         ws.QUEUE_GROUPS = pickle.loads(pickled_queue_groups)
-
-    def exposed_start_worker_local_scheduler(
-            self,
-            sched_module_name, reschedule_interval_sec
-    ):
-        """Start worker local scheduler"""
-        return start_sched_loop(sched_module_name, reschedule_interval_sec)
-
-    def exposed_set_worker_id(self, worker_id):
-        """Set worker_id from master"""
-        ws.WORKER_ID = worker_id
-
-    def exposed_set_worker_num_dict(self, worker_num_dict):
-        """Set worker_id from master"""
-        ws.WORKER_NUM_DICT = worker_num_dict
-
-    def exposed_reg_job_graph(self, pickled_job_graph):
-        """Register job graph"""
-        job_graph = pickle.loads(pickled_job_graph)
-        ws.JOB_GRAPH = job_graph
 
     def exposed_block(self):
         """Master blocks worker's activity by calling this function.

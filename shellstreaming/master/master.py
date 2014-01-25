@@ -85,19 +85,11 @@ def main():
         ms.job_placement = JobPlacement(job_graph)
         for host_port in ms.WORKER_IDS:
             ms.conn_pool[host_port] = rpyc.connect(*host_port)
-        # set worker id to each worker
-        map(lambda w: rpyc_namespace(w).set_worker_id(w), ms.WORKER_IDS)
-        # set worker num dict for each worker
-        worker_num_dict = {w: num for num, w in enumerate(ms.WORKER_IDS)}
-        map(lambda w: rpyc_namespace(w).set_worker_num_dict(worker_num_dict), ms.WORKER_IDS)
-        # register job graph to each worker
+        # initialize workers at a time (less rpc call)
+        worker_num_dict   = {w: num for num, w in enumerate(ms.WORKER_IDS)}
         pickled_job_graph = pickle.dumps(job_graph)
-        map(lambda w: rpyc_namespace(w).reg_job_graph(pickled_job_graph), ms.WORKER_IDS)
-        # launch worker-local scheduler on each worker
-        for w in ms.WORKER_IDS:
-            rpyc_namespace(w).start_worker_local_scheduler(
-                config.get('shellstreaming', 'worker_scheduler_module'),
-                config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'))
+        map(lambda w: rpyc_namespace(w).init(w, worker_num_dict, pickled_job_graph, config.get('shellstreaming', 'worker_scheduler_module'), config.getfloat('shellstreaming', 'worker_reschedule_interval_sec')),
+            ms.WORKER_IDS)
         # start master's main loop.
         t_sched_loop_sec0 = time.time()
         sched_loop(job_graph, ms.WORKER_IDS,
