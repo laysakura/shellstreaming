@@ -60,10 +60,14 @@ def sched_loop(
 
     # ** main loop **
     while True:
-        block_until_master_permits()
         sched_module.update_instances()
         declare_finished_jobs()
-        time.sleep(reschedule_interval_sec)
+
+        # sleep, but be altert to `block` command by master
+        t0 = time.time()
+        while time.time() - t0 < reschedule_interval_sec:
+            block_until_master_permits()
+            time.sleep(0.01)
 
 
 def start_sched_loop(sched_module_name, reschedule_interval_sec):
