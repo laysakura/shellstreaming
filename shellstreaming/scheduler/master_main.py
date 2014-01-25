@@ -116,20 +116,26 @@ def sched_loop(
         prev_job_placement = ms.job_placement.copy()  # for calling reg_unreg_jobs_to_workers() later
         remove_finished_jobs(ms.job_placement)
 
+        t0 = time.time()
         next_job_placement = sched_module.calc_job_placement(
             job_graph, workers, ms.job_placement,
             # machine resource, ...
         )   # [todo] - most important part in scheduling
+        logger.critical('calc_job_placement: %f sec' % (time.time() - t0))
         logger.debug('New job assignment is calculated: %s' % (next_job_placement))
 
         # register/unregister jobs to workers
+        t0 = time.time()
         reg_unreg_jobs_to_workers(next_job_placement, prev_job_placement)
+        logger.critical('reg_unreg_jobs_to_workers: %f sec' % (time.time() - t0))
         ms.job_placement = next_job_placement
 
         # update queue_groups in each worker
         update_queue_groups(ms.job_placement)
 
+        t0 = time.time()
         resume_all_workers()  # start again all workers' activity
+        logger.critical('resume_all_workers: %f sec' % (time.time() - t0))
         t_stop_the_world_sec1 = time.time()
         logger.debug('resumed workers activity, %f sec stop-the-world' % (t_stop_the_world_sec1 - t_stop_the_world_sec0))
         # [todo] - shorter stop-the-world for performance

@@ -23,7 +23,7 @@ DEFAULT_CONFIG = {
     'worker_log_path'                : join(gettempdir(), 'shellstreaming-worker.log'),
     # `master_scheduler_module` is more important for performance
     'worker_scheduler_module'        : 'shellstreaming.scheduler.worker_sched_single_thread',
-    'worker_reschedule_interval_sec' : '1',
+    'worker_reschedule_interval_sec' : '0.1',
 
     # auto_deploy
     'parallel_deploy'             : 'False',
