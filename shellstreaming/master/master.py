@@ -86,9 +86,11 @@ def main():
         for host_port in ms.WORKER_IDS:
             ms.conn_pool[host_port] = rpyc.connect(*host_port)
         # initialize workers at a time (less rpc call)
-        worker_num_dict   = {w: num for num, w in enumerate(ms.WORKER_IDS)}
-        pickled_job_graph = pickle.dumps(job_graph)
-        map(lambda w: rpyc_namespace(w).init(w, worker_num_dict, pickled_job_graph, config.get('shellstreaming', 'worker_scheduler_module'), config.getfloat('shellstreaming', 'worker_reschedule_interval_sec')),
+        pickled_worker_num_dict = pickle.dumps({w: num for num, w in enumerate(ms.WORKER_IDS)})
+        pickled_job_graph       = pickle.dumps(job_graph)
+        map(lambda w: rpyc_namespace(w).init(w, pickled_worker_num_dict, pickled_job_graph,
+                                             config.get('shellstreaming', 'worker_scheduler_module'),
+                                             config.getfloat('shellstreaming', 'worker_reschedule_interval_sec')),
             ms.WORKER_IDS)
         # start master's main loop.
         t_sched_loop_sec0 = time.time()

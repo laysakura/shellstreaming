@@ -8,9 +8,12 @@
 # standard module
 import cPickle as pickle
 import time
+import logging
+import os
 
 # 3rd party module
 import rpyc
+import psutil
 
 # my module
 from shellstreaming.worker import worker_struct as ws
@@ -35,10 +38,12 @@ class WorkerServerService(rpyc.Service):
         WorkerServerService.server.close()
         WorkerServerService.server = None
 
-    def exposed_init(self, worker_id, worker_num_dict, pickled_job_graph, sched_module_name, reschedule_interval_sec):
+    def exposed_init(self, worker_id, pickled_worker_num_dict, pickled_job_graph,
+                     sched_module_name, reschedule_interval_sec):
         ws.WORKER_ID       = worker_id
-        ws.WORKER_NUM_DICT = worker_num_dict
+        ws.WORKER_NUM_DICT = pickle.loads(pickled_worker_num_dict)
         ws.JOB_GRAPH       = pickle.loads(pickled_job_graph)
+        set_affinity(ws.WORKER_ID, ws.WORKER_NUM_DICT)
         start_sched_loop(sched_module_name, reschedule_interval_sec)
 
     def exposed_update_queue_groups(self, pickled_queue_groups):
@@ -80,3 +85,33 @@ class WorkerServerService(rpyc.Service):
         """
         q = ws.local_queues[stream_edge_id]
         return RemoteQueue(q)
+
+
+def _ith_in_node(worker_id, worker_num_dict):
+    """
+    .. code-block: python
+        >>> worker_num_dict = {('node0', 10000): 0, ('node0', 10001): 1, ('node1', 10000): 2, ('node0', 10002): 3}
+        >>> _ith_in_node(('node0', 10002), worker_num_dict)
+        2
+        >>> _ith_in_node(('node1', 10000), worker_num_dict)
+        0
+    """
+    node = worker_id[0]
+    i    = 0
+    for w, num in sorted(worker_num_dict.items(), key=lambda num: num[1]):
+        if w == worker_id:
+            return i
+        if w[0] == node:
+            i += 1
+    raise KeyError('"%s:%s" does not in `worker_num_dict`: %s' % (worker_id[0], worker_id[1], worker_num_dict))
+
+
+def set_affinity(worker_id, worker_num_dict):
+    """Bind the worker to a cpu core"""
+    logger = logging.getLogger('TerminalLogger')
+    logger.critical(worker_num_dict)
+    i      = _ith_in_node(worker_id, worker_num_dict)
+    core   = i % psutil.NUM_CPUS
+    p      = psutil.Process(os.getpid())
+    p.set_cpu_affinity([core])
+    logger.debug('%s:%s is `set_affinity`ed to CPU core %d' % (worker_id[0], worker_id[1], core))
