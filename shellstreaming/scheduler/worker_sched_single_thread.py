@@ -16,6 +16,7 @@ def update_instances():
     """Execute, wait job instance thread.
     """
     logger = logging.getLogger('TerminalLogger')
+    prev_job_instances = ws.job_instances.copy()  # used to check if any instance is newly finished/started
 
     # instanciate newly-registered jobs
     for job_id in set(ws.ASSIGNED_JOBS) - set(ws.finished_jobs):
@@ -51,3 +52,6 @@ def update_instances():
                     **job_kw)
             # register launced job
             ws.job_instances[job_id] = [job_instance]
+
+    if ws.job_instances != prev_job_instances:
+        logger.debug('Updated job instances: %s' % (ws.job_instances))

@@ -62,7 +62,6 @@ def sched_loop(
     while True:
         block_until_master_permits()
         sched_module.update_instances()
-        logger.debug('Update job instances: %s' % (ws.job_instances))
         declare_finished_jobs()
         time.sleep(reschedule_interval_sec)
 

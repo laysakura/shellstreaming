@@ -108,7 +108,9 @@ def sched_loop(
     while True:
         t_stop_the_world_sec0 = time.time()
         logger.debug('pausing all workers ...')
+        t0 = time.time()
         pause_all_workers()  # sychnronous call. stop all workers' activity
+        logger.critical('pause_all_workers: %f sec' % (time.time() - t0))
         logger.debug('paused!')
 
         prev_job_placement = ms.job_placement.copy()  # for calling reg_unreg_jobs_to_workers() later
