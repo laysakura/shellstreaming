@@ -36,9 +36,9 @@ class WorkerServerService(rpyc.Service):
         WorkerServerService.server = None
 
     def exposed_init(self, worker_id, worker_num_dict, pickled_job_graph, sched_module_name, reschedule_interval_sec):
-        ws.WORKER_ID = worker_id
+        ws.WORKER_ID       = worker_id
         ws.WORKER_NUM_DICT = worker_num_dict
-        ws.JOB_GRAPH = pickle.loads(pickled_job_graph)
+        ws.JOB_GRAPH       = pickle.loads(pickled_job_graph)
         start_sched_loop(sched_module_name, reschedule_interval_sec)
 
     def exposed_update_queue_groups(self, pickled_queue_groups):
