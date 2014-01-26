@@ -5,7 +5,7 @@
 
     :synopsis: Provides sort operators
 """
-from relshell.batch import Batch
+from shellstreaming.core.batch import Batch
 from shellstreaming.operator.base import Base
 
 

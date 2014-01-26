@@ -6,8 +6,8 @@
     :synopsis: Provides wrapper of :class:`BatchQueue` and :class:`RemoteQueue`.
 """
 # standard modules
-import time
 import cPickle as pickle
+from collections import deque
 
 # my modules
 import shellstreaming.worker.worker_struct as ws
@@ -30,9 +30,9 @@ class QueueGroup(object):
         :param edge_id: edge corresponding to this QueueGroup
         :param worker_ids: workers who have `param`:edge_id:'s queue
         """
-        self._edge           = edge_id
-        self._workers_to_pop = worker_ids[:]  # workers who have non-empty queue
-        self._working        = False
+        self._edge             = edge_id
+        self._workers_to_pop   = worker_ids[:]  # workers who have non-empty queue
+        self._batch_local_repo = deque()        # cache aggregated batches locally
 
     def pop(self):
         """Pop batch from (local|remote) queue.
@@ -45,6 +45,19 @@ class QueueGroup(object):
         """
         # pop a batch, or return None when no batch is available
         while True:
+            # only when every candidate worker returns None, this queue returns None
+            if self._workers_to_pop == []:
+                return None
+
+            # return batch from aggregated batch local cache if exists
+            if len(self._batch_local_repo) > 0:
+                batch = self._batch_local_repo.popleft()
+                if batch is None:
+                    self._workers_to_pop.remove(self._last_remote_worker)
+                    continue
+                else:
+                    return batch
+
             # select a queue
             if ws.WORKER_ID in self._workers_to_pop:
                 # optimization: local queue first
@@ -55,6 +68,7 @@ class QueueGroup(object):
                 worker  = select_remote_worker_to_pop(self._edge, self._workers_to_pop)  # [fix] - make this function replacable
                 q       = rpyc_namespace(worker).queue_netref(self._edge)
                 q_class = q.internal_queue_class()
+                self._last_remote_worker = worker
 
             # pop batch from BatchQueue or PartitionedBatchQueue
             if q_class == 'BatchQueue':
@@ -64,30 +78,18 @@ class QueueGroup(object):
             else:
                 assert(False)
 
-            if batch is not None:
-                break
-            # edge corresponding to this `worker` is already closed at least on selected worker
-            self._workers_to_pop.remove(worker)
-            if self._workers_to_pop == []:
+            if batch is None:
+                # edge corresponding to this `worker` is already closed at least on selected worker
+                self._workers_to_pop.remove(worker)
+                continue
+            else:
                 break
 
+        # after `break`
         if type(batch) == str:
-            batch = pickle.loads(batch)
-
-        # when comming to this code path (just before returning batch, or changing state),
-        # it means job instance thread is working.
-        # must be blocked if master requests so.
-        self._working = True
-        self._block_if_necessary()
-        self._working = False
+            batches = pickle.loads(batch)  # batch from remote queue is aggregated
+            for b in batches:              # cache locally
+                self._batch_local_repo.append(b)
+            batch = self._batch_local_repo.popleft()
 
         return batch
-
-    def is_working(self):
-        """Return whether this QueueGroup is working any batch (, which means worker is not paused)"""
-        return self._working
-
-    def _block_if_necessary(self):
-        while ws.BLOCKED_BY_MASTER:
-            self._working = False
-            time.sleep(0.001)

@@ -6,7 +6,7 @@
     :synopsis: Provides abstract istream
 """
 # my module
-from relshell.batch import Batch
+from shellstreaming.core.batch import Batch
 from shellstreaming.core.base_job import BaseJob
 
 

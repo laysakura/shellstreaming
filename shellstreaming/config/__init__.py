@@ -15,14 +15,15 @@ DEFAULT_CONFIG_LOCATION = (expanduser(join('~', '.shellstreaming.cnf')), )
 DEFAULT_CONFIG = {
     # master
     'job_graph_path'                 : '',
-    'master_scheduler_module'        : 'shellstreaming.scheduler.master_sched_firstnode',
+    'master_scheduler_module'        : 'shellstreaming.scheduler.master_sched_firstworker',
     'master_reschedule_interval_sec' : '3',
 
     # worker
     'worker_default_port'            : '18871',
     'worker_log_path'                : join(gettempdir(), 'shellstreaming-worker.log'),
+    # `master_scheduler_module` is more important for performance
     'worker_scheduler_module'        : 'shellstreaming.scheduler.worker_sched_single_thread',
-    'worker_reschedule_interval_sec' : '1',
+    'worker_reschedule_interval_sec' : '0.1',
 
     # auto_deploy
     'parallel_deploy'             : 'False',
@@ -33,5 +34,6 @@ DEFAULT_CONFIG = {
     # debug
     'log_level'       : 'DEBUG',
     'localhost_debug' : 'False',
+    'check_datatype'  : 'True',
 }
 """Default config values"""

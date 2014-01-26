@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import nose.tools as ns
-from relshell.batch import Batch
+from shellstreaming.core.batch import Batch
 from relshell.recorddef import RecordDef
 from relshell.record import Record
 from shellstreaming.core.batch_queue import BatchQueue

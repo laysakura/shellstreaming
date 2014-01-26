@@ -17,15 +17,23 @@ class BatchQueue(object):
 
     def __init__(self):
         """Constructor"""
-        self._q = q.Queue()
+        self._q       = q.Queue()
+        self._records = 0
 
     def push(self, batch):
         """"""
         self._q.put(batch)
+        if batch is not None:
+            self._records += len(batch)
 
     def pop(self):
         """"""
         batch = self._q.get(timeout=365 * 24 * 60 * 60)  # workaround: enable Ctrl-C http://bugs.python.org/issue1360
         if batch is None:
             self.push(None)  # supply `None` again in case other consumers are informed `empty`
+            return None
+        self._records -= len(batch)
         return batch
+
+    def records(self):
+        return self._records

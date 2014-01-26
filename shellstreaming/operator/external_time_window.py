@@ -8,7 +8,7 @@
 # standard module
 
 # my module
-from relshell.batch import Batch
+from shellstreaming.core.batch import Batch
 from relshell.timespan import Timespan
 from shellstreaming.operator.base import Base
 
