@@ -15,6 +15,10 @@ WORD_COUNT     = SHELLCMD_DIR + '/shellcmd/word_count'      # input: word, outpu
 
 
 def main():
+    # truncate file first
+    with open(OUTPUT_FILE, 'w'):
+        pass
+
     sentence_stream = api.IStream(RandSentence, seed=1, sleep_sec=1e-7, max_records=NUM_RECORDS, fixed_to=['localhost'])
     word_stream = api.Operator(
         [sentence_stream], ShellCmd,
@@ -54,7 +58,7 @@ def test():
             wc_dict[word] = count
 
     print("%d lines" % (i + 1))
-    assert(i == 50961)
+    assert(i == 50961)  # ここだけやたら増えてるが，ワード数は大丈夫
     assert(wc_dict['from']     == 552)
     assert(wc_dict['november'] == 130)
     assert(wc_dict['2009']     == 87)

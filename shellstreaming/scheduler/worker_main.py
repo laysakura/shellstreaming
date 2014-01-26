@@ -25,27 +25,6 @@ def sched_loop(
     sched_module = import_module(sched_module_name)
 
     # ** sub routines **
-    def is_blocking_all_in_edges(job_id):
-        is_blocking_all_q = True
-        for edge_id in ws.JOB_GRAPH.in_stream_edge_ids(job_id):
-            if edge_id not in ws.QUEUE_GROUPS:  # queue group is not yet registered, which means no input to block
-                continue
-            q = ws.QUEUE_GROUPS[edge_id]
-            if q.is_working():
-                is_blocking_all_q = False
-                break
-        return is_blocking_all_q
-
-    def block_until_master_permits():
-        while ws.BLOCKED_BY_MASTER:
-            is_worker_blocked = True
-            for job_id in set(ws.ASSIGNED_JOBS) - set(ws.finished_jobs):
-                if not is_blocking_all_in_edges(job_id):
-                    is_worker_blocked = False
-            if is_worker_blocked:
-                ws.ack_blocked = True
-        ws.ack_blocked = False
-
     def declare_might_finished_jobs():
         for job_id in set(ws.ASSIGNED_JOBS) - set(ws.might_finished_jobs):
             if job_id not in ws.job_instance:
@@ -71,7 +50,6 @@ def sched_loop(
         # sleep, but be altert to `block` command by master
         t0 = time.time()
         while time.time() - t0 < reschedule_interval_sec:
-            block_until_master_permits()
             time.sleep(0.01)
 
 

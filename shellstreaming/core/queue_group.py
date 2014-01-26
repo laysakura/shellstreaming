@@ -6,7 +6,6 @@
     :synopsis: Provides wrapper of :class:`BatchQueue` and :class:`RemoteQueue`.
 """
 # standard modules
-import time
 import cPickle as pickle
 from collections import deque
 
@@ -33,7 +32,6 @@ class QueueGroup(object):
         """
         self._edge             = edge_id
         self._workers_to_pop   = worker_ids[:]  # workers who have non-empty queue
-        self._working          = False
         self._batch_local_repo = deque()        # cache aggregated batches locally
 
     def pop(self):
@@ -45,10 +43,6 @@ class QueueGroup(object):
         :param pop_from: worker name used for popping from :class:`PartitionedBatchQueue`.
             None is allowed when popping from :class:`BatchQueue`
         """
-        import logging
-        logger = logging.getLogger('TerminalLogger')
-        logger.critical('workers_to_pop = %s' % (self._workers_to_pop))
-
         # pop a batch, or return None when no batch is available
         while True:
             # only when every candidate worker returns None, this queue returns None
@@ -58,7 +52,6 @@ class QueueGroup(object):
             # return batch from aggregated batch local cache if exists
             if len(self._batch_local_repo) > 0:
                 batch = self._batch_local_repo.popleft()
-                logger.critical('batch from self._batch_local_repo')
                 if batch is None:
                     self._workers_to_pop.remove(self._last_remote_worker)
                     continue
@@ -98,24 +91,5 @@ class QueueGroup(object):
             for b in batches:              # cache locally
                 self._batch_local_repo.append(b)
             batch = self._batch_local_repo.popleft()
-            logger.critical('batch remote queue')
-        else:
-            logger.critical('batch local queue')
-
-        # when comming to this code path (just before returning batch, or changing state),
-        # it means job instance thread is working.
-        # must be blocked if master requests so.
-        self._working = True
-        self._block_if_necessary()
-        self._working = False
 
         return batch
-
-    def is_working(self):
-        """Return whether this QueueGroup is working any batch (, which means worker is not paused)"""
-        return self._working
-
-    def _block_if_necessary(self):
-        while ws.BLOCKED_BY_MASTER:
-            self._working = False
-            time.sleep(0.001)

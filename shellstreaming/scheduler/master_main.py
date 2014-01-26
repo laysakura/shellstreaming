@@ -73,7 +73,6 @@ def sched_loop(
             might_finished_assignments = [(j, w) for j, w in collect_might_finished_assignments() if j not in really_finished_jobs]
             for mf_job, mf_worker in might_finished_assignments:
                 ms.job_placement.fire(mf_job, mf_worker)
-                logger.info('%s on %s might finish' % (mf_job, mf_worker))
 
                 # もう mf_job が終わることが確定しているなら，fire以外はすることがない
                 if mf_job in ms.will_finish_jobs:
@@ -85,7 +84,6 @@ def sched_loop(
                     if mf_job not in ms.will_finish_jobs:
                         ms.will_finish_jobs.append(mf_job)
                         really_finished_jobs.append(mf_job)
-                        logger.critical('"%s"' % (ms.job_placement))  # [fix] - 全部のistream instance終わってない
                         logger.debug('"%s" is finished' % (mf_job))  # [fix] - 全部のistream instance終わってない
                     continue
 
@@ -111,7 +109,6 @@ def sched_loop(
                 for in_edge in job_graph.in_stream_edge_ids(mf_job):
                     assert(len(ms.workers_who_might_have_active_outq[in_edge]) > 0)
                     queue_groups[in_edge] = QueueGroup(in_edge, ms.workers_who_might_have_active_outq[in_edge])
-                    logger.critical('Creating "%s" QueueGroup w/ workers_to_pop=%s' % (in_edge, ms.workers_who_might_have_active_outq[in_edge]))
                 update_queue_groups(queue_groups)
 
                 if mf_job not in [j for j, w in ms.last_assignments]:
@@ -153,12 +150,8 @@ def sched_loop(
         return queue_groups
 
     def update_queue_groups(queue_groups):
-        t0 = time.time()
         create_local_queues_if_necessary(queue_groups)
-        logger.error('create_local_queues_if_necessary: %f sec' % (time.time() - t0))
-        t0 = time.time()
         map(lambda w: rpyc_namespace(w).update_queue_groups(pickle.dumps(queue_groups)), workers)
-        logger.error('rpyc.update_queue_groups: %f sec' % (time.time() - t0))
 
     def remove_finished_jobs(job_placement):
         for job_id in ms.will_finish_jobs:
@@ -180,42 +173,21 @@ def sched_loop(
 
     # ** main loop **
     while True:
-        t_stop_the_world_sec0 = time.time()
-        logger.debug('pausing all workers ...')
-        # t0 = time.time()
-        # pause_all_workers()  # sychnronous call. stop all workers' activity
-        # logger.critical('pause_all_workers: %f sec' % (time.time() - t0))
-        logger.debug('paused!')
-
         prev_job_placement = ms.job_placement.copy()  # for calling reg_unreg_jobs_to_workers() later
         remove_finished_jobs(ms.job_placement)
 
-        t0 = time.time()
         next_job_placement = sched_module.calc_job_placement(
             job_graph, workers, ms.job_placement,
             # machine resource, ...
         )   # [todo] - most important part in scheduling
-        logger.critical('calc_job_placement: %f sec' % (time.time() - t0))
-        logger.debug('New job assignment is calculated: %s' % (next_job_placement))
 
         # update queue_groups in each worker
-        t0 = time.time()
         queue_groups = create_queue_groups(next_job_placement)
         update_queue_groups(queue_groups)
-        logger.critical('update_queue_groups: %f sec' % (time.time() - t0))
 
         # register/unregister jobs to workers
-        t0 = time.time()
         reg_unreg_jobs_to_workers(next_job_placement, prev_job_placement)
-        logger.critical('reg_unreg_jobs_to_workers: %f sec' % (time.time() - t0))
         ms.job_placement = next_job_placement
-
-        # t0 = time.time()
-        # resume_all_workers()  # start again all workers' activity
-        # logger.critical('resume_all_workers: %f sec' % (time.time() - t0))
-        t_stop_the_world_sec1 = time.time()
-        logger.debug('resumed workers activity, %f sec stop-the-world' % (t_stop_the_world_sec1 - t_stop_the_world_sec0))
-        # [todo] - shorter stop-the-world for performance
 
         # sleep & poll all workers whether they finished their jobs.
         # if all jobs in job graph are finished, scheduler loop can be safely finished here since
