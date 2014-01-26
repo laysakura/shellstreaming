@@ -58,7 +58,7 @@ def test():
             wc_dict[word] = count
 
     print("%d lines" % (i + 1))
-    assert(i == 50961)  # ここだけやたら増えてるが，ワード数は大丈夫
+    assert(i == 50961)
     assert(wc_dict['from']     == 552)
     assert(wc_dict['november'] == 130)
     assert(wc_dict['2009']     == 87)

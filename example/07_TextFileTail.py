@@ -18,6 +18,8 @@ def main():
     # create input file first
     with open(INPUT_FILE, 'w'):
         pass
+    with open(OUTPUT_FILE, 'w'):
+        pass
 
     # workflow
     tail_stream = api.IStream(TextFileTail, INPUT_FILE, read_existing_lines=False, fixed_to=['localhost'])

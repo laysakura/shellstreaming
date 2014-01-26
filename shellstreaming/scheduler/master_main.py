@@ -54,6 +54,14 @@ def sched_loop(
             map(lambda j: might_finished_assignments.append((j, worker)), worker_might_finished_jobs)
         return might_finished_assignments
 
+    def total_records_in_qs():
+        """Returns total records in all queues"""
+        ret = 0
+        for w in workers:
+            qstat = pickle.loads(rpyc_namespace(w).queue_status())
+            ret += sum(qstat.values())
+        return ret
+
     def sleep_and_poll_finish():
         t0 = time.time()
         while True:
@@ -63,11 +71,10 @@ def sched_loop(
             # 本当にジョブが終わったかを見る時は，ms.job_placement を見て，割当てワーカの有無を見る
             all_jobs = job_graph.nodes()
             really_finished_jobs = [j for j in all_jobs if ms.job_placement.is_finished(j) and j in ms.will_finish_jobs]
-            # logger.critical('really_finished_jobs => %s, ms.job_placement => %s' % (really_finished_jobs, ms.job_placement))
-            if set(all_jobs) == set(really_finished_jobs):
-                for worker in workers:
-                    qstat = rpyc_namespace(worker).queue_status()
-                    logger.warn('[%s] qstat => %s' % (worker, qstat))
+            finish_sched_loop = set(really_finished_jobs) == set(all_jobs)
+            if finish_sched_loop:
+                finish_sched_loop = total_records_in_qs() == 0
+            if finish_sched_loop:
                 raise StopIteration
             # start double-check whether workers' jobs are really finished
             might_finished_assignments = [(j, w) for j, w in collect_might_finished_assignments() if j not in really_finished_jobs]

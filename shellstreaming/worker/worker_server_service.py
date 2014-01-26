@@ -82,7 +82,7 @@ class WorkerServerService(rpyc.Service):
             logger.debug('Local queue for %s is created' % (e))
 
     def exposed_queue_status(self):
-        return {e: q.records() for e, q in ws.local_queues.iteritems()}
+        return pickle.dumps({e: q.records() for e, q in ws.local_queues.iteritems()})
 
     # APIs for workers
     def exposed_queue_netref(self, stream_edge_id):
