@@ -13,10 +13,9 @@ import relshell.batch
 class Batch(relshell.batch.Batch):
     """"""
 
-    check_datatype = None
+    check_datatype = True
     """This value must be set before any instance is created"""
 
     def __init__(self, record_def, records):
         """Constructor"""
-        assert(Batch.check_datatype is not None)
         relshell.batch.Batch.__init__(self, record_def, records, Batch.check_datatype)

@@ -5,7 +5,7 @@ from os.path import join
 from tempfile import gettempdir
 from relshell.record import Record
 from relshell.recorddef import RecordDef
-from shellstreaming.core.batch import Batch
+from relshell.batch import Batch
 from shellstreaming.core.batch_queue import BatchQueue
 from shellstreaming.ostream.localfile import LocalFile
 
