@@ -29,8 +29,8 @@ workers_who_might_have_active_outq = {}
     }
 """
 
-finished_jobs = []
-"""List of really finished jobs"""
+will_finish_jobs = []
+"""List of jobs which will definitely be finished w/o further job instances"""
 
 last_assignments = []
 """List of lastly assigned (job, worker)s before really finish"""

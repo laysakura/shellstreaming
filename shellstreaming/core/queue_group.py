@@ -45,6 +45,9 @@ class QueueGroup(object):
         :param pop_from: worker name used for popping from :class:`PartitionedBatchQueue`.
             None is allowed when popping from :class:`BatchQueue`
         """
+        if self._workers_to_pop == []:
+            return None
+
         # pop a batch, or return None when no batch is available
         while True:
             # return batch from aggregated batch local cache if exists

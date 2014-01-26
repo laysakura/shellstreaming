@@ -81,6 +81,9 @@ class WorkerServerService(rpyc.Service):
                 ws.local_queues[e] = PartitionedBatchQueue(len(ws.WORKER_NUM_DICT), partition_key)
             logger.debug('Local queue for %s is created' % (e))
 
+    def exposed_queue_status(self):
+        return {e: q.records() for e, q in ws.local_queues.iteritems()}
+
     # APIs for workers
     def exposed_queue_netref(self, stream_edge_id):
         """Pass wrapper of BatchQueue to be remotely accessed

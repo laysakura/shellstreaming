@@ -7,7 +7,7 @@ from shellstreaming.ostream import LocalFile
 
 LOW_OUTPUT_FILE  = '/tmp/02_FilterSplit_lo.txt'
 HIGH_OUTPUT_FILE = '/tmp/02_FilterSplit_hi.txt'
-NUM_RECORDS      = 100000
+NUM_RECORDS      = 10000
 
 
 def main():

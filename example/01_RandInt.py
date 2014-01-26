@@ -8,6 +8,10 @@ OUTPUT_FILE = '/tmp/01_RandInt.txt'
 
 
 def main():
+    # truncate file first
+    with open(OUTPUT_FILE, 'w'):
+        pass
+
     randint_stream = api.IStream(RandInt, 0, 100, sleep_sec=1e-8, max_records=1000)
     api.OStream(randint_stream, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
 

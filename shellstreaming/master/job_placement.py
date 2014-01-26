@@ -58,7 +58,8 @@ class JobPlacement(object):
         """
         if self.fixed_to(job_id) and worker_id not in self.fixed_to(job_id):
             raise ValueError('%s is fixed to %s' % (job_id, self.fixed_to(job_id)))
-        assert(worker_id not in self.assigned_workers(job_id))
+        if worker_id in self.assigned_workers(job_id):
+            return
         if self.is_started(job_id):
             self._job_place[job_id].append(worker_id)
         else:

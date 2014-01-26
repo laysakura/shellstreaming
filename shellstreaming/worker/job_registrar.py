@@ -23,7 +23,7 @@ class JobRegistrar(object):
     def exposed_unregister(self, job_id):
         """Unregister :param:`job_id` from job list to execute"""
         assert(job_id in ws.ASSIGNED_JOBS)
-        del ws.ASSIGNED_JOBS[job_id]
+        ws.ASSIGNED_JOBS.remove(job_id)
 
     def exposed_might_finished_jobs(self):
         """Return list of might-finished jobs"""

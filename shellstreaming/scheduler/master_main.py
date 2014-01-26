@@ -57,45 +57,67 @@ def sched_loop(
     def sleep_and_poll_finish():
         t0 = time.time()
         while True:
-            # poll workers finished jobs
-            if len(set(job_graph.nodes()) - set(ms.finished_jobs)) == 0:
+            # 全部の job が終わってたらスケジューラループを終了．
+            # ms.will_finish_jobs に含まれていてもそのジョブは「終わることが確定している」だけで，
+            # 「まだoutputを出しているinstanceを持っている」かもしれない．
+            # 本当にジョブが終わったかを見る時は，ms.job_placement を見て，割当てワーカの有無を見る
+            all_jobs = job_graph.nodes()
+            really_finished_jobs = [j for j in all_jobs if ms.job_placement.is_finished(j) and j in ms.will_finish_jobs]
+            # logger.critical('really_finished_jobs => %s, ms.job_placement => %s' % (really_finished_jobs, ms.job_placement))
+            if set(all_jobs) == set(really_finished_jobs):
+                for worker in workers:
+                    qstat = rpyc_namespace(worker).queue_status()
+                    logger.warn('[%s] qstat => %s' % (worker, qstat))
                 raise StopIteration
             # start double-check whether workers' jobs are really finished
-            might_finished_assignments = [(j, w) for j, w in set(collect_might_finished_assignments()) if j not in ms.finished_jobs]
+            might_finished_assignments = [(j, w) for j, w in collect_might_finished_assignments() if j not in really_finished_jobs]
             for mf_job, mf_worker in might_finished_assignments:
+                ms.job_placement.fire(mf_job, mf_worker)
+
+                # もう mf_job が終わることが確定しているなら，fire以外はすることがない
+                if mf_job in ms.will_finish_jobs:
+                    continue
+
                 # istream does not need double-checking since it inputs data not from queue group
                 # but from data sources
                 if mf_job in job_graph.begin_nodes():
-                    if mf_job not in ms.finished_jobs:
-                        ms.finished_jobs.append(mf_job)
-                        logger.debug('"%s" is finished on %s!!' % (mf_job, mf_worker))  # [fix] - 全部のistream instance終わってない
+                    if mf_job not in ms.will_finish_jobs:
+                        ms.will_finish_jobs.append(mf_job)
+                        really_finished_jobs.append(mf_job)
+                        logger.critical('"%s"' % (ms.job_placement))  # [fix] - 全部のistream instance終わってない
+                        logger.debug('"%s" is finished' % (mf_job))  # [fix] - 全部のistream instance終わってない
                     continue
 
                 # workers finish last assignment => really finish!
                 if (mf_job, mf_worker) in ms.last_assignments:
-                    assert(mf_job not in ms.finished_jobs)
-                    ms.finished_jobs.append(mf_job)  この時点では終わってない．終了が確定しただけ．
+                    logger.error('mf_job => "%s", will_finish_jobs => %s, last_assignments => %s' % (mf_job, ms.will_finish_jobs, ms.last_assignments))
+                    assert(mf_job not in ms.will_finish_jobs)
+                    ms.will_finish_jobs.append(mf_job)
                     ms.last_assignments.remove((mf_job, mf_worker))
-                    logger.debug('"%s" is finished!!' % (mf_job))
+                    logger.critical('ms.last_assignments => %s' % (ms.last_assignments))
+                    logger.debug('"%s" will finish soon since every input queue is assured to be checked' % (mf_job))
                     continue
 
                 # if all of pred jobs are finished,
                 # order a worker to check if this `job` really takes all None from all possibly-active queues,
                 # then this `job` is really finished
                 pred_jobs = job_graph.predecessors(mf_job)
-                if len(filter(lambda pred: pred in ms.finished_jobs, pred_jobs)) == len(pred_jobs):
+                if len(filter(lambda pred: pred in ms.will_finish_jobs, pred_jobs)) == len(pred_jobs):
                     if mf_job not in [j for j, w in ms.last_assignments]:
                         ms.last_assignments.append((mf_job, mf_worker))
+                        logger.critical('ms.last_assignments => %s' % (ms.last_assignments))
 
-                # re-assign job to double-check
+                # re-assign mf_job to double-check
                 ## QueueGroupをupdate
                 queue_groups = create_queue_groups(ms.job_placement)
                 for in_edge in job_graph.in_stream_edge_ids(mf_job):
+                    logger.warn('in_edge = %s, ms.workers_who_might_have_active_outq = %s' % (in_edge, ms.workers_who_might_have_active_outq[in_edge]))
+                    assert(len(ms.workers_who_might_have_active_outq[in_edge]) > 0)
                     queue_groups[in_edge] = QueueGroup(in_edge, ms.workers_who_might_have_active_outq[in_edge])
-                    logger.warn('"%s" in %s might have remaining batch. Lets find all of them!!' % (in_edge, ms.workers_who_might_have_active_outq[in_edge]))
                 if mf_job not in [j for j, w in ms.last_assignments]:
                     # まだ上流ジョブが終わってないなら，さっきまでこの`mf_job`をやらせていたワーカにもう一度やらせる
                     rpyc_namespace(mf_worker).update_queue_groups(pickle.dumps(queue_groups))
+                    ms.job_placement.assign(mf_job, mf_worker)
                     job_registrars[mf_worker].register(mf_job)
                 else:
                     # 上流ジョブ終わっていて `mf_job` の last_assignments も決まっていたらそいつにやらせる
@@ -104,7 +126,9 @@ def sched_loop(
                             last_assigned_worker = w
                             break
                     rpyc_namespace(last_assigned_worker).update_queue_groups(pickle.dumps(queue_groups))
+                    ms.job_placement.assign(mf_job, last_assigned_worker)
                     job_registrars[last_assigned_worker].register(mf_job)
+                    logger.warn('"%s" is lastly assigned to %s' % (mf_job, last_assigned_worker))
 
             # time to reschedule
             if time.time() - t0 >= reschedule_interval_sec:
@@ -146,7 +170,7 @@ def sched_loop(
         logger.error('rpyc.update_queue_groups: %f sec' % (time.time() - t0))
 
     def remove_finished_jobs(job_placement):
-        for job_id in ms.finished_jobs:
+        for job_id in ms.will_finish_jobs:
             for w in job_placement.assigned_workers(job_id):
                 job_placement.fire(job_id, w)
 
