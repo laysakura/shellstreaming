@@ -15,11 +15,7 @@ WORD_COUNT     = SHELLCMD_DIR + '/shellcmd/word_count'      # input: word, outpu
 
 
 def main():
-    # truncate file first
-    with open(OUTPUT_FILE, 'w'):
-        pass
-
-    sentence_stream = api.IStream(RandSentence, seed=1, sleep_sec=1e-7, max_records=NUM_RECORDS, fixed_to=['localhost'])
+    sentence_stream = api.IStream(RandSentence, seed=1, sleep_sec=1e-7, max_records=NUM_RECORDS, fixed_to=['cloko000'])
     word_stream = api.Operator(
         [sentence_stream], ShellCmd,
         '%s < IN_STREAM > OUT_STREAM' % (SPLIT_SENTENCE),
@@ -44,7 +40,7 @@ def main():
         msg_to_cmd='not word\n',
         reply_from_cmd='single word is expected\n')
 
-    api.OStream(wc_stream, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
+    api.OStream(wc_stream, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['cloko000'])
 
 
 def test():

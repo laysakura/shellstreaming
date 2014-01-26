@@ -8,6 +8,7 @@
     Simple wrapper of internal queue class
 """
 import Queue as q
+import threading
 
 
 class BatchQueue(object):
@@ -18,13 +19,16 @@ class BatchQueue(object):
     def __init__(self):
         """Constructor"""
         self._q       = q.Queue()
-        self._records = 0
+        self._records = 0  # BatchQueue would be popped/pushed at the same time. Atomically inc/dec this var.
+        self._lock = threading.Lock()
 
     def push(self, batch):
         """"""
         self._q.put(batch)
         if batch is not None:
+            self._lock.acquire()
             self._records += len(batch)
+            self._lock.release()
 
     def pop(self):
         """"""
@@ -32,7 +36,9 @@ class BatchQueue(object):
         if batch is None:
             self.push(None)  # supply `None` again in case other consumers are informed `empty`
             return None
+        self._lock.acquire()
         self._records -= len(batch)
+        self._lock.release()
         return batch
 
     def records(self):

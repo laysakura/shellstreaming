@@ -53,21 +53,6 @@ class WorkerServerService(rpyc.Service):
         """Updates ws.QUEUE_GROUPS"""
         ws.QUEUE_GROUPS = pickle.loads(pickled_queue_groups)
 
-    def exposed_block(self):
-        """Master blocks worker's activity by calling this function.
-
-        This function itself is blocking function (confusing!) in that
-        it returns after worker has really stopped.
-        """
-        ws.BLOCKED_BY_MASTER = True
-        while not ws.ack_blocked:
-            time.sleep(0.001)
-
-    def exposed_unblock(self):
-        """Master restarts worker's activity by calling this function.
-        """
-        ws.BLOCKED_BY_MASTER = False
-
     def exposed_create_local_queues(self, edge_ids):
         """Create local queues corresponding to :param:`edge_ids` if it is not yet created"""
         logger = logging.getLogger('TerminalLogger')

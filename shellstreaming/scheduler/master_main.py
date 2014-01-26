@@ -59,6 +59,7 @@ def sched_loop(
         ret = 0
         for w in workers:
             qstat = pickle.loads(rpyc_namespace(w).queue_status())
+            logger.warn('qstat: %s' % (qstat))
             ret += sum(qstat.values())
         return ret
 
