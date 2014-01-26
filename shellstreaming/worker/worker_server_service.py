@@ -68,18 +68,18 @@ class WorkerServerService(rpyc.Service):
         """
         ws.BLOCKED_BY_MASTER = False
 
-    def exposed_create_local_queues_if_not_exist(self, edge_ids):
+    def exposed_create_local_queues(self, edge_ids):
         """Create local queues corresponding to :param:`edge_ids` if it is not yet created"""
         logger = logging.getLogger('TerminalLogger')
         for e in edge_ids:
-            if e not in ws.local_queues.keys():
-                # create BatchQueue or PartitionedBatchQueue
-                partition_key = ws.JOB_GRAPH.edgeattr_from_edgeid(e)['partition_key']
-                if partition_key is None:
-                    ws.local_queues[e] = BatchQueue()
-                else:
-                    ws.local_queues[e] = PartitionedBatchQueue(len(ws.WORKER_NUM_DICT), partition_key)
-                logger.debug('Local queue for %s is created' % (e))
+            assert(e not in ws.local_queues.keys())
+            # create BatchQueue or PartitionedBatchQueue
+            partition_key = ws.JOB_GRAPH.edgeattr_from_edgeid(e)['partition_key']
+            if partition_key is None:
+                ws.local_queues[e] = BatchQueue()
+            else:
+                ws.local_queues[e] = PartitionedBatchQueue(len(ws.WORKER_NUM_DICT), partition_key)
+            logger.debug('Local queue for %s is created' % (e))
 
     # APIs for workers
     def exposed_queue_netref(self, stream_edge_id):

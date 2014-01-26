@@ -17,7 +17,7 @@ class LocalFile(IoStream):
         :param path: path to output file (overwritten)
         :param **kw: passed to :func:`Base.__init__()`
         """
-        self._f = open(path, 'w')
+        self._f = open(path, 'a')
         IoStream.__init__(self, self._f, **kw)
 
     def __del__(self):

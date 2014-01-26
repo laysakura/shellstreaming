@@ -17,14 +17,14 @@ class JobRegistrar(object):
 
     def exposed_register(self, job_id):
         """Register :param:`job_id` to execute"""
-        assert(job_id not in ws.ASSIGNED_JOBS)
-        ws.ASSIGNED_JOBS.append(job_id)
+        if job_id not in ws.ASSIGNED_JOBS:
+            ws.ASSIGNED_JOBS.append(job_id)
 
     def exposed_unregister(self, job_id):
         """Unregister :param:`job_id` from job list to execute"""
         assert(job_id in ws.ASSIGNED_JOBS)
         del ws.ASSIGNED_JOBS[job_id]
 
-    def exposed_finished_jobs(self):
-        """Return list of finished jobs"""
-        return pickle.dumps(ws.finished_jobs)
+    def exposed_might_finished_jobs(self):
+        """Return list of might-finished jobs"""
+        return pickle.dumps(ws.might_finished_jobs)

@@ -37,9 +37,8 @@ BLOCKED_BY_MASTER = False
 Only :func:`exposd_block` & :func:`exposd_unblock` modifies this"""
 
 # for communicating information with master
-finished_jobs = []
-"""Jobs which are assigned by master and finished.
-Here `finish` means input queue has pass `None`.
+might_finished_jobs = []
+"""Jobs which are assigned by master and might be finished. Double checking from master is necessary before really finish.
 """
 
 # data only worker reads/updates
@@ -53,12 +52,12 @@ conn_pool = {}
     }
 """
 
-job_instances = {}
-"""Jobs' instances
+job_instance = {}
+"""Jobs' instance
 
 .. code-block:: python
     {
-        '<job id>': [<job instance>, ...],
+        '<job id>': <job instance>,
         ...
     }
 """
