@@ -73,11 +73,8 @@ def sched_loop(
 
                 # workers finish last assignment => really finish!
                 if (mf_job, mf_worker) in ms.last_assignments:
-                    logger.critical('job=%s, worker=%s' % (mf_job, mf_worker))
-                    logger.critical('ms.last_assignments: %s' % (ms.last_assignments))
-                    logger.critical('ms.finished_jobs: %s' % (ms.finished_jobs))
                     assert(mf_job not in ms.finished_jobs)
-                    ms.finished_jobs.append(mf_job)
+                    ms.finished_jobs.append(mf_job)  この時点では終わってない．終了が確定しただけ．
                     ms.last_assignments.remove((mf_job, mf_worker))
                     logger.debug('"%s" is finished!!' % (mf_job))
                     continue
@@ -88,7 +85,6 @@ def sched_loop(
                 pred_jobs = job_graph.predecessors(mf_job)
                 if len(filter(lambda pred: pred in ms.finished_jobs, pred_jobs)) == len(pred_jobs):
                     if mf_job not in [j for j, w in ms.last_assignments]:
-                        logger.critical('adding ms.last_assignments: (%s, %s)' % ((mf_job, mf_worker)))
                         ms.last_assignments.append((mf_job, mf_worker))
 
                 # re-assign job to double-check
@@ -98,12 +94,11 @@ def sched_loop(
                     queue_groups[in_edge] = QueueGroup(in_edge, ms.workers_who_might_have_active_outq[in_edge])
                     logger.warn('"%s" in %s might have remaining batch. Lets find all of them!!' % (in_edge, ms.workers_who_might_have_active_outq[in_edge]))
                 if mf_job not in [j for j, w in ms.last_assignments]:
-                    # まだ上流ジョブが終わってないなら，さっきまでこの`job`をやらせていた全員にもう一度やらせる
-                    assigned_workers = ms.job_placement.assigned_workers(mf_job)
-                    map(lambda w: rpyc_namespace(w).update_queue_groups(pickle.dumps(queue_groups)), assigned_workers)
-                    map(lambda w: job_registrars[w].register(mf_job), assigned_workers)
+                    # まだ上流ジョブが終わってないなら，さっきまでこの`mf_job`をやらせていたワーカにもう一度やらせる
+                    rpyc_namespace(mf_worker).update_queue_groups(pickle.dumps(queue_groups))
+                    job_registrars[mf_worker].register(mf_job)
                 else:
-                    # 上流ジョブ終わっていて `job` の last_assignments も決まっていたらそいつにやらせる
+                    # 上流ジョブ終わっていて `mf_job` の last_assignments も決まっていたらそいつにやらせる
                     for j, w in ms.last_assignments:
                         if mf_job == j:
                             last_assigned_worker = w
