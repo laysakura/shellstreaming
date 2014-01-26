@@ -65,7 +65,8 @@ class PartitionedBatchQueue(object):
         """
         q     = self._qs[pop_from]
         batch = q.pop()
-        self._records -= batch
+        if batch is not None:
+            self._records -= len(batch)
         return batch
 
     def records(self):

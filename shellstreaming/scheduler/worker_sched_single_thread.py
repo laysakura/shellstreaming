@@ -41,6 +41,8 @@ def update_instances():
                     output_queue=ws.local_queues[out_edges[0]],
                     **job_kw)
             elif job_type == 'ostream':
+                logger.critical('candidates src workers: %s' % (ws.QUEUE_GROUPS[in_edges[0]])._workers_to_pop)
+
                 assert(len(out_edges) == 0 and len(in_edges) == 1)
                 job_instance = job_class(
                     *job_args,

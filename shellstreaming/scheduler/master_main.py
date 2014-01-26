@@ -73,6 +73,7 @@ def sched_loop(
             might_finished_assignments = [(j, w) for j, w in collect_might_finished_assignments() if j not in really_finished_jobs]
             for mf_job, mf_worker in might_finished_assignments:
                 ms.job_placement.fire(mf_job, mf_worker)
+                logger.info('%s on %s might finish' % (mf_job, mf_worker))
 
                 # もう mf_job が終わることが確定しているなら，fire以外はすることがない
                 if mf_job in ms.will_finish_jobs:
@@ -90,11 +91,9 @@ def sched_loop(
 
                 # workers finish last assignment => really finish!
                 if (mf_job, mf_worker) in ms.last_assignments:
-                    logger.error('mf_job => "%s", will_finish_jobs => %s, last_assignments => %s' % (mf_job, ms.will_finish_jobs, ms.last_assignments))
                     assert(mf_job not in ms.will_finish_jobs)
                     ms.will_finish_jobs.append(mf_job)
                     ms.last_assignments.remove((mf_job, mf_worker))
-                    logger.critical('ms.last_assignments => %s' % (ms.last_assignments))
                     logger.debug('"%s" will finish soon since every input queue is assured to be checked' % (mf_job))
                     continue
 
@@ -105,18 +104,18 @@ def sched_loop(
                 if len(filter(lambda pred: pred in ms.will_finish_jobs, pred_jobs)) == len(pred_jobs):
                     if mf_job not in [j for j, w in ms.last_assignments]:
                         ms.last_assignments.append((mf_job, mf_worker))
-                        logger.critical('ms.last_assignments => %s' % (ms.last_assignments))
 
                 # re-assign mf_job to double-check
                 ## QueueGroupをupdate
                 queue_groups = create_queue_groups(ms.job_placement)
                 for in_edge in job_graph.in_stream_edge_ids(mf_job):
-                    logger.warn('in_edge = %s, ms.workers_who_might_have_active_outq = %s' % (in_edge, ms.workers_who_might_have_active_outq[in_edge]))
                     assert(len(ms.workers_who_might_have_active_outq[in_edge]) > 0)
                     queue_groups[in_edge] = QueueGroup(in_edge, ms.workers_who_might_have_active_outq[in_edge])
+                    logger.critical('Creating "%s" QueueGroup w/ workers_to_pop=%s' % (in_edge, ms.workers_who_might_have_active_outq[in_edge]))
+                update_queue_groups(queue_groups)
+
                 if mf_job not in [j for j, w in ms.last_assignments]:
                     # まだ上流ジョブが終わってないなら，さっきまでこの`mf_job`をやらせていたワーカにもう一度やらせる
-                    rpyc_namespace(mf_worker).update_queue_groups(pickle.dumps(queue_groups))
                     ms.job_placement.assign(mf_job, mf_worker)
                     job_registrars[mf_worker].register(mf_job)
                 else:
@@ -125,30 +124,25 @@ def sched_loop(
                         if mf_job == j:
                             last_assigned_worker = w
                             break
-                    rpyc_namespace(last_assigned_worker).update_queue_groups(pickle.dumps(queue_groups))
                     ms.job_placement.assign(mf_job, last_assigned_worker)
                     job_registrars[last_assigned_worker].register(mf_job)
-                    logger.warn('"%s" is lastly assigned to %s' % (mf_job, last_assigned_worker))
 
             # time to reschedule
             if time.time() - t0 >= reschedule_interval_sec:
                 return
             time.sleep(0.1)
 
-    def create_local_queues_if_necessary(job_placement):
+    def create_local_queues_if_necessary(queue_groups):
         for worker in workers:
-            out_edges_not_created_yet = []
-            for job in job_placement.assigned_jobs(worker):
-                # every worker who at least once instanciates `job` might have active output queue of `job` instance
-                for out_edge in job_graph.out_stream_edge_ids(job):
-                    if out_edge not in ms.workers_who_might_have_active_outq:
-                        ms.workers_who_might_have_active_outq[out_edge] = []
-                    if worker not in ms.workers_who_might_have_active_outq[out_edge]:
-                        logger.debug('Queue of "%s" is being created on %s' % (out_edge, worker))
-                        ms.workers_who_might_have_active_outq[out_edge].append(worker)
-                        out_edges_not_created_yet.append(out_edge)
-
-            rpyc_namespace(worker).create_local_queues(out_edges_not_created_yet)
+            edges_not_created_yet = []
+            for edge, qgroup in queue_groups.iteritems():
+                if worker in qgroup._workers_to_pop:
+                    if edge not in ms.workers_who_might_have_active_outq:
+                        ms.workers_who_might_have_active_outq[edge] = []
+                    if worker not in ms.workers_who_might_have_active_outq[edge]:
+                        ms.workers_who_might_have_active_outq[edge].append(worker)
+                        edges_not_created_yet.append(edge)
+            rpyc_namespace(worker).create_local_queues(edges_not_created_yet)
 
     def create_queue_groups(job_placement):
         queue_groups = {}
@@ -158,13 +152,10 @@ def sched_loop(
                 queue_groups[edge] = QueueGroup(edge, assigned_workers)
         return queue_groups
 
-    def update_queue_groups(job_placement):
+    def update_queue_groups(queue_groups):
         t0 = time.time()
-        create_local_queues_if_necessary(job_placement)
+        create_local_queues_if_necessary(queue_groups)
         logger.error('create_local_queues_if_necessary: %f sec' % (time.time() - t0))
-        t0 = time.time()
-        queue_groups = create_queue_groups(job_placement)
-        logger.error('create_queue_groups: %f sec' % (time.time() - t0))
         t0 = time.time()
         map(lambda w: rpyc_namespace(w).update_queue_groups(pickle.dumps(queue_groups)), workers)
         logger.error('rpyc.update_queue_groups: %f sec' % (time.time() - t0))
@@ -209,7 +200,8 @@ def sched_loop(
 
         # update queue_groups in each worker
         t0 = time.time()
-        update_queue_groups(next_job_placement)
+        queue_groups = create_queue_groups(next_job_placement)
+        update_queue_groups(queue_groups)
         logger.critical('update_queue_groups: %f sec' % (time.time() - t0))
 
         # register/unregister jobs to workers

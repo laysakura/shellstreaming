@@ -7,6 +7,8 @@
 """
 
 
+JOB_GRAPH = None
+
 WORKER_IDS = []
 """List of worker host-port pairs
 

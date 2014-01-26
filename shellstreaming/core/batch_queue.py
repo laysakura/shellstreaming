@@ -25,9 +25,6 @@ class BatchQueue(object):
         self._q.put(batch)
         if batch is not None:
             self._records += len(batch)
-            import logging
-            logger = logging.getLogger('TerminalLogger')
-            logger.warn('push: records: %d' % (self._records))
 
     def pop(self):
         """"""
@@ -36,9 +33,6 @@ class BatchQueue(object):
             self.push(None)  # supply `None` again in case other consumers are informed `empty`
             return None
         self._records -= len(batch)
-        import logging
-        logger = logging.getLogger('TerminalLogger')
-        logger.warn('pop: records: %d' % (self._records))
         return batch
 
     def records(self):
