@@ -32,8 +32,8 @@ workers_who_might_have_active_outq = {}
 finished_jobs = []
 """List of really finished jobs"""
 
-lastly_assigned_jobs = []
-"""List of lastly assigned jobs before really finish"""
+last_assignments = []
+"""List of lastly assigned (job, worker)s before really finish"""
 
 conn_pool = {}
 """Connection pool to worker servers
