@@ -47,7 +47,7 @@ def IStream(istream, *istream_args, **istream_kw):
         istream_kw['fixed_to'] = ['%s:%d' % (worker[0], worker[1])]
         _num_istream += 1
 
-    stream = _reg_job('istream', None, istream, istream_args, istream_kw)
+    stream = _reg_job('istream', [], istream, istream_args, istream_kw)
     return stream
 
 
@@ -64,26 +64,39 @@ def Operator(in_streams, operator, *operator_args, **operator_kw):
 
 
 def OStream(in_stream, ostream, *ostream_args, **ostream_kw):
-    _reg_job('ostream', in_stream, ostream, ostream_args, ostream_kw)
+    _reg_job('ostream', [in_stream], ostream, ostream_args, ostream_kw)
 
 
-def _reg_job(job_type, in_stream, job_class, job_class_args, job_class_kw):
+def _reg_job(job_type, in_streams, job_class, job_class_args, job_class_kw):
     """Update :data:`_job_graph`
     """
+    logger = logging.getLogger('TerminalLogger')
     global _job_graph, _num_job_node, _num_stream_edge
 
     # add node
     job_id = "%d: %s" % (_num_job_node, job_class.__name__)
     _num_job_node += 1
     fixed_to = None
+
     if 'fixed_to' in job_class_kw:
         fixed_to = [parse_hostname_port(w, DEFAULT_PORT) for w in job_class_kw['fixed_to']]
         del job_class_kw['fixed_to']
+
+    # partition_by 指定のついたキューの下のジョブは固定数でなければ，
+    # partition キューを何個作れば良いかわからなくなる．
+    # fixed_to 指定がなければ全並列を選ぶ．
+    for in_stream in in_streams:
+        if in_stream and in_stream.partition_key and not fixed_to:
+            fixed_to = ms.WORKER_IDS
+            logger.info('"%s" is executed on every node in parallel since upstream edge has `partition_by` spec' % (job_id))
+            break
+
     _job_graph.add_node(job_id, job_type, job_class, job_class_args, job_class_kw, fixed_to)
 
     if job_type == 'ostream':
         # edge from pred job to this job
-        assert(in_stream is not None)
+        assert(len(in_streams) == 1)
+        in_stream = in_streams[0]
         to_from = (in_stream.src_job_id, job_id)
         _job_graph.add_edge(*to_from, stream_edge_id=in_stream.id, partition_key=in_stream.partition_key)
         _job_graph.edge_labels[to_from] = in_stream.id
@@ -95,12 +108,11 @@ def _reg_job(job_type, in_stream, job_class, job_class_args, job_class_kw):
         return StreamEdge(stream_id, src_job_id=job_id)
     else:
         assert(job_type == 'operator')
-        assert(type(in_stream) in (list, tuple))
         # input: some operators have multiple input streams
-        for s in in_stream:
-            to_from = (s.src_job_id, job_id)
-            _job_graph.add_edge(*to_from, stream_edge_id=s.id, partition_key=s.partition_key)
-            _job_graph.edge_labels[to_from] = s.id
+        for in_stream in in_streams:
+            to_from = (in_stream.src_job_id, job_id)
+            _job_graph.add_edge(*to_from, stream_edge_id=in_stream.id, partition_key=in_stream.partition_key)
+            _job_graph.edge_labels[to_from] = in_stream.id
         # output: some operators have multiple output streams
         streams = []
         for s in job_class.out_stream_edge_id_suffixes(job_class_args):

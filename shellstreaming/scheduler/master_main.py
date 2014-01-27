@@ -27,7 +27,8 @@ def sched_loop(
 ):
     """Scheduler main loop of stream processing
     """
-    logger = logging.getLogger('TerminalLogger')
+    logger  = logging.getLogger('TerminalLogger')
+    workers = tuple(workers)
 
     # prepare each worker's JobRegistrar
     job_registrars = {}
@@ -59,7 +60,7 @@ def sched_loop(
         ret = 0
         for w in workers:
             qstat = pickle.loads(rpyc_namespace(w).queue_status())
-            logger.warn('qstat: %s' % (qstat))
+            logger.warn('[%s] qstat: %s' % (w, qstat))
             ret += sum(qstat.values())
         return ret
 
@@ -78,9 +79,11 @@ def sched_loop(
             if finish_sched_loop:
                 raise StopIteration
             # start double-check whether workers' jobs are really finished
-            might_finished_assignments = [(j, w) for j, w in collect_might_finished_assignments() if j not in really_finished_jobs]
+            might_finished_assignments = collect_might_finished_assignments()
+            might_finished_assignments = [(j, w) for j, w in might_finished_assignments if j not in really_finished_jobs]
             for mf_job, mf_worker in might_finished_assignments:
                 ms.job_placement.fire(mf_job, mf_worker)
+                logger.debug('%s reports %s might be finished. Double-check start ...' % (mf_worker, mf_job))
 
                 # もう mf_job が終わることが確定しているなら，fire以外はすることがない
                 if mf_job in ms.will_finish_jobs:
@@ -96,11 +99,13 @@ def sched_loop(
                     continue
 
                 # workers finish last assignment => really finish!
-                if (mf_job, mf_worker) in ms.last_assignments:
-                    assert(mf_job not in ms.will_finish_jobs)
-                    ms.will_finish_jobs.append(mf_job)
-                    ms.last_assignments.remove((mf_job, mf_worker))
-                    logger.debug('"%s" will finish soon since every input queue is assured to be checked' % (mf_job))
+                if mf_job in ms.last_assignments and mf_worker in ms.last_assignments[mf_job]:
+                    ms.last_assignments[mf_job].remove(mf_worker)
+                    if ms.last_assignments[mf_job] == []:
+                        assert(mf_job not in ms.will_finish_jobs)
+                        ms.will_finish_jobs.append(mf_job)
+                        del ms.last_assignments[mf_job]
+                        logger.debug('"%s" will finish soon since every input queue is assured to be checked' % (mf_job))
                     continue
 
                 # if all of pred jobs are finished,
@@ -108,8 +113,12 @@ def sched_loop(
                 # then this `job` is really finished
                 pred_jobs = job_graph.predecessors(mf_job)
                 if len(filter(lambda pred: pred in ms.will_finish_jobs, pred_jobs)) == len(pred_jobs):
-                    if mf_job not in [j for j, w in ms.last_assignments]:
-                        ms.last_assignments.append((mf_job, mf_worker))
+                    if mf_job not in ms.last_assignments:
+                        workers_to_assign = [mf_worker]  # only might-finish worker is enough if no fixed_to
+                        if job_graph.node[mf_job]['fixed_to'] is not None:
+                            # fixed_to があるなら，その全員をアサインする
+                            workers_to_assign = job_graph.node[mf_job]['fixed_to']
+                        ms.last_assignments[mf_job] = workers_to_assign
 
                 # re-assign mf_job to double-check
                 ## QueueGroupをupdate
@@ -119,18 +128,17 @@ def sched_loop(
                     queue_groups[in_edge] = QueueGroup(in_edge, ms.workers_who_might_have_active_outq[in_edge])
                 update_queue_groups(queue_groups)
 
-                if mf_job not in [j for j, w in ms.last_assignments]:
+                if mf_job not in ms.last_assignments:
                     # まだ上流ジョブが終わってないなら，さっきまでこの`mf_job`をやらせていたワーカにもう一度やらせる
                     ms.job_placement.assign(mf_job, mf_worker)
                     job_registrars[mf_worker].register(mf_job)
+                    logger.debug('Pred job of %s is not finished. asking %s to launch %s instance' % (mf_job, mf_worker, mf_job))
                 else:
                     # 上流ジョブ終わっていて `mf_job` の last_assignments も決まっていたらそいつにやらせる
-                    for j, w in ms.last_assignments:
-                        if mf_job == j:
-                            last_assigned_worker = w
-                            break
-                    ms.job_placement.assign(mf_job, last_assigned_worker)
-                    job_registrars[last_assigned_worker].register(mf_job)
+                    workers_to_assign = ms.last_assignments[mf_job]
+                    map(lambda w: ms.job_placement.assign(mf_job, w), workers_to_assign)
+                    map(lambda w: job_registrars[w].register(mf_job), workers_to_assign)
+                    logger.debug('Pred job of %s seems finished. asking %s to launch %s instance for last check' % (mf_job, workers_to_assign, mf_job))
 
             # time to reschedule
             if time.time() - t0 >= reschedule_interval_sec:
@@ -188,6 +196,7 @@ def sched_loop(
             job_graph, workers, ms.job_placement,
             # machine resource, ...
         )   # [todo] - most important part in scheduling
+        logger.debug('New scheduling is calculated: %s' % (next_job_placement))
 
         # update queue_groups in each worker
         queue_groups = create_queue_groups(next_job_placement)

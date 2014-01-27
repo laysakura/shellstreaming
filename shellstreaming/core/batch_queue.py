@@ -36,9 +36,11 @@ class BatchQueue(object):
         if batch is None:
             self.push(None)  # supply `None` again in case other consumers are informed `empty`
             return None
+
         self._lock.acquire()
         self._records -= len(batch)
         self._lock.release()
+
         return batch
 
     def records(self):

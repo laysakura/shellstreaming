@@ -34,8 +34,17 @@ workers_who_might_have_active_outq = {}
 will_finish_jobs = []
 """List of jobs which will definitely be finished w/o further job instances"""
 
-last_assignments = []
-"""List of lastly assigned (job, worker)s before really finish"""
+last_assignments = {}
+"""
+.. code-block:: python
+    {
+        job_id: [worker_id, ...],  # this job must be re-executed by all of these [worker_id, ...]
+                                   # [] means assignment is accomplished
+        ...
+    }
+
+
+"""
 
 conn_pool = {}
 """Connection pool to worker servers

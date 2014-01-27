@@ -39,9 +39,6 @@ class QueueGroup(object):
 
         Blocks while ws.BLOCKED_BY_MASTER flag is True.
         This is for `stop the world` implementation.
-
-        :param pop_from: worker name used for popping from :class:`PartitionedBatchQueue`.
-            None is allowed when popping from :class:`BatchQueue`
         """
         # pop a batch, or return None when no batch is available
         while True:
@@ -74,22 +71,21 @@ class QueueGroup(object):
             if q_class == 'BatchQueue':
                 batch = q.pop()
             elif q_class == 'PartitionedBatchQueue':
-                batch = q.pop(pop_from=ws.WORKER_NUM_DICT[ws.WORKER_ID])
+                batch = q.pop(pop_from=ws.WORKER_NUM_DICT[ws.WORKER_ID])  # [fix] - partition_key を指定された下流ジョブが fixed_to で部分ワーカ集合を指定していた場合，グローバルなワーカ番号を使うと，例えば3つのキューのキュー#1は使われないのにキュー#4を要求されたり大変なことになる
             else:
                 assert(False)
+
+            # batch from remote queue
+            if type(batch) == str:
+                batches = pickle.loads(batch)  # batch from remote queue is aggregated
+                for b in batches:              # cache locally
+                    self._batch_local_repo.append(b)
+                batch = self._batch_local_repo.popleft()
 
             if batch is None:
                 # edge corresponding to this `worker` is already closed at least on selected worker
                 self._workers_to_pop.remove(worker)
                 continue
-            else:
-                break
 
-        # after `break`
-        if type(batch) == str:
-            batches = pickle.loads(batch)  # batch from remote queue is aggregated
-            for b in batches:              # cache locally
-                self._batch_local_repo.append(b)
-            batch = self._batch_local_repo.popleft()
-
-        return batch
+            assert(batch is not None)
+            return batch

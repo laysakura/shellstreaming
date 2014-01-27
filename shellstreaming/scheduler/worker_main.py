@@ -40,7 +40,7 @@ def sched_loop(
                 ## request master to newly create double-checking job instance if necessary
                 del ws.job_instance[job_id]
                 ws.ASSIGNED_JOBS.remove(job_id)
-                logger.debug('Job %s might have finished ...? Asking master to double-check' % (job_id))
+                logger.debug('[%s] Job %s might have finished ...? Asking master to double-check' % (ws.WORKER_ID, job_id))
 
     # ** main loop **
     while True:

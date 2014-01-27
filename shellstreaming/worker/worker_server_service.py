@@ -63,7 +63,11 @@ class WorkerServerService(rpyc.Service):
             if partition_key is None:
                 ws.local_queues[e] = BatchQueue()
             else:
-                ws.local_queues[e] = PartitionedBatchQueue(len(ws.WORKER_NUM_DICT), partition_key)
+                src_j, dest_j = ws.JOB_GRAPH.src_dest_from_edgeid(e)
+                fixed_to = ws.JOB_GRAPH.node[dest_j]['fixed_to']
+                assert(fixed_to is not None)
+                assert(len(fixed_to) == len(ws.WORKER_NUM_DICT))  # [fix] - 現在，partition_key 指定の下流ジョブは全ワーカで馬鹿並列することにしかできない． queue_group.py の [fix] 参照
+                ws.local_queues[e] = PartitionedBatchQueue(len(fixed_to), partition_key)  #ここが，下流ジョブのfixed_to数になっていて欲しい
             logger.debug('Local queue for %s is created' % (e))
 
     def exposed_queue_status(self):
