@@ -113,16 +113,19 @@ def main():
         map(lambda w: kill_worker_server(*w), ms.WORKER_IDS)
         raise
 
-    # run user's validation codes
-    _run_test(args.stream_py)
-
     # message
     logger.info('''
-Successfully finished all job execution.
+Finished all job execution.
 Execution time: %(t_sched_loop_sec)f sec.
 ''' % {
     't_sched_loop_sec': t_sched_loop_sec1 - t_sched_loop_sec0
 })
+
+    # run user's validation codes
+    _run_test(args.stream_py)
+
+    # message
+    logger.info('passed test()!')
 
     return 0
 

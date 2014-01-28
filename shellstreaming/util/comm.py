@@ -65,9 +65,15 @@ def rpyc_namespace(host_port):
     """Return rpyc's root namespace of :param:`host_port`"""
     # [todo] - too ugly?
     import shellstreaming.worker.worker_struct as ws
-    if host_port in ws.conn_pool:  # worker
-        conn = ws.conn_pool[host_port]
-    else:                          # master
+    if host_port in ws.conn_pool:  # only worker has ws.conn_pool set; from worker to worker
+        conn_pool = ws.conn_pool
+    else:                          # from master to worker
         import shellstreaming.master.master_struct as ms
-        conn = ms.conn_pool[host_port]
-    return conn.root
+        conn_pool = ms.conn_pool
+    conn = conn_pool[host_port]
+    try:
+        return conn.root
+    except EOFError:
+        logger.warn('"connection closed by peer" error when connecting to %s:%s. try re-connecting...' % (host_port))
+        conn_pool[host_port] = rpyc.connect(*host_port)
+        return rpyc_namespace(host_port)
