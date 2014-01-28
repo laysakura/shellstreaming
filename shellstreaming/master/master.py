@@ -18,7 +18,6 @@ from ConfigParser import SafeConfigParser
 # 3rd party
 import cPickle as pickle
 import networkx as nx
-import rpyc
 
 # my module
 from shellstreaming.config import DEFAULT_CONFIG, DEFAULT_CONFIG_LOCATION
@@ -27,7 +26,7 @@ from shellstreaming.util.logger import setup_TerminalLogger
 from shellstreaming.util.importer import import_from_file
 from shellstreaming.worker.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.master_main import sched_loop
-from shellstreaming.util.comm import wait_worker_server, kill_worker_server, rpyc_namespace
+from shellstreaming.util.comm import wait_worker_server, kill_worker_server, rpyc_namespace, connect_or_msg
 from shellstreaming.master.job_placement import JobPlacement
 import shellstreaming.master.master_struct as ms
 from shellstreaming import api
@@ -86,7 +85,7 @@ def main():
         # initialize :module:`master_struct`
         ms.job_placement = JobPlacement(job_graph)
         for host_port in ms.WORKER_IDS:
-            ms.conn_pool[host_port] = rpyc.connect(*host_port)
+            ms.conn_pool[host_port] = connect_or_msg(*host_port)
         # initialize workers at a time (less rpc call)
         pickled_worker_num_dict = pickle.dumps({w: num for num, w in enumerate(ms.WORKER_IDS)})
         pickled_job_graph       = pickle.dumps(job_graph)
