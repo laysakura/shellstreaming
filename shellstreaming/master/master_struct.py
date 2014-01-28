@@ -22,28 +22,15 @@ WORKER_IDS = []
 job_placement = None
 """Instance of :class:`JobPlacement`"""
 
-workers_who_might_have_active_outq = {}
-"""
+local_queue_placement = {}
+"""Master knows what queue each worker locally has.
+If all of them are empty, stream processing has finished.
+
 .. code-block:: python
     {
-        job_id: [worker_id, ...],  # this job is processed by these workers at least once
+        (<worker hostname>, <worker port number>): [edge id, ...],
         ...
     }
-"""
-
-will_finish_jobs = []
-"""List of jobs which will definitely be finished w/o further job instances"""
-
-last_assignments = {}
-"""
-.. code-block:: python
-    {
-        job_id: [worker_id, ...],  # this job must be re-executed by all of these [worker_id, ...]
-                                   # [] means assignment is accomplished
-        ...
-    }
-
-
 """
 
 conn_pool = {}

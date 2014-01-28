@@ -32,13 +32,9 @@ ASSIGNED_JOBS = []
 QUEUE_GROUPS = {}
 """{edge_id: QueueGroup()} structure. Only :func:`exposd_update_queue_groups` modifies this"""
 
-BLOCKED_BY_MASTER = False
-"""True only when master starts `stop the world` for changing job scheduling.
-Only :func:`exposd_block` & :func:`exposd_unblock` modifies this"""
-
 # for communicating information with master
-might_finished_jobs = []
-"""Jobs which are assigned by master and might be finished. Double checking from master is necessary before really finish.
+finished_jobs = []
+"""Jobs whose instance is finished.
 """
 
 # data only worker reads/updates
@@ -61,9 +57,6 @@ job_instance = {}
         ...
     }
 """
-
-ack_blocked = False
-"""True when worker has finished blocking asked by worker"""
 
 # for communicating with other workers
 local_queues = {}

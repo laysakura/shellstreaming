@@ -54,22 +54,23 @@ class WorkerServerService(rpyc.Service):
         """Updates ws.QUEUE_GROUPS"""
         ws.QUEUE_GROUPS = pickle.loads(pickled_queue_groups)
 
-    def exposed_create_local_queues(self, edge_ids):
+    def exposed_create_local_queues_if_not_exist(self, edge_ids):
         """Create local queues corresponding to :param:`edge_ids` if it is not yet created"""
         logger = logging.getLogger('TerminalLogger')
         for e in edge_ids:
-            assert(e not in ws.local_queues.keys())
-            # create BatchQueue or PartitionedBatchQueue
-            partition_key = ws.JOB_GRAPH.edgeattr_from_edgeid(e)['partition_key']
-            if partition_key is None:
-                ws.local_queues[e] = BatchQueue()
-            else:
-                src_j, dest_j = ws.JOB_GRAPH.src_dest_from_edgeid(e)
-                fixed_to = ws.JOB_GRAPH.node[dest_j]['fixed_to']
-                assert(fixed_to is not None)
-                assert(len(fixed_to) == len(ws.WORKER_NUM_DICT))  # [fix] - 現在，partition_key 指定の下流ジョブは全ワーカで馬鹿並列することにしかできない． queue_group.py の [fix] 参照
-                ws.local_queues[e] = PartitionedBatchQueue(len(fixed_to), partition_key)  #ここが，下流ジョブのfixed_to数になっていて欲しい
-            logger.debug('Local queue for %s is created' % (e))
+            if e not in ws.local_queues.keys():
+                # create BatchQueue or PartitionedBatchQueue
+                logger.debug('creating local queue for %s' % (e))
+                partition_key = ws.JOB_GRAPH.edgeattr_from_edgeid(e)['partition_key']
+                if partition_key is None:
+                    ws.local_queues[e] = BatchQueue()
+                else:
+                    src_j, dest_j = ws.JOB_GRAPH.src_dest_from_edgeid(e)
+                    fixed_to = ws.JOB_GRAPH.node[dest_j]['fixed_to']
+                    assert(fixed_to is not None)
+                    assert(len(fixed_to) == len(ws.WORKER_NUM_DICT))  # [fix] - 現在，partition_key 指定の下流ジョブは全ワーカで馬鹿並列することにしかできない． queue_group.py の [fix] 参照
+                    ws.local_queues[e] = PartitionedBatchQueue(len(fixed_to), partition_key)  # ここが，下流ジョブのfixed_to数になっていて欲しい
+                logger.debug('Local queue for %s is created' % (e))
 
     def exposed_queue_status(self):
         return pickle.dumps({e: q.records() for e, q in ws.local_queues.iteritems()})
@@ -104,7 +105,6 @@ def _ith_in_node(worker_id, worker_num_dict):
 def set_affinity(worker_id, worker_num_dict):
     """Bind the worker to a cpu core"""
     logger = logging.getLogger('TerminalLogger')
-    logger.critical(worker_num_dict)
     i      = _ith_in_node(worker_id, worker_num_dict)
     core   = i % psutil.NUM_CPUS
     p      = psutil.Process(os.getpid())

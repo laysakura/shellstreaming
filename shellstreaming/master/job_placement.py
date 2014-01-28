@@ -51,6 +51,12 @@ class JobPlacement(object):
         """Return if :param:`job_id` is already finished"""
         return self.is_started(job_id) and self._job_place[job_id] == []
 
+    def are_all_finished(self):
+        for j in self._job_graph.nodes():
+            if not self.is_finished(j):
+                return False
+        return True
+
     def assign(self, job_id, worker_id):
         """Assign :param:`job_id` to :param:`worker_id`
 
@@ -58,8 +64,7 @@ class JobPlacement(object):
         """
         if self.fixed_to(job_id) and worker_id not in self.fixed_to(job_id):
             raise ValueError('%s is fixed to %s' % (job_id, self.fixed_to(job_id)))
-        if worker_id in self.assigned_workers(job_id):
-            return
+        assert(worker_id not in self.assigned_workers(job_id))
         if self.is_started(job_id):
             self._job_place[job_id].append(worker_id)
         else:

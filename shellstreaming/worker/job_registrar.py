@@ -25,6 +25,6 @@ class JobRegistrar(object):
         assert(job_id in ws.ASSIGNED_JOBS)
         ws.ASSIGNED_JOBS.remove(job_id)
 
-    def exposed_might_finished_jobs(self):
+    def exposed_finished_jobs(self):
         """Return list of might-finished jobs"""
-        return pickle.dumps(ws.might_finished_jobs)
+        return pickle.dumps(ws.finished_jobs)

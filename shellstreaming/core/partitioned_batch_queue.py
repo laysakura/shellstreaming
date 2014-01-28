@@ -27,10 +27,11 @@ class PartitionedBatchQueue(object):
         :param partition_key: column name of records in batch.
             value of this column is used to distribute record to internal queues.
         """
-        self._qs      = [BatchQueue() for i in range(num_q)]
-        self._key     = partition_key
-        self._records = 0
-        self._lock    = threading.Lock()
+        self._qs       = [BatchQueue() for i in range(num_q)]
+        self._key      = partition_key
+        self._records  = 0
+        self._lock     = threading.Lock()
+        self._finished = False
 
     def push(self, batch):
         """"""
@@ -72,6 +73,7 @@ class PartitionedBatchQueue(object):
         batch = q.pop()
 
         if batch is None:
+            self._finished = True
             self.push(None)  # supply `None` again in case other consumers are informed `empty`
             return None
 
@@ -82,4 +84,6 @@ class PartitionedBatchQueue(object):
         return batch
 
     def records(self):
+        if self._finished:
+            return None
         return self._records

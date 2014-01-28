@@ -19,10 +19,7 @@ def update_instances():
     prev_job_instance = ws.job_instance.copy()  # used to check if any instance is newly finished/started
 
     # instanciate newly-registered jobs
-    for job_id in set(ws.ASSIGNED_JOBS):
-        # execute `job_id` which is asked to double-check by master
-        if job_id in ws.might_finished_jobs:
-            ws.might_finished_jobs.remove(job_id)
+    for job_id in set(ws.ASSIGNED_JOBS) - set(ws.finished_jobs):
         # launch not-yet-instanciated job
         if job_id not in ws.job_instance:
             job_attr = ws.JOB_GRAPH.node[job_id]
@@ -41,8 +38,6 @@ def update_instances():
                     output_queue=ws.local_queues[out_edges[0]],
                     **job_kw)
             elif job_type == 'ostream':
-                logger.critical('candidates src workers: %s' % (ws.QUEUE_GROUPS[in_edges[0]])._workers_to_pop)
-
                 assert(len(out_edges) == 0 and len(in_edges) == 1)
                 job_instance = job_class(
                     *job_args,
