@@ -63,6 +63,8 @@ def wait_worker_server(worker_host, worker_port, timeout_sec=None):
 
 def rpyc_namespace(host_port):
     """Return rpyc's root namespace of :param:`host_port`"""
+    logger = logging.getLogger('TerminalLogger')
+
     # [todo] - too ugly?
     import shellstreaming.worker.worker_struct as ws
     if host_port in ws.conn_pool:  # only worker has ws.conn_pool set; from worker to worker
