@@ -46,11 +46,7 @@ def sched_loop(
     while True:
         sched_module.update_instances()
         declare_might_finished_jobs()
-
-        # sleep, but be altert to `block` command by master
-        t0 = time.time()
-        while time.time() - t0 < reschedule_interval_sec:
-            time.sleep(0.01)
+        time.sleep(reschedule_interval_sec)
 
 
 def start_sched_loop(sched_module_name, reschedule_interval_sec):
