@@ -26,6 +26,7 @@ DEFAULT_CONFIG = {
     'worker_scheduler_module'        : 'shellstreaming.scheduler.worker_sched_single_thread',
     'worker_reschedule_interval_sec' : '0.1',
     'worker_set_cpu_affinity'        : 'False',
+    'in_queue_selection_module'      : 'shellstreaming.scheduler.worker_select_queue_local_first_and_random',
 
     # auto_deploy
     'parallel_deploy'             : 'False',
@@ -37,5 +38,8 @@ DEFAULT_CONFIG = {
     'log_level'       : 'DEBUG',
     'localhost_debug' : 'False',
     'check_datatype'  : 'True',
+
+    # optimization parameter
+    'min_records_in_aggregated_batches' : '1',
 }
 """Default config values"""

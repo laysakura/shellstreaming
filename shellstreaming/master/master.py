@@ -86,6 +86,7 @@ def main():
         ms.job_placement = JobPlacement(job_graph)
         for host_port in ms.WORKER_IDS:
             ms.conn_pool[host_port] = connect_or_msg(*host_port)
+        ms.MIN_RECORDS_IN_AGGREGATED_BATCHES = config.getint('shellstreaming', 'min_records_in_aggregated_batches')
         # initialize workers at a time (less rpc call)
         pickled_worker_num_dict = pickle.dumps({w: num for num, w in enumerate(ms.WORKER_IDS)})
         pickled_job_graph       = pickle.dumps(job_graph)
@@ -93,6 +94,7 @@ def main():
                                              config.getboolean('shellstreaming', 'worker_set_cpu_affinity'),
                                              config.get('shellstreaming', 'worker_scheduler_module'),
                                              config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'),
+                                             config.get('shellstreaming', 'in_queue_selection_module'),
                                              config.getboolean('shellstreaming', 'check_datatype')),
             ms.WORKER_IDS)
         # start master's main loop.

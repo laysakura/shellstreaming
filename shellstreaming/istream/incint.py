@@ -25,7 +25,9 @@ class IncInt(Base):
     def run(self):
         rdef = RecordDef([{'name': 'num', 'type': 'INT'}])
         while True:
-            time.sleep(self._sleep_sec)
+            if self._sleep_sec is not None:
+                time.sleep(self._sleep_sec)
+
             if self._interrupted():
                 break
             self.add(rdef, Record(self._cnt))

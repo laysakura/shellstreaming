@@ -11,13 +11,14 @@ import cPickle as pickle
 class RemoteQueue(object):
     """"""
 
-    def __init__(self, batch_queue):
+    def __init__(self, batch_queue, min_records_in_aggregated_batches):
         """
         :param batch_queue: instance of :class:`BatchQueue` or :class:`PartitionedBatchQueue` to be wrapped
         """
         self._q     = batch_queue
         self._empty = False
-        self._records_to_transfer_at_a_time = 10000  # [fix] - optimization: customize this parameter
+        # optimization: aggregated communication
+        self._min_records_in_aggregated_batches = min_records_in_aggregated_batches
 
     def exposed_pop(self, pop_from=None):
         if self._empty:
@@ -25,7 +26,7 @@ class RemoteQueue(object):
 
         aggr_batches = []  # optimization: aggregated transfer of batches
         num_aggr_rec = 0
-        while num_aggr_rec < self._records_to_transfer_at_a_time:
+        while num_aggr_rec < self._min_records_in_aggregated_batches:
             if pop_from is None:
                 assert(self._q.__class__.__name__ == 'BatchQueue')
                 batch = self._q.pop()

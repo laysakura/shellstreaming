@@ -32,6 +32,9 @@ ASSIGNED_JOBS = []
 QUEUE_GROUPS = {}
 """{edge_id: QueueGroup()} structure. Only :func:`exposd_update_queue_groups` modifies this"""
 
+IN_QUEUE_SELECTION_MODULE = None
+"""Module that include select_remote_worker_to_pop() function """
+
 # for communicating information with master
 finished_jobs = []
 """Jobs whose instance is finished.

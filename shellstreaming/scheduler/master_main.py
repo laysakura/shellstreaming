@@ -124,7 +124,7 @@ def sched_loop(
         for job in job_graph.nodes_iter():
             for edge in job_graph.out_stream_edge_ids(job):
                 assigned_workers   = job_placement.assigned_workers(job)
-                queue_groups[edge] = QueueGroup(edge, assigned_workers)
+                queue_groups[edge] = QueueGroup(edge, assigned_workers, ms.MIN_RECORDS_IN_AGGREGATED_BATCHES)
         return queue_groups
 
     def update_queue_groups(job_placement):

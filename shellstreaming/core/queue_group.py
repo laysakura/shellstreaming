@@ -25,7 +25,7 @@ class QueueGroup(object):
     When queue placement changes, create new instance of :class:`QueueGroup`.
     """
 
-    def __init__(self, edge_id, worker_ids):
+    def __init__(self, edge_id, worker_ids, min_records_in_aggregated_batches):
         """
         :param edge_id: edge corresponding to this QueueGroup
         :param worker_ids: workers who have `param`:edge_id:'s queue
@@ -33,6 +33,7 @@ class QueueGroup(object):
         self._edge             = edge_id
         self._workers_to_pop   = worker_ids[:]  # workers who have non-empty queue
         self._batch_local_repo = deque()        # cache aggregated batches locally
+        self._min_records_in_aggregated_batches = min_records_in_aggregated_batches  # optimization: batch aggregation
 
     def pop(self):
         """Pop batch from (local|remote) queue.
@@ -56,16 +57,15 @@ class QueueGroup(object):
                     return batch
 
             # select a queue
-            if ws.WORKER_ID in self._workers_to_pop:
-                # optimization: local queue first
-                worker  = ws.WORKER_ID
+            select_func = ws.IN_QUEUE_SELECTION_MODULE.select_remote_worker_to_pop
+            from_worker = select_func(self._edge, self._workers_to_pop)
+            if from_worker == ws.WORKER_ID:  # from local queue
                 q       = ws.local_queues[self._edge]
                 q_class = q.__class__.__name__
             else:
-                worker  = select_remote_worker_to_pop(self._edge, self._workers_to_pop)  # [fix] - make this function replacable
-                q       = rpyc_namespace(worker).queue_netref(self._edge)
+                q       = rpyc_namespace(from_worker).queue_netref(self._edge, self._min_records_in_aggregated_batches)
                 q_class = q.internal_queue_class()
-                self._last_remote_worker = worker
+                self._last_remote_worker = from_worker
 
             # pop batch from BatchQueue or PartitionedBatchQueue
             if q_class == 'BatchQueue':
@@ -84,7 +84,7 @@ class QueueGroup(object):
 
             if batch is None:
                 # edge corresponding to this `worker` is already closed at least on selected worker
-                self._workers_to_pop.remove(worker)
+                self._workers_to_pop.remove(from_worker)
                 continue
 
             assert(batch is not None)

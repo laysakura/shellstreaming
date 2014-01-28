@@ -9,6 +9,7 @@
 import cPickle as pickle
 import logging
 import os
+from importlib import import_module
 
 # 3rd party module
 import rpyc
@@ -41,11 +42,13 @@ class WorkerServerService(rpyc.Service):
     def exposed_init(self, worker_id, pickled_worker_num_dict, pickled_job_graph,
                      set_cpu_affinity,
                      sched_module_name, reschedule_interval_sec,
+                     in_queue_selection_module_name,
                      check_datatype):
-        ws.WORKER_ID         = worker_id
-        ws.WORKER_NUM_DICT   = pickle.loads(pickled_worker_num_dict)
-        ws.JOB_GRAPH         = pickle.loads(pickled_job_graph)
-        Batch.check_datatype = check_datatype
+        ws.WORKER_ID                 = worker_id
+        ws.WORKER_NUM_DICT           = pickle.loads(pickled_worker_num_dict)
+        ws.JOB_GRAPH                 = pickle.loads(pickled_job_graph)
+        ws.IN_QUEUE_SELECTION_MODULE = import_module(in_queue_selection_module_name)
+        Batch.check_datatype         = check_datatype
         if set_cpu_affinity:
             set_affinity(ws.WORKER_ID, ws.WORKER_NUM_DICT)
         start_sched_loop(sched_module_name, reschedule_interval_sec)
@@ -76,11 +79,11 @@ class WorkerServerService(rpyc.Service):
         return pickle.dumps({e: q.records() for e, q in ws.local_queues.iteritems()})
 
     # APIs for workers
-    def exposed_queue_netref(self, stream_edge_id):
+    def exposed_queue_netref(self, stream_edge_id, min_records_in_aggregated_batches):
         """Pass wrapper of BatchQueue to be remotely accessed
         """
         q = ws.local_queues[stream_edge_id]
-        return RemoteQueue(q)
+        return RemoteQueue(q, min_records_in_aggregated_batches)
 
 
 def _ith_in_node(worker_id, worker_num_dict):

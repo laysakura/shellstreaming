@@ -42,3 +42,6 @@ conn_pool = {}
         ...
     }
 """
+
+MIN_RECORDS_IN_AGGREGATED_BATCHES = 0
+"""optimization: batch aggregation size"""
