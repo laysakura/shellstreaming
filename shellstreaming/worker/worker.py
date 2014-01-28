@@ -21,7 +21,7 @@ from ConfigParser import SafeConfigParser
 
 # my modules
 from shellstreaming.config import DEFAULT_CONFIG
-from shellstreaming.config.parse import parse_worker_hosts
+from shellstreaming.config.parse import parse_worker_hosts, parse_worker_path
 
 
 def main(myhostname, cnfpath, logpath):
@@ -55,7 +55,7 @@ def _run_worker_servers(myhostname, cnfpath, logpath):
             'script'     : script,
             'cnfpath'    : cnfpath,
             'port'       : port,
-            'logpath'    : logpath,
+            'logpath'    : parse_worker_path(logpath, myhostname, port),
         }
         Popen(shlex.split(cmd), env=os.environ)
 

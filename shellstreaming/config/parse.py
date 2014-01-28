@@ -37,3 +37,9 @@ def parse_worker_hosts(worker_hosts, default_port):
             raise ValueError('"%s" is duplicated in `worker_hosts` config value' % (worker))
         ret.append(host_port)
     return ret
+
+
+def parse_worker_path(path, hostname, port):
+    """Replace HOSTNAME & PORT to :param:`hostname` & :param:`port` respectively.
+    """
+    return path.replace('HOSTNAME', hostname).replace('PORT', str(port))
