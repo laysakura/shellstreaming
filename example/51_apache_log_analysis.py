@@ -62,7 +62,8 @@ def main():
     access_win = api.Operator(
         [ts_access_stream], ExternalTimeWindow,
         timestamp_column='timestamp',
-        size_days=4, latest_timestamp=api.Timestamp('2014-01-04 23:59:59'))
+        size_days=4, latest_timestamp=api.Timestamp('2014-01-04 23:59:59'),
+        fixed_to=['localhost'])  # ステートフル．4日間のレコード集合という状態を持つ
 
     # copy 2 way
     access_win0, access_win1 = api.Operator([access_win], CopySplit, 2)
@@ -75,14 +76,14 @@ def main():
     date_win = api.Operator(
         [access_win0], ShellCmd,
         r'''awk '{print $2}' < IN_STREAM > OUT_STREAM''',
-        out_record_def=api.RecordDef([{'name': 'date'  , 'type': 'STRING'}]),
+        out_record_def=api.RecordDef([{'name': 'date', 'type': 'STRING'}]),
         out_col_patterns={'date': re.compile(r'^.+$', re.MULTILINE)})
 
     # sort date for `uniq -c` command
     sorted_date_win = api.Operator(
         [date_win], ShellCmd,
         r'''sort < IN_STREAM > OUT_STREAM''',
-        out_record_def=api.RecordDef([{'name': 'date'  , 'type': 'STRING'}]),
+        out_record_def=api.RecordDef([{'name': 'date', 'type': 'STRING'}]),
         out_col_patterns={'date': re.compile(r'^.+$', re.MULTILINE)})
 
     # group by date
@@ -90,7 +91,7 @@ def main():
         [sorted_date_win], ShellCmd,
         r'''uniq -c < IN_STREAM > OUT_STREAM''',
         out_record_def=api.RecordDef([
-            {'name': 'count'  , 'type': 'INT'},
+            {'name': 'count' , 'type': 'INT'},
             {'name': 'date'  , 'type': 'STRING'},
         ]),
         out_col_patterns={
@@ -130,7 +131,8 @@ def main():
         out_col_patterns={
             'count'      : re.compile(r'\d+', re.MULTILINE),
             'statuscode' : re.compile(r'\d{3}', re.MULTILINE),
-        })
+        },
+    fixed_to=['localhost'])
 
     api.OStream(count_group_by_statuscode, LocalFile, STATUS_CODES, output_format='json', fixed_to=['localhost'])
 

@@ -80,7 +80,9 @@ def main():
         job_graph = _parse_stream_py(args.stream_py)
         # draw job graph
         if config.get('shellstreaming', 'job_graph_path') != '':
-            _draw_job_graph(job_graph, config.get('shellstreaming', 'job_graph_path'))
+            _draw_job_graph(job_graph,
+                            config.get('shellstreaming', 'job_graph_path'),
+                            config.getint('shellstreaming', 'job_graph_dpi'))
         # initialize :module:`master_struct`
         ms.job_placement = JobPlacement(job_graph)
         for host_port in ms.WORKER_IDS:
@@ -243,7 +245,7 @@ def _run_test(stream_py):
         raise
 
 
-def _draw_job_graph(job_graph, path):
+def _draw_job_graph(job_graph, path, dpi):
     import matplotlib.pyplot as plt
 
     pos = nx.spring_layout(job_graph)
@@ -259,7 +261,7 @@ def _draw_job_graph(job_graph, path):
         node_color='w')
     # edge label
     nx.draw_networkx_edge_labels(job_graph, pos, job_graph.edge_labels)
-    plt.savefig(path, dpi=600)
+    plt.savefig(path, dpi=dpi)
 
     logger = logging.getLogger('TerminalLogger')
     logger.info('Job graph figure is generated on: %s' % (path))
