@@ -25,6 +25,7 @@ DEFAULT_CONFIG = {
     # `master_scheduler_module` is more important for performance
     'worker_scheduler_module'        : 'shellstreaming.scheduler.worker_sched_single_thread',
     'worker_reschedule_interval_sec' : '0.1',
+    'worker_set_cpu_affinity'        : 'False',
 
     # auto_deploy
     'parallel_deploy'             : 'False',

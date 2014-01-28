@@ -91,6 +91,7 @@ def main():
         pickled_worker_num_dict = pickle.dumps({w: num for num, w in enumerate(ms.WORKER_IDS)})
         pickled_job_graph       = pickle.dumps(job_graph)
         map(lambda w: rpyc_namespace(w).init(w, pickled_worker_num_dict, pickled_job_graph,
+                                             config.getboolean('shellstreaming', 'worker_set_cpu_affinity'),
                                              config.get('shellstreaming', 'worker_scheduler_module'),
                                              config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'),
                                              config.getboolean('shellstreaming', 'check_datatype')),

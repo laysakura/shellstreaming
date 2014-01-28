@@ -7,7 +7,6 @@
 """
 # standard module
 import cPickle as pickle
-import time
 import logging
 import os
 
@@ -40,13 +39,15 @@ class WorkerServerService(rpyc.Service):
         WorkerServerService.server = None
 
     def exposed_init(self, worker_id, pickled_worker_num_dict, pickled_job_graph,
+                     set_cpu_affinity,
                      sched_module_name, reschedule_interval_sec,
                      check_datatype):
         ws.WORKER_ID         = worker_id
         ws.WORKER_NUM_DICT   = pickle.loads(pickled_worker_num_dict)
         ws.JOB_GRAPH         = pickle.loads(pickled_job_graph)
         Batch.check_datatype = check_datatype
-        set_affinity(ws.WORKER_ID, ws.WORKER_NUM_DICT)
+        if set_cpu_affinity:
+            set_affinity(ws.WORKER_ID, ws.WORKER_NUM_DICT)
         start_sched_loop(sched_module_name, reschedule_interval_sec)
 
     def exposed_update_queue_groups(self, pickled_queue_groups):
