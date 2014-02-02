@@ -5,6 +5,7 @@
 
     :synopsis: 
 """
+import copy
 
 
 class JobPlacement(object):
@@ -88,8 +89,8 @@ class JobPlacement(object):
     def copy(self):
         """Returns deep copy of `self`"""
         obj = JobPlacement(self._job_graph)
-        obj._job_place = self._job_place.copy()
-        obj._fixed_job = self._fixed_job.copy()
+        obj._job_place = copy.deepcopy(self._job_place)
+        obj._fixed_job = copy.deepcopy(self._fixed_job)
         return obj
 
     def __str__(self):
