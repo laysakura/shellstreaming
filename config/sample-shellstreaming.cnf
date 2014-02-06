@@ -1,0 +1,28 @@
+# copy this config file to: $HOME/.shellstreaming.cnf
+
+[shellstreaming]
+
+# Which workers to use?
+# Without port number, 18871 is used by default
+worker_hosts = localhost,localhost:10000
+
+# Whether to enable single process mode.
+# Useful for shellstreaming developper
+localhost_debug = yes
+
+# Auto-deploy feature
+send_latest_codes_on_start = yes
+ssh_private_key = /home/nakatani/.ssh/id_rsa_lab_nopass
+parallel_deploy = yes
+
+# For debugging
+log_level = DEBUG
+worker_log_path = /tmp/shellstreaming-worker-HOSTNAME-PORT.log
+
+# For performance
+check_datatype = no
+worker_set_cpu_affinity = on
+
+# job graph
+job_graph_path = jobgraph.png
+job_graph_dpi = 600
