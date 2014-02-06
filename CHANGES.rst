@@ -1,10 +1,10 @@
 Changelog for shellstreaming
 ============================
 
-0.0.13 (unreleased)
--------------------
+0.1.0 (unreleased)
+------------------
 
-- Nothing changed yet.
+- First beta release
 
 
 0.0.12 (2013-12-12)

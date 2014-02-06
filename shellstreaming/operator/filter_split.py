@@ -6,7 +6,7 @@
     :synopsis: Provides filtering operators with multiple outputs
 """
 from relshell.recorddef import RecordDef
-from relshell.batch import Batch
+from shellstreaming.core.batch import Batch
 from shellstreaming.operator.base import Base
 
 

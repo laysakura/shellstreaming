@@ -18,14 +18,13 @@ import logging
 from ConfigParser import SafeConfigParser
 
 # 3rd party module
-import rpyc
 from rpyc.utils.server import ThreadedServer as Server
 
 # my module
 from shellstreaming.config import DEFAULT_CONFIG
 from shellstreaming.config.parse import parse_worker_hosts
 from shellstreaming.util.logger import setup_TerminalLogger
-from shellstreaming.util.comm import kill_worker_server, wait_worker_server
+from shellstreaming.util.comm import kill_worker_server, wait_worker_server, connect_or_msg
 import shellstreaming.worker.worker_struct as ws
 from shellstreaming.worker.worker_server_service import WorkerServerService
 
@@ -51,7 +50,7 @@ def main(port, cnfpath):
         while True:
             try:
                 wait_worker_server(*worker, timeout_sec=0.001)
-                ws.conn_pool[worker] = rpyc.connect(*worker)
+                ws.conn_pool[worker] = connect_or_msg(*worker)
                 break
             except IOError:
                 if WorkerServerService.server is None:  # master has killed me

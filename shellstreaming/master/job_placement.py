@@ -5,6 +5,7 @@
 
     :synopsis: 
 """
+import copy
 
 
 class JobPlacement(object):
@@ -51,6 +52,12 @@ class JobPlacement(object):
         """Return if :param:`job_id` is already finished"""
         return self.is_started(job_id) and self._job_place[job_id] == []
 
+    def are_all_finished(self):
+        for j in self._job_graph.nodes():
+            if not self.is_finished(j):
+                return False
+        return True
+
     def assign(self, job_id, worker_id):
         """Assign :param:`job_id` to :param:`worker_id`
 
@@ -82,8 +89,8 @@ class JobPlacement(object):
     def copy(self):
         """Returns deep copy of `self`"""
         obj = JobPlacement(self._job_graph)
-        obj._job_place = self._job_place.copy()
-        obj._fixed_job = self._fixed_job.copy()
+        obj._job_place = copy.deepcopy(self._job_place)
+        obj._fixed_job = copy.deepcopy(self._fixed_job)
         return obj
 
     def __str__(self):

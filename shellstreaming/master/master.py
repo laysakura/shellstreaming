@@ -18,7 +18,6 @@ from ConfigParser import SafeConfigParser
 # 3rd party
 import cPickle as pickle
 import networkx as nx
-import rpyc
 
 # my module
 from shellstreaming.config import DEFAULT_CONFIG, DEFAULT_CONFIG_LOCATION
@@ -27,7 +26,7 @@ from shellstreaming.util.logger import setup_TerminalLogger
 from shellstreaming.util.importer import import_from_file
 from shellstreaming.worker.run_worker_server import start_worker_server_thread
 from shellstreaming.scheduler.master_main import sched_loop
-from shellstreaming.util.comm import wait_worker_server, kill_worker_server, rpyc_namespace
+from shellstreaming.util.comm import wait_worker_server, kill_worker_server, rpyc_namespace, connect_or_msg
 from shellstreaming.master.job_placement import JobPlacement
 import shellstreaming.master.master_struct as ms
 from shellstreaming import api
@@ -80,24 +79,24 @@ def main():
         job_graph = _parse_stream_py(args.stream_py)
         # draw job graph
         if config.get('shellstreaming', 'job_graph_path') != '':
-            _draw_job_graph(job_graph, config.get('shellstreaming', 'job_graph_path'))
+            _draw_job_graph(job_graph,
+                            config.get('shellstreaming', 'job_graph_path'),
+                            config.getint('shellstreaming', 'job_graph_dpi'))
         # initialize :module:`master_struct`
         ms.job_placement = JobPlacement(job_graph)
         for host_port in ms.WORKER_IDS:
-            ms.conn_pool[host_port] = rpyc.connect(*host_port)
-        # set worker id to each worker
-        map(lambda w: rpyc_namespace(w).set_worker_id(w), ms.WORKER_IDS)
-        # set worker num dict for each worker
-        worker_num_dict = {w: num for num, w in enumerate(ms.WORKER_IDS)}
-        map(lambda w: rpyc_namespace(w).set_worker_num_dict(worker_num_dict), ms.WORKER_IDS)
-        # register job graph to each worker
-        pickled_job_graph = pickle.dumps(job_graph)
-        map(lambda w: rpyc_namespace(w).reg_job_graph(pickled_job_graph), ms.WORKER_IDS)
-        # launch worker-local scheduler on each worker
-        for w in ms.WORKER_IDS:
-            rpyc_namespace(w).start_worker_local_scheduler(
-                config.get('shellstreaming', 'worker_scheduler_module'),
-                config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'))
+            ms.conn_pool[host_port] = connect_or_msg(*host_port)
+        ms.MIN_RECORDS_IN_AGGREGATED_BATCHES = config.getint('shellstreaming', 'min_records_in_aggregated_batches')
+        # initialize workers at a time (less rpc call)
+        pickled_worker_num_dict = pickle.dumps({w: num for num, w in enumerate(ms.WORKER_IDS)})
+        pickled_job_graph       = pickle.dumps(job_graph)
+        map(lambda w: rpyc_namespace(w).init(w, pickled_worker_num_dict, pickled_job_graph,
+                                             config.getboolean('shellstreaming', 'worker_set_cpu_affinity'),
+                                             config.get('shellstreaming', 'worker_scheduler_module'),
+                                             config.getfloat('shellstreaming', 'worker_reschedule_interval_sec'),
+                                             config.get('shellstreaming', 'in_queue_selection_module'),
+                                             config.getboolean('shellstreaming', 'check_datatype')),
+            ms.WORKER_IDS)
         # start master's main loop.
         t_sched_loop_sec0 = time.time()
         sched_loop(job_graph, ms.WORKER_IDS,
@@ -110,21 +109,24 @@ def main():
     except KeyboardInterrupt:
         logger.debug('Received `KeyboardInterrupt`. Killing all worker servers ...')
         map(lambda w: kill_worker_server(*w), ms.WORKER_IDS)
-        return 1
+        raise
     except:
         map(lambda w: kill_worker_server(*w), ms.WORKER_IDS)
         raise
+
+    # message
+    logger.info('''
+Finished all job execution.
+Execution time: %(t_sched_loop_sec)f sec.
+''' % {
+    't_sched_loop_sec': t_sched_loop_sec1 - t_sched_loop_sec0
+})
 
     # run user's validation codes
     _run_test(args.stream_py)
 
     # message
-    logger.info('''
-Successfully finished all job execution.
-Execution time: %(t_sched_loop_sec)f sec.
-''' % {
-    't_sched_loop_sec': t_sched_loop_sec1 - t_sched_loop_sec0
-})
+    logger.info('passed test()!')
 
     return 0
 
@@ -248,7 +250,7 @@ def _run_test(stream_py):
         raise
 
 
-def _draw_job_graph(job_graph, path):
+def _draw_job_graph(job_graph, path, dpi):
     import matplotlib.pyplot as plt
 
     pos = nx.spring_layout(job_graph)
@@ -264,7 +266,7 @@ def _draw_job_graph(job_graph, path):
         node_color='w')
     # edge label
     nx.draw_networkx_edge_labels(job_graph, pos, job_graph.edge_labels)
-    plt.savefig(path)
+    plt.savefig(path, dpi=dpi)
 
     logger = logging.getLogger('TerminalLogger')
     logger.info('Job graph figure is generated on: %s' % (path))

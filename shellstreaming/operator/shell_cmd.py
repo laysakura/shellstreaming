@@ -47,8 +47,6 @@ class ShellCmd(Base):
         """
         """
         while True:
-            # [fix] - specifying `pop_from` everytime is ugly...
-            # [fix] - if real queue is BatchQueue (not PartitionedBatchQueue), pop_from info is meaningless.
             batch = self._in_q.pop()
             if batch is None:
                 self._out_q.push(None)

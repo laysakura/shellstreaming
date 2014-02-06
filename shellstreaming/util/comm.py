@@ -22,7 +22,7 @@ def kill_worker_server(worker_host, worker_port):
     logger = logging.getLogger('TerminalLogger')
 
     try:
-        conn = rpyc.connect(worker_host, worker_port)
+        conn = connect_or_msg(worker_host, worker_port)
     except (socket.gaierror, socket.error):  # connection refused
         raise IOError('%s:%s does not seem to have worker server' % (worker_host, worker_port))
 
@@ -50,24 +50,47 @@ def wait_worker_server(worker_host, worker_port, timeout_sec=None):
 
         # try connection
         try:
-            conn = rpyc.connect(worker_host, worker_port)
+            conn = connect_or_msg(worker_host, worker_port)
             conn.close()
             logger.debug('connection to %s:%s is confirmed' % (worker_host, worker_port))
             return
         except (socket.gaierror, socket.error):  # connection refused
-            time.sleep(0.5)
+            logger.debug('waiting for %s:%s to launch ...' % (worker_host, worker_port))
+            time.sleep(0.1)
             continue
         except:
             raise
 
 
+def connect_or_msg(hostname, port):
+    """Kinder message than rpyc.connect when failed to connect
+    """
+    logger = logging.getLogger('TerminalLogger')
+    try:
+        return rpyc.connect(hostname, port)
+    except (socket.gaierror, socket.error):
+        logger.warn('Connection is refused by %s:%s ...' % (hostname, port))
+        raise
+    except:
+        logger.error('Unexpected error happened during connecting to %s:%s' % (hostname, port))
+        raise
+
+
 def rpyc_namespace(host_port):
     """Return rpyc's root namespace of :param:`host_port`"""
+    logger = logging.getLogger('TerminalLogger')
+
     # [todo] - too ugly?
     import shellstreaming.worker.worker_struct as ws
-    if host_port in ws.conn_pool:  # worker
-        conn = ws.conn_pool[host_port]
-    else:                          # master
+    if host_port in ws.conn_pool:  # only worker has ws.conn_pool set; from worker to worker
+        conn_pool = ws.conn_pool
+    else:                          # from master to worker
         import shellstreaming.master.master_struct as ms
-        conn = ms.conn_pool[host_port]
-    return conn.root
+        conn_pool = ms.conn_pool
+    conn = conn_pool[host_port]
+    try:
+        return conn.root
+    except EOFError:
+        logger.warn('"connection closed by peer" error when connecting to %s:%s. try re-connecting...' % (host_port))
+        conn_pool[host_port] = connect_or_msg(*host_port)
+        return rpyc_namespace(host_port)

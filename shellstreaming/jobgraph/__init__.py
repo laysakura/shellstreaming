@@ -78,6 +78,14 @@ class JobGraph(nx.DiGraph):
                 return attr
         raise KeyError('"%s" is not in this JobGraph' % (edge_id))
 
+    def src_dest_from_edgeid(self, edge_id):
+        """Return edge attr dict of :param:`edge_id`"""
+        for e in self.edges_iter(data=True):
+            src, dest, attr = e
+            if attr['stream_edge_id'] == edge_id:
+                return (src, dest)
+        raise KeyError('"%s" is not in this JobGraph' % (edge_id))
+
     def out_stream_edge_ids(self, job_id):
         """Return :class:`StreamEdge` id of each outcomming edge"""
         return [self.edge[job_id][succ]['stream_edge_id'] for succ in self.successors(job_id)]

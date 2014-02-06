@@ -21,7 +21,7 @@ from ConfigParser import SafeConfigParser
 
 # my modules
 from shellstreaming.config import DEFAULT_CONFIG
-from shellstreaming.config.parse import parse_worker_hosts
+from shellstreaming.config.parse import parse_worker_hosts, parse_worker_path
 
 
 def main(myhostname, cnfpath, logpath):
@@ -40,6 +40,8 @@ def _run_worker_servers(myhostname, cnfpath, logpath):
     script     = join(dirname(abspath(__file__)), 'run_worker_server.py')
     deploy_dir = join(dirname(abspath(__file__)), '..', '..', '..')
     virtualenv_activator = join(deploy_dir, 'bin', 'activate')
+    python_egg_cache_dir = join(deploy_dir, '.python-eggs')
+    os.environ['PYTHON_EGG_CACHE'] = python_egg_cache_dir
 
     # setup config
     config = SafeConfigParser(DEFAULT_CONFIG)
@@ -50,12 +52,13 @@ def _run_worker_servers(myhostname, cnfpath, logpath):
                            config.get('shellstreaming', 'worker_hosts'),
                            config.getint('shellstreaming', 'worker_default_port'))
     for port in ports:
-        cmd = 'nohup sh -c "[ -f %(virtualenv)s ] && . %(virtualenv)s ; python %(script)s --port=%(port)d --config=%(cnfpath)s >> %(logpath)s 2>&1" &' % {
+        cmd = 'nohup sh -c "mkdir -p %(python_egg)s ; [ -f %(virtualenv)s ] && . %(virtualenv)s ; python %(script)s --port=%(port)d --config=%(cnfpath)s >> %(logpath)s 2>&1" &' % {
+            'python_egg' : python_egg_cache_dir,
             'virtualenv' : virtualenv_activator,
             'script'     : script,
             'cnfpath'    : cnfpath,
             'port'       : port,
-            'logpath'    : logpath,
+            'logpath'    : parse_worker_path(logpath, myhostname, port),
         }
         Popen(shlex.split(cmd), env=os.environ)
 

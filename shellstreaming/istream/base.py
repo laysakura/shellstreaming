@@ -6,7 +6,7 @@
     :synopsis: Provides abstract istream
 """
 # my module
-from relshell.batch import Batch
+from shellstreaming.core.batch import Batch
 from shellstreaming.core.base_job import BaseJob
 
 
@@ -67,18 +67,23 @@ class Base(BaseJob):
         def _create_next_batch():
             self._next_batch = []
 
-        # Finish istream after outputing enough records or data source has no more data.
-        self._num_records += 1
-        if (self._max_records and self._num_records > self._max_records) or record is None:
+        # finish istream when getting None
+        if record is None:
             _when_got_last_record()
             return
 
         if self._next_batch is None:
             _create_next_batch()
 
+        self._next_batch.append(record)
+
         if len(self._next_batch) == self._rec_in_batch:
             # this record is for 2nd batch
             _produce_next_batch()
             _create_next_batch()
 
-        self._next_batch.append(record)
+        # Finish istream after outputing enough records or data source has no more data.
+        self._num_records += 1
+        if self._max_records and self._num_records == self._max_records:
+            _when_got_last_record()
+            return
