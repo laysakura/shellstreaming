@@ -117,8 +117,17 @@ div.body div.seealso {
     background-color: #ffc;
     border: 1px solid #ff6;
 }
-div.body em.property, div.body .class em {
+div.body em.property, div.body .class em, div.body .function em {
     font-size: 75%;
+}
+div.body span.pre {
+    font-size: 90%;
+    margin: 0 2px;
+    padding: 0 5px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 3px;
+    font-family: 'Monaco', 'Consolas', 'Courier New', Courier, monospace, sans-serif;
 }
 div.body tt {
     padding: 0;
