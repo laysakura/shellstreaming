@@ -9,9 +9,6 @@ OUTPUT_FILE = '/tmp/03_CountWindow.txt'
 
 
 def main():
-    with open(OUTPUT_FILE, 'w'):
-        pass
-
     incint_stream = api.IStream(IncInt, max_records=6)
     incint_win = api.Operator([incint_stream], CountWindow, 3, slide_size=1, fixed_to=['localhost'])
     api.OStream(incint_win, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])

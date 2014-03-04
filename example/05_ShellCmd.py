@@ -11,9 +11,6 @@ NUM_RECORDS = 100000
 
 
 def main():
-    with open(OUTPUT_FILE, 'w'):
-        pass
-
     randint_stream = api.IStream(RandInt, 0, 100, sleep_sec=1e-7, max_records=NUM_RECORDS)
     cat_stream = api.Operator(
         [randint_stream], ShellCmd,

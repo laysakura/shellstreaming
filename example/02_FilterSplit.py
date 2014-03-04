@@ -13,8 +13,8 @@ NUM_RECORDS      = 100000
 def main():
     randint_stream = api.IStream(RandInt, 0, 100, sleep_sec=1e-7, max_records=NUM_RECORDS)
     lo_stream, hi_stream = api.Operator([randint_stream], FilterSplit, 'num < 50', 'num >= 50')
-    api.OStream(lo_stream, LocalFile, LOW_OUTPUT_FILE,  output_format='json', fixed_to=['cloko020:10000'])
-    api.OStream(hi_stream, LocalFile, HIGH_OUTPUT_FILE, output_format='json', fixed_to=['cloko020:10000'])
+    api.OStream(lo_stream, LocalFile, LOW_OUTPUT_FILE,  output_format='json', fixed_to=['localhost'])
+    api.OStream(hi_stream, LocalFile, HIGH_OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
 
 
 def test():

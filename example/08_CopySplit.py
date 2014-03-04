@@ -12,10 +12,6 @@ NUM_RECORDS   = 100000
 
 
 def main():
-    for f in (OUTPUT_FILE_0, OUTPUT_FILE_1, OUTPUT_FILE_2):
-        with open(f, 'w'):
-            pass
-
     randint_stream = api.IStream(RandInt, 0, 100, sleep_sec=1e-7, max_records=NUM_RECORDS)
     s0, s1, s2     = api.Operator([randint_stream], CopySplit, 3)
     api.OStream(s0, LocalFile, OUTPUT_FILE_0, output_format='json', fixed_to=['localhost'])
