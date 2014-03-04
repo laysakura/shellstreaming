@@ -21,7 +21,7 @@ log_level = DEBUG
 send_latest_codes_on_start = no
 
 # SSH private key to login to `worker_hosts`.
-ssh_private_key = /home/nakatani/.ssh/id_rsa_lab_nopass
+#ssh_private_key = /home/yourname/.ssh/id_rsa
 
 # If you want to send send shellstreaing codes to `worker_hosts` in parallel,
 # set it `yes`.
