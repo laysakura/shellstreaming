@@ -4,17 +4,38 @@ Tutorial
 .. toctree::
    :maxdepth: 1
 
-Run first example in localhost
-------------------------------
-
-shellstreamingで最初のアプリケーションを動かしてみます。
-shellstreamingは分散ストリーム処理系ですが、まずは設定の容易なlocalhost-modeを使ってみましょう。
+Installation
+------------
 
 サンプルアプリケーションはgithubレポジトリにありますので、まだcloneをしていない場合はcloneをしてください。
 
 .. code-block:: bash
 
     $ git clone https://github.com/laysakura/shellstreaming
+
+shellstreamingはPythonのパッケージであり、使うのにインストールする必要があります。
+ソースからインストールする場合は、cloneしたレポジトリのroot directoryから下記のコマンドを
+実行してください（Pythonのインストール、virtualenvの有無によりsudoが必要な場合があります）。
+
+.. code-block:: bash
+
+    $ python setup.py install
+
+PyPIというPythonのパッケージ・レポジトリからダウンロードしてインストールすることもできます。
+
+.. code-block:: bash
+
+    $ pip install shellstreaming
+
+.. warning::
+
+    shellstreamingはPython 2.7以上を必要としています。Python 3をサポートしていません。
+
+Run first example in localhost
+------------------------------
+
+shellstreamingで最初のアプリケーションを動かしてみます。
+shellstreamingは分散ストリーム処理系ですが、まずは設定の容易なlocalhost-modeを使ってみましょう。
 
 shellstreamingの動作には設定ファイルが必要です。
 設定ファイルは ``$HOME/.shellstreaming.cnf`` に配置します。
