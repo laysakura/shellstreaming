@@ -1,0 +1,34 @@
+[shellstreaming]
+
+# Workers to use.
+# Use <hostname:port,...> format.
+# Intra-node parallelization is realized by specifying multiple port for one host.
+#worker_hosts = a.example.com:10000,a.example.com:10001,b.example.com:10000
+
+# Whether to use localhost-mode.
+# This parameter is for debugging and developing your applications.
+localhost_debug = yes
+
+# Log level. You can use the followings:
+# DEBUG, INFO, WARNING, ERROR, CRITICAL
+# Left one is more verbose.
+log_level = DEBUG
+
+
+# Whether to send shellstreaming codes which exist on your environment to `worker_hosts`.
+# It's necessary if `worker_hosts` do not have ones.
+# But it takes about 30 seconds, so you can skip it if `worker_hosts` have ones.
+send_latest_codes_on_start = no
+
+# SSH private key to login to `worker_hosts`.
+ssh_private_key = /home/nakatani/.ssh/id_rsa_lab_nopass
+
+# If you want to send send shellstreaing codes to `worker_hosts` in parallel,
+# set it `yes`.
+parallel_deploy = yes
+
+# File path of log file in each worker.
+worker_log_path = /tmp/shellstreaming-worker-HOSTNAME-PORT.log
+
+
+# For other setting values, see `shellstreaming/config/__init__.py`
