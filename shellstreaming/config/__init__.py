@@ -16,8 +16,8 @@ DEFAULT_CONFIG = {
     # master
     'job_graph_path'                 : '',
     'job_graph_dpi'                  : '600',
-    'master_scheduler_module'        : 'shellstreaming.scheduler.master_sched_firstworker',
-    'master_reschedule_interval_sec' : '3',
+    'master_scheduler_module'        : 'shellstreaming.scheduler.master_sched_allworker',
+    'master_reschedule_interval_sec' : '10000',
 
     # worker
     'worker_default_port'            : '18871',
@@ -29,7 +29,7 @@ DEFAULT_CONFIG = {
     'in_queue_selection_module'      : 'shellstreaming.scheduler.worker_select_queue_local_first_and_random',
 
     # auto_deploy
-    'parallel_deploy'             : 'False',
+    'parallel_deploy'             : 'True',
     'ssh_private_key'             : 'None',
     'send_latest_config_on_start' : 'True',
     'send_latest_codes_on_start'  : 'True',

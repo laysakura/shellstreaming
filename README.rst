@@ -9,22 +9,32 @@ A stream processor working with shell commands
 .. contents:: :local:
 
 Installation
-############
+------------
 
 .. code-block:: bash
 
     $ pip install virtualenv shellstreaming
+    $ cp config/sample-shellstreaming.cnf ~/.shellstreaming.cnf
     $ vim ~/.shellstreaming.cnf
+
+Run examples
+------------
+
+.. code-block:: bash
+
+    $ git clone https://github.com/laysakura/shellstreaming.git
+    $ cd shellstreaming
+    $ shellstreaming example/01_RandInt.py
+
+
+API reference
+-------------
+
+Sphinx-powered documents are available on http://packages.python.org/shellstreaming
 
 
 For developers
 --------------
-
-API reference
-#############
-
-Sphinx-powered documents are available on http://packages.python.org/shellstreaming
-
 
 Building and uploading documents
 ################################
