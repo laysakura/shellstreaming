@@ -6,8 +6,8 @@ from shellstreaming.istream.base import Base
 
 def test_Base_add_no_record():
     class EmptyStream(Base):
-        def __init__(self, output_queue, batch_span_ms=1000):
-            Base.__init__(self, output_queue, batch_span_ms)
+        def __init__(self, output_queue):
+            Base.__init__(self, output_queue, records_in_batch=100)
 
         def run(self):
             self.add(None, None)

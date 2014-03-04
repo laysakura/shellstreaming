@@ -18,19 +18,18 @@ import logging
 from ConfigParser import SafeConfigParser
 
 # 3rd party module
-import rpyc
 from rpyc.utils.server import ThreadedServer as Server
 
 # my module
 from shellstreaming.config import DEFAULT_CONFIG
+from shellstreaming.config.parse import parse_worker_hosts
 from shellstreaming.util.logger import setup_TerminalLogger
-from shellstreaming.util.comm import kill_worker_server, wait_worker_server
-from shellstreaming.scheduler.worker_main import start_sched_loop
+from shellstreaming.util.comm import kill_worker_server, wait_worker_server, connect_or_msg
 import shellstreaming.worker.worker_struct as ws
 from shellstreaming.worker.worker_server_service import WorkerServerService
 
 
-def main(cnfpath):
+def main(port, cnfpath):
     # setup config
     config = SafeConfigParser(DEFAULT_CONFIG)
     config.read(cnfpath)
@@ -41,14 +40,21 @@ def main(cnfpath):
     logger = logging.getLogger('TerminalLogger')
 
     # start `WorkerServerService` thread
-    port = config.getint('shellstreaming', 'worker_port')
     logger.debug('Launching `WorkerServerService` on port %d ...' % (port))
     th_service = start_worker_server_thread(port, logger)
 
     # make connection to other workers
-    for worker in config.get('shellstreaming', 'worker_hosts').split(','):
-        wait_worker_server(worker, port)
-        ws.conn_pool[worker] = rpyc.connect(worker, port)
+    workers = parse_worker_hosts(config.get('shellstreaming', 'worker_hosts'),
+                                 config.getint('shellstreaming', 'worker_default_port'))
+    for worker in workers:
+        while True:
+            try:
+                wait_worker_server(*worker, timeout_sec=0.001)
+                ws.conn_pool[worker] = connect_or_msg(*worker)
+                break
+            except IOError:
+                if WorkerServerService.server is None:  # master has killed me
+                    return 1
 
     # wait for `server` to be `close()`ed by master client.
     while WorkerServerService.server:
@@ -58,6 +64,7 @@ def main(cnfpath):
     th_service.join()
 
     return 0
+
 
 def start_worker_server_thread(port, logger):
     # attempt to kill already launched server (for avoiding `Address already in use`)
@@ -81,6 +88,10 @@ def _parse_args():
     parser = argparse.ArgumentParser('shellstreaming `WorkerServerService` launcher')
 
     parser.add_argument(
+        '--port',
+        required=True, type=int,
+        help='TCP port number to launch this worker')
+    parser.add_argument(
         '--config', '-c',
         required=True,
         help='Configuration file')
@@ -91,4 +102,4 @@ def _parse_args():
 
 if __name__ == '__main__':
     args = _parse_args()
-    sys.exit(main(cnfpath=args.config))
+    sys.exit(main(args.port, args.config))

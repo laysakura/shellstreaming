@@ -9,7 +9,19 @@
 
 # information master passes. used especially for worker local scheduling
 WORKER_ID = None
-"""Worker's id. Only :func:`exposd_set_worker_id` modifies this"""
+"""Worker's id. Got from config file's hostname.
+Only :func:`exposd_set_worker_id` modifies this
+
+.. code-block:: python
+    (<worker hostname>, <worker port number>)
+"""
+
+WORKER_NUM_DICT = {}
+"""Provides integer unique number for each worker.
+
+{worker_id: worker_num, ...}
+Only :func:`exposd_set_worker_num_dict` modifies this
+"""
 
 JOB_GRAPH = None
 """Job graph to refer. Only :func:`exposd_reg_job_graph` modifies this"""
@@ -20,14 +32,12 @@ ASSIGNED_JOBS = []
 QUEUE_GROUPS = {}
 """{edge_id: QueueGroup()} structure. Only :func:`exposd_update_queue_groups` modifies this"""
 
-BLOCKED_BY_MASTER = False
-"""True only when master starts `stop the world` for changing job scheduling.
-Only :func:`exposd_block` & :func:`exposd_unblock` modifies this"""
+IN_QUEUE_SELECTION_MODULE = None
+"""Module that include select_remote_worker_to_pop() function """
 
 # for communicating information with master
 finished_jobs = []
-"""Jobs which are assigned by master and finished.
-Here `finish` means input queue has pass `None`.
+"""Jobs whose instance is finished.
 """
 
 # data only worker reads/updates
@@ -36,23 +46,20 @@ conn_pool = {}
 
 .. code-block:: python
     {
-        '<worker id>': <rpyc.connection object>,
+        (<worker hostname>, <worker port number>): <rpyc.connection object>,
         ...
     }
 """
 
-job_instances = {}
-"""Jobs' instances
+job_instance = {}
+"""Jobs' instance
 
 .. code-block:: python
     {
-        '<job id>': [<job instance>, ...],
+        '<job id>': <job instance>,
         ...
     }
 """
-
-ack_blocked = False
-"""True when worker has finished blocking asked by worker"""
 
 # for communicating with other workers
 local_queues = {}

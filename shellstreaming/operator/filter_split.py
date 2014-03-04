@@ -6,7 +6,7 @@
     :synopsis: Provides filtering operators with multiple outputs
 """
 from relshell.recorddef import RecordDef
-from relshell.batch import Batch
+from shellstreaming.core.batch import Batch
 from shellstreaming.operator.base import Base
 
 
@@ -34,7 +34,7 @@ class FilterSplit(Base):
                 if edge_id.endswith(cond):
                     self._out_qs[cond] = q
 
-        Base.__init__(self, **kw)
+        Base.__init__(self)
 
     def run(self):
         """Filter batch according to :param:`*conditions`

@@ -14,7 +14,7 @@ from shellstreaming.util.comm import wait_worker_server, kill_worker_server
 
 BASEDIR      = join(abspath(dirname(__file__)), '..', '..', 'shellstreaming')
 SCRIPTPATH   = join(BASEDIR, 'autodeploy', 'auto_deploy.py')
-WORKER_HOSTS = ['localhost']
+WORKER_IDS = ['localhost']
 WORKER_PORT  = int(DEFAULT_CONFIG['worker_port'])
 SSH_PRIV_KEY = join(os.environ['HOME'], '.ssh', 'id_rsa')
 LOG_PATH     = 'test_auto_deploy.txt'  # not created actually
@@ -37,7 +37,7 @@ def test_deploy():
 
     cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s %(ssh_priv_key)s' % {
         'script'       : SCRIPTPATH,
-        'hosts'        : ','.join(WORKER_HOSTS),
+        'hosts'        : ','.join(WORKER_IDS),
         'tasks'        : 'pack deploy:cnfpath=%s' % (cnfpath),
         'ssh_priv_key' : '-i ' + SSH_PRIV_KEY,
     }
@@ -51,7 +51,7 @@ def test_deploy():
 def test_start_worker():
     cmd = 'fab -f %(script)s -H %(hosts)s %(tasks)s %(ssh_priv_key)s' % {
         'script'       : SCRIPTPATH,
-        'hosts'        : ','.join(WORKER_HOSTS),
+        'hosts'        : ','.join(WORKER_IDS),
         'tasks'        : 'start_worker:cnfpath=%s,logpath=%s' % (cnfpath, LOG_PATH),
         'ssh_priv_key' : '-i ' + SSH_PRIV_KEY,
     }
@@ -60,5 +60,5 @@ def test_start_worker():
     exitcode = p.wait()
     ns.eq_(exitcode, 0)
 
-    wait_worker_server(','.join(WORKER_HOSTS), WORKER_PORT)
-    kill_worker_server(','.join(WORKER_HOSTS), WORKER_PORT)
+    wait_worker_server(','.join(WORKER_IDS), WORKER_PORT)
+    kill_worker_server(','.join(WORKER_IDS), WORKER_PORT)

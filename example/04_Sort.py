@@ -11,9 +11,9 @@ NUM_RECORDS = 10000
 
 def main():
     randint_stream = api.IStream(RandInt, 0, 100, max_records=NUM_RECORDS)
-    randint_win = api.Operator(randint_stream, CountWindow, 3, slide_size=3, fixed_to=['cloko000'])
-    sorted_win = api.Operator(randint_win, Sort, 'num')
-    api.OStream(sorted_win, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['cloko000'])
+    randint_win = api.Operator([randint_stream], CountWindow, 3, slide_size=3, fixed_to=['localhost'])
+    sorted_win = api.Operator([randint_win], Sort, 'num')
+    api.OStream(sorted_win, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
 
 
 def test():

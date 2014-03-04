@@ -9,7 +9,7 @@
 from collections import deque
 
 # my module
-from relshell.batch import Batch
+from shellstreaming.core.batch import Batch
 from shellstreaming.operator.base import Base
 
 
@@ -42,7 +42,7 @@ class CountWindow(Base):  # [todo] - inherit common `Window` class?
         assert(len(out_qs) == 1)
         self._out_q = out_qs.values()[0]
 
-        Base.__init__(self, **kw)
+        Base.__init__(self)
 
     def run(self):
         """"""

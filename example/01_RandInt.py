@@ -5,11 +5,12 @@ from shellstreaming.ostream import LocalFile
 
 
 OUTPUT_FILE = '/tmp/01_RandInt.txt'
+NUM_RECORDS = 100000
 
 
 def main():
-    randint_stream = api.IStream(RandInt, 0, 100, sleep_sec=1e-8, max_records=1000)
-    api.OStream(randint_stream, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['cloko000'])
+    randint_stream = api.IStream(RandInt, 0, 100, sleep_sec=1e-8, max_records=NUM_RECORDS)
+    api.OStream(randint_stream, LocalFile, OUTPUT_FILE, output_format='json', fixed_to=['localhost'])
 
 
 def test():
@@ -19,4 +20,4 @@ def test():
         for i, line in enumerate(f):
             record = json.loads(line)
             assert(0 <= int(record['num']) <= 100)
-        assert(i + 1 == 1000)
+        assert(i + 1 == NUM_RECORDS)

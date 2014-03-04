@@ -1,8 +1,14 @@
 shellstreaming API Reference
 ============================
 
-InputStream
------------
+:doc:`tutorial`
+---------------
+
+Tutorial for getting started with shellstreaming.
+
+
+:doc:`api/inputstream`
+----------------------
 .. toctree::
    :maxdepth: 1
    :hidden:

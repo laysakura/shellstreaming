@@ -16,11 +16,12 @@ def update_instances():
     """Execute, wait job instance thread.
     """
     logger = logging.getLogger('TerminalLogger')
+    prev_job_instance = ws.job_instance.copy()  # used to check if any instance is newly finished/started
 
     # instanciate newly-registered jobs
     for job_id in set(ws.ASSIGNED_JOBS) - set(ws.finished_jobs):
         # launch not-yet-instanciated job
-        if job_id not in ws.job_instances or ws.job_instances[job_id] == []:
+        if job_id not in ws.job_instance:
             job_attr = ws.JOB_GRAPH.node[job_id]
             job_type, job_class = (job_attr['type'], job_attr['class'])
             job_args, job_kw    = (job_attr['args'], job_attr['kwargs'])
@@ -50,4 +51,7 @@ def update_instances():
                     output_queues={edge: ws.local_queues[edge] for edge in out_edges},
                     **job_kw)
             # register launced job
-            ws.job_instances[job_id] = [job_instance]
+            ws.job_instance[job_id] = job_instance
+
+    if ws.job_instance != prev_job_instance:
+        logger.debug('Updated job instance: %s' % (ws.job_instance))

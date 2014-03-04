@@ -11,7 +11,7 @@ TEST_FILE = join(abspath(dirname(__file__)), '..', 'data', 'istream_textfile_inp
 def test_textfile_usage():
     n_batches = n_records = 0
     q       = BatchQueue()
-    istream = TextFile(TEST_FILE, output_queue=q, batch_span_ms=20)
+    istream = TextFile(TEST_FILE, output_queue=q)
 
     # consume batches
     while True:

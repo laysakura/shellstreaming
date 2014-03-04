@@ -12,20 +12,15 @@ from shellstreaming.util.decorator import abstractstatic
 class Base(BaseJob):
     """Base class for operators"""
 
-    def __init__(self, input_queues, output_queues):
+    def __init__(self):
         """Constructor
-
-        :param input_queues:  queue to pop input batches
-        :param output_queues: queue to push output batches
-        :type input_queues: {<StreamEdge id>: <BatchQueue instance>, ...}
-        :type output_queues: same as :param:`input_queues`
         """
         BaseJob.__init__(self)
 
-    def interrupt(self):
+    def interrupt(self, output_queues):
         """API to safely kill data-fetching thread.
         """
-        self._batch_q.push(None)  # producer has end data-fetching
+        map(lambda q: q.push(None), output_queues)
         BaseJob.interrupt(self)
 
     @abstractstatic
