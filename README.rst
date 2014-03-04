@@ -11,7 +11,7 @@ A stream processor working with shell commands
 Tutorial
 --------
 
-See http://packages.python.org/shellstreaming/Tutorial.html
+See http://packages.python.org/shellstreaming/tutorial.html
 
 For developers
 --------------
