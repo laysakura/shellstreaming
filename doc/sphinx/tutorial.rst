@@ -43,7 +43,7 @@ shellstreamingの動作には設定ファイルが必要です。
 .. code-block:: bash
 
     $ cd shellstreaming
-    $ support-files/sample-shellstreaming.cnf $HOME/.shellstreaming.cnf
+    $ cp support-files/sample-shellstreaming.cnf $HOME/.shellstreaming.cnf
 
 では、早速アプリケーションを動かします。
 
