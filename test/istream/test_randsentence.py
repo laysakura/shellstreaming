@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import nose.tools as ns
+import Queue
 from shellstreaming.core.batch_queue import BatchQueue
 from shellstreaming.istream.randsentence import RandSentence
 
@@ -11,7 +12,10 @@ def test_randint_usage():
     # consume batches
     num_records = 0
     while True:
-        batch = q.pop()
+        try:
+            batch = q.pop()
+        except Queue.Empty:
+            continue
         if batch is None:  # producer has end data-fetching
             break
         for record in batch:
