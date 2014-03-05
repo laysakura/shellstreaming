@@ -35,4 +35,5 @@ packages = [
     'shellstreaming.core',
     'shellstreaming.util',
     'shellstreaming.autodeploy',
+    'shellstreaming.api',
 ]
