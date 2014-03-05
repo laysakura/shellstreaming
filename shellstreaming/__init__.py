@@ -8,7 +8,7 @@ from sys import version_info
 
 
 __name__        = 'shellstreaming'
-__version__     = '0.1.0'
+__version__     = '0.1.1'
 __description__ = 'A stream processor working with shell commands'
 
 install_requires = [

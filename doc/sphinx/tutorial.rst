@@ -74,7 +74,7 @@ Run shellstreaming in parallel mode
 shellstreamingは分散ストリーム処理系です。
 複数のノードを用いてアプリケーションを並列動作させてみましょう。
 
-まずは設定ファイルを編集します。
+まずは設定ファイルを編集します(変更箇所のみ抜粋)。
 
 **$HOME/.shellstreaming.cnf**
 
