@@ -82,7 +82,7 @@ shellstreamingは分散ストリーム処理系です。
 
     [shellstreaming]
 
-    worker_hosts = localhost,a.example.com:10000,b.example.com:10000
+    worker_hosts = a.example.com:10000,b.example.com:10000
 
     localhost_debug = no
 
@@ -91,11 +91,28 @@ shellstreamingは分散ストリーム処理系です。
     ssh_private_key = /home/yourname/.ssh/id_rsa
 
 
-この設定では、``localhost`` , ``a.example.com`` , ``b.example.com`` の3台のノードでの並列処理が行われます。
+この設定では、 ``a.example.com`` , ``b.example.com`` の2台のノードでの並列処理が行われます。
 ``10000`` はTCPポート番号で、shellstreaming のワーカプロセスがこのポートでマスターや他ワーカからの接続を待ち受けます。
-``localhost`` にはポート番号が指定されていませんが、デフォルトで18871番がが使用されます。
+ファイアーウォール等の設定にご注意ください。
+また、 ``shellstreaming`` コマンドを発行するノードにマスタープロセスが立ち上がります。
 
-それぞれのノードには、 ``ssh_private_key`` で指定した秘密鍵を用いたSSHログインが可能である必要があります。
+ワーカプロセスが立ち上がるそれぞれのノードには、マスタープロセスが立ち上がるノードからSSHログインが
+可能である必要があります。
+ログイン時には、``ssh_private_key`` で指定した秘密鍵が用いられます。
+
+ここでは、ストリーム処理アプリケーションとして、 ``example/02_FilterSplit.py`` を使用します。
+マシン環境に合わせるために、ソースを以下のように変更してください。
+
+**example/02_FilterSplit.py**
+
+.. code-block:: python
+
+    ...
+    api.OStream(lo_stream, LocalFile, LOW_OUTPUT_FILE,  output_format='json', fixed_to=['a.example.com:10000'])
+    api.OStream(hi_stream, LocalFile, HIGH_OUTPUT_FILE, output_format='json', fixed_to=['a.example.com:10000'])
+    ...
+
+こうすることで、処理結果は ``a.example.com`` に集約されるようになります。
 
 では、実際に簡単なアプリケーションを並列動作させてみましょう。
 
@@ -124,7 +141,7 @@ shellstreamingは分散ストリーム処理系です。
 これが一段落すると、``example/02_FilterSplit.py`` に記述された実際の処理が走ります。
 
 一度SSH経由でコードを送られたノードは、次回以降はそのコードを再利用することができます。
-設定ファイルを ``send_latest_codes_on_start = no`` とすることで、起動時間を抑えることができます。
+設定ファイルを ``send_latest_codes_on_start=no`` とすることで、起動時間を抑えることができます。
 
 ``example/02_FilterSplit.py`` は、最初に0から100までの乱数列を生成し、それが50より小さいかどうかで出力先を
 ``/tmp/02_FilterSplit_lo.txt``, ``/tmp/02_FilterSplit_hi.txt`` の2つに振り分けています。
@@ -133,13 +150,14 @@ shellstreamingは分散ストリーム処理系です。
 Run more realistic applications
 -------------------------------
 
-ここでは、
+ここでは、ストリーム処理系で実際に動作させるようなアプリケーションを取り上げます。
+特に、シェルコマンドを活用した ``shellstreaming`` の強みが発揮されるようなアプリケーションを紹介しています。
 
 
 Log analysis for Apache HTTP Server
 ###################################
 
-Apache HTTP Server, 通称``apache2``のアクセスログを解析するストリームアプリケーションを動作させてみましょう。
+Apache HTTP Server, 通称 ``apache2`` のアクセスログを解析するストリームアプリケーションを動作させてみましょう。
 アプリケーションの動作の詳細は、 http://www.logos.ic.i.u-tokyo.ac.jp/~nakatani/pdf/master_thesis.pdf の3.1節をご覧ください。
 
 ここでは、``a.example.com``, ``b.example.com`` の2台が ``/tmp/access.log`` にアクセスログを所有するものとし、
@@ -173,17 +191,39 @@ Apache HTTP Server, 通称``apache2``のアクセスログを解析するスト�
 
     ...
 
-では、``localhost``においてこのアプリケーションを開始します。
+では、 ``localhost`` においてこのアプリケーションを開始します。
+ただし、 ``a.example.com``, ``b.example.com`` に ``/tmp/access.log`` ファイルを予め作成しておいてください(空でも大丈夫です)。
 
 .. code-block:: bash
 
+    $ (a.example.com) touch /tmp/access.log
+    $ (b.example.com) touch /tmp/access.log
     $ shellstreaming example/51_apache_log_analysis.py
 
 このとき、shellstreaming は ``a.example.com`` と ``b.example.com`` の ``/tmp/access.log`` ファイルを監視し、
 それに対して追記があった場合に、ログの解析処理をします。
 
-試しに、``a.example.com``においてログの追記を行なってみましょう。
+試しに、 ``a.example.com`` においてログの追記を行なってみましょう。
 
 .. code-block:: bash
 
-    $ echo '192.168.100.3 - - [03/01/2014:16:09:00 +0900] "GET / HTTP/1.1" 400 265 "-" "-"' >> /tmp/access.log
+    $ (a.example.com) echo '192.168.100.3 - - [03/01/2014:16:09:00 +0900] "GET / HTTP/1.1" 400 265 "-" "-"' >> /tmp/access.log
+
+この追記されたログの集計結果は、 ``c.example.com`` の ``/tmp/51_apache_log_analysis_daily.txt`` と
+``/tmp/51_apache_log_analysis_statuscode.txt`` にあります。
+集約結果は追記毎に追加されていくので、 ``tail`` コマンドで確認しましょう。
+
+.. code-block:: bash
+
+    $ (c.example.com) tail -f /tmp/51_apache_log_analysis_daily.txt
+    $ (c.example.com) tail -f /tmp/51_apache_log_analysis_statuscode.txt
+
+更に追記を続けると、集約結果が更新されていくことが分かります。
+
+.. code-block:: bash
+
+    $ (a.example.com) echo '192.168.100.3 - - [03/01/2014:16:09:00 +0900] "GET / HTTP/1.1" 400 265 "-" "-"' >> /tmp/access.log
+    $ (a.example.com) echo '192.168.100.3 - - [01/01/2014:16:09:00 +0900] "GET / HTTP/1.1" 400 265 "-" "-"' >> /tmp/access.log
+    $ (a.example.com) echo '192.168.100.3 - - [02/01/2014:16:09:00 +0900] "GET / HTTP/1.1" 200 265 "-" "-"' >> /tmp/access.log
+
+``b.example.com`` からも追記をしてみて、複数の(仮想の)Webサーバのログを集計できていることを確認してください。
