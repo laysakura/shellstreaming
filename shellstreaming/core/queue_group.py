@@ -37,43 +37,47 @@ class QueueGroup(object):
 
     def pop(self):
         """Pop batch from (local|remote) queue.
-
-        Blocks while ws.BLOCKED_BY_MASTER flag is True.
-        This is for `stop the world` implementation.
         """
         # pop a batch, or return None when no batch is available
         while True:
-            # only when every candidate worker returns None, this queue returns None
-            if self._workers_to_pop == []:
-                return None
 
-            # return batch from aggregated batch local cache if exists
-            if len(self._batch_local_repo) > 0:
-                batch = self._batch_local_repo.popleft()
-                if batch is None:
-                    self._workers_to_pop.remove(self._last_remote_worker)
-                    continue
+            while True:
+                # only when every candidate worker returns None, this queue returns None
+                if self._workers_to_pop == []:
+                    return None
+
+                # return batch from aggregated batch local cache if exists
+                if len(self._batch_local_repo) > 0:
+                    batch = self._batch_local_repo.popleft()
+                    if batch is None:
+                        self._workers_to_pop.remove(self._last_remote_worker)
+                        continue
+                    else:
+                        return batch
+
+                # select a queue
+                select_func = ws.IN_QUEUE_SELECTION_MODULE.select_remote_worker_to_pop
+                from_worker = select_func(self._edge, self._workers_to_pop)
+                if from_worker == ws.WORKER_ID:  # from local queue
+                    q       = ws.local_queues[self._edge]
+                    q_class = q.__class__.__name__
                 else:
-                    return batch
+                    q       = rpyc_namespace(from_worker).queue_netref(self._edge, self._min_records_in_aggregated_batches)
+                    q_class = q.internal_queue_class()
+                    self._last_remote_worker = from_worker
 
-            # select a queue
-            select_func = ws.IN_QUEUE_SELECTION_MODULE.select_remote_worker_to_pop
-            from_worker = select_func(self._edge, self._workers_to_pop)
-            if from_worker == ws.WORKER_ID:  # from local queue
-                q       = ws.local_queues[self._edge]
-                q_class = q.__class__.__name__
-            else:
-                q       = rpyc_namespace(from_worker).queue_netref(self._edge, self._min_records_in_aggregated_batches)
-                q_class = q.internal_queue_class()
-                self._last_remote_worker = from_worker
-
-            # pop batch from BatchQueue or PartitionedBatchQueue
-            if q_class == 'BatchQueue':
-                batch = q.pop()
-            elif q_class == 'PartitionedBatchQueue':
-                batch = q.pop(pop_from=ws.WORKER_NUM_DICT[ws.WORKER_ID])  # [fix] - partition_key を指定された下流ジョブが fixed_to で部分ワーカ集合を指定していた場合，グローバルなワーカ番号を使うと，例えば3つのキューのキュー#1は使われないのにキュー#4を要求されたり大変なことになる
-            else:
-                assert(False)
+                # pop batch from BatchQueue or PartitionedBatchQueue
+                # if selected queue is Empty at that time, retry pop
+                try:
+                    if q_class == 'BatchQueue':
+                        batch = q.pop()
+                    elif q_class == 'PartitionedBatchQueue':
+                        batch = q.pop(pop_from=ws.WORKER_NUM_DICT[ws.WORKER_ID])  # [fix] - partition_key を指定された下流ジョブが fixed_to で部分ワーカ集合を指定していた場合，グローバルなワーカ番号を使うと，例えば3つのキューのキュー#1は使われないのにキュー#4を要求されたり大変なことになる
+                    else:
+                        assert(False)
+                    break
+                except:  # queue was empty
+                    pass # retry
 
             # batch from remote queue
             if type(batch) == str:

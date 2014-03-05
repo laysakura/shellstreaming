@@ -128,3 +128,62 @@ shellstreamingは分散ストリーム処理系です。
 
 ``example/02_FilterSplit.py`` は、最初に0から100までの乱数列を生成し、それが50より小さいかどうかで出力先を
 ``/tmp/02_FilterSplit_lo.txt``, ``/tmp/02_FilterSplit_hi.txt`` の2つに振り分けています。
+
+
+Run more realistic applications
+-------------------------------
+
+ここでは、
+
+
+Log analysis for Apache HTTP Server
+###################################
+
+Apache HTTP Server, 通称``apache2``のアクセスログを解析するストリームアプリケーションを動作させてみましょう。
+アプリケーションの動作の詳細は、 http://www.logos.ic.i.u-tokyo.ac.jp/~nakatani/pdf/master_thesis.pdf の3.1節をご覧ください。
+
+ここでは、``a.example.com``, ``b.example.com`` の2台が ``/tmp/access.log`` にアクセスログを所有するものとし、
+``c.example.com`` も加えた3台でログ解析を分散処理することとします。
+
+まず、設定ファイルでワーカの設定を確認してください。
+
+.. code-block:: python
+
+    [shellstreaming]
+
+    worker_hosts = a.example.com:10000,b.example.com:10000,c.example.com:10000
+
+次に、ログ解析のためのストリーム処理アプリケーションを作成します。
+といっても、``example/51_apache_log_analysis.py`` でほとんどできているので、あとは多少のパラメータを変更するだけです。
+
+変更箇所は以下のとおりです。
+
+**example/51_apache_log_analysis.py**
+
+.. code-block:: python
+
+    ...
+
+    APACHE_LOG   = '/tmp/access.log'
+    DAILY_ACCESS = '/tmp/51_apache_log_analysis_daily.txt'
+    STATUS_CODES = '/tmp/51_apache_log_analysis_statuscode.txt'
+
+    workers_with_access_log   = ['a.example.com:10000', 'b.example.com:10000']
+    worker_to_collect_results = ['c.example.com:10000']
+
+    ...
+
+では、``localhost``においてこのアプリケーションを開始します。
+
+.. code-block:: bash
+
+    $ shellstreaming example/51_apache_log_analysis.py
+
+このとき、shellstreaming は ``a.example.com`` と ``b.example.com`` の ``/tmp/access.log`` ファイルを監視し、
+それに対して追記があった場合に、ログの解析処理をします。
+
+試しに、``a.example.com``においてログの追記を行なってみましょう。
+
+.. code-block:: bash
+
+    $ echo '192.168.100.3 - - [03/01/2014:16:09:00 +0900] "GET / HTTP/1.1" 400 265 "-" "-"' >> /tmp/access.log

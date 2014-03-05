@@ -7,14 +7,17 @@ from shellstreaming.operator import ShellCmd, ExternalTimeWindow, CopySplit
 from shellstreaming.ostream import LocalFile
 
 
-APACHE_LOG   = join(abspath(dirname(__file__)), '51_apache_log_analysis_access.log')
+APACHE_LOG   = '/tmp/access.log'
 DAILY_ACCESS = '/tmp/51_apache_log_analysis_daily.txt'
 STATUS_CODES = '/tmp/51_apache_log_analysis_statuscode.txt'
+
+workers_with_access_log   = ['cloko020:10000', 'cloko021:10000']
+worker_to_collect_results = ['cloko022:10000']
 
 
 def main():
     log_stream = api.IStream(TextFileTail, APACHE_LOG, read_existing_lines=True,
-                             fixed_to=['localhost'])  # specify nodes where apache log exists
+                             fixed_to=workers_with_access_log)
 
     # filter lines in which '/' is 'GET' accessed
     access_stream = api.Operator(
@@ -63,7 +66,7 @@ def main():
         [ts_access_stream], ExternalTimeWindow,
         timestamp_column='timestamp',
         size_days=4, latest_timestamp=api.Timestamp('2014-01-04 23:59:59'),
-        fixed_to=['localhost'])  # ステートフル．4日間のレコード集合という状態を持つ
+        fixed_to=worker_to_collect_results)  # ステートフル．4日間のレコード集合という状態を持つ
 
     # copy 2 way
     access_win0, access_win1 = api.Operator([access_win], CopySplit, 2)
@@ -99,7 +102,7 @@ def main():
             'date': re.compile(r'\d{4}-\d{2}-\d{2}', re.MULTILINE),
         })
 
-    api.OStream(count_group_by_date, LocalFile, DAILY_ACCESS, output_format='json', fixed_to=['localhost'])
+    api.OStream(count_group_by_date, LocalFile, DAILY_ACCESS, output_format='json', fixed_to=worker_to_collect_results)
 
     ########################################
     # path 2: group by status code
@@ -132,9 +135,9 @@ def main():
             'count'      : re.compile(r'\d+', re.MULTILINE),
             'statuscode' : re.compile(r'\d{3}', re.MULTILINE),
         },
-    fixed_to=['localhost'])
+    fixed_to=worker_to_collect_results)
 
-    api.OStream(count_group_by_statuscode, LocalFile, STATUS_CODES, output_format='json', fixed_to=['localhost'])
+    api.OStream(count_group_by_statuscode, LocalFile, STATUS_CODES, output_format='json', fixed_to=worker_to_collect_results)
 
 
 def test():

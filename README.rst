@@ -8,14 +8,10 @@ A stream processor working with shell commands
 
 .. contents:: :local:
 
-Installation
-############
+Tutorial
+--------
 
-.. code-block:: bash
-
-    $ pip install virtualenv shellstreaming
-    $ vim ~/.shellstreaming.cnf
-
+See http://packages.python.org/shellstreaming/tutorial.html
 
 For developers
 --------------
