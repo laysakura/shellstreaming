@@ -19,9 +19,6 @@ def main():
     log_stream = api.IStream(TextFileTail, APACHE_LOG, read_existing_lines=True,
                              fixed_to=workers_with_access_log)
 
-    api.OStream(log_stream, LocalFile, '/tmp/debug.txt', output_format='json', fixed_to=worker_to_collect_results)
-    return
-
     # filter lines in which '/' is 'GET' accessed
     access_stream = api.Operator(
         [log_stream], ShellCmd,
@@ -63,9 +60,6 @@ def main():
             'statuscode' : re.compile(r'(?<=beg-statuscode ).+(?= end-statuscode)', re.MULTILINE),
         },
     )
-
-    api.OStream(ts_access_stream, LocalFile, '/tmp/debug.txt', output_format='json', fixed_to=worker_to_collect_results)
-    return
 
     # make window within 2014/01/01 - 2014/01/04
     access_win = api.Operator(
