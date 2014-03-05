@@ -1,7 +1,7 @@
 Changelog for shellstreaming
 ============================
 
-0.1.1 (unreleased)
+0.1.1 (2014-03-05)
 ------------------
 
 - Adds tutorial
