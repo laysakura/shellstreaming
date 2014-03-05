@@ -72,7 +72,7 @@ def sched_loop(
     def sleep_and_poll_finish():
         t0 = time.time()
         while True:
-            time.sleep(0.1)
+            time.sleep(0.5)
 
             # poll queue status of every worker to check wheter streaming processing has ended
             assert(len(ms.local_queue_placement) > 0)  # at least one local queue is created in main loop
